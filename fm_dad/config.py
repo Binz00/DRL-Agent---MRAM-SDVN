@@ -18,7 +18,7 @@ import logging
 # ---------------------------------------------------------------------------
 # Logging setup — shared across all fm_dad modules
 # ---------------------------------------------------------------------------
-LOG_LEVEL = logging.DEBUG          # Set to logging.INFO to reduce verbosity
+LOG_LEVEL = logging.INFO          # Set to logging.DEBUG for full verbosity
 
 def get_logger(name: str) -> logging.Logger:
     """Return a module-level logger with a consistent format."""
@@ -161,9 +161,9 @@ AGENT_CONFIGS = {
 }
 
 # ---------------------------------------------------------------------------
-# File paths  (relative to the fm_dad/ package root)
+# File paths  (relative to the fm_dad/ working directory)
 # ---------------------------------------------------------------------------
-DATA_DIR   = "data"
+DATA_DIR   = "data/synthetic_data"   # real CSVs live in this subfolder
 MODELS_DIR = "models"
 
 DATA_FILES = {
