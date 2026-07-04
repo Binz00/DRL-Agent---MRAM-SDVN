@@ -160,10 +160,12 @@ def compute_reward_sp(
     r_fp  (Eq. 3.51): 1 if action > a0 AND is_attacker == 0
                         AND rho_recv < rho_recv_low (upstream victim), else 0.
 
-    # ASSUMPTION: The spec says "confirmed via dFF > eta_FF". The dFF threshold
-    # check is a preprocessing step already baked into the is_attacker label in
-    # the training CSV. The reward function uses is_attacker directly, consistent
-    # with how the spec treats all other agents.
+    # NOTE: is_attacker is the TRUE ground-truth attacker label.
+    # It is SEPARATE from the dFF > eta_FF detection gate.
+    # The gate decides IF the agent is invoked (all training rows already passed it).
+    # is_attacker decides WHETHER penalizing was correct (r_sec) or a false positive (r_fp).
+    # In synthetic data, some innocent nodes (is_attacker=0) MUST also pass the gate,
+    # to create the false-positive group the agent needs to learn from.
 
     Args:
         action            : Chosen action index a_t ∈ {0..4}.
@@ -269,8 +271,13 @@ def compute_reward_fs(
     """
     Compute reward for the FS (Flow Stretching) agent (Eqs. 3.46, 3.54–3.55).
 
-    r_sec (Eq. 3.54): 1 if action > a0 AND is_attacker == 1
-                        (dFF > eta_FF on Stage-1 flagged path — baked into label).
+    # r_sec (Eq. 3.54): 1 if action > a0 AND is_attacker == 1.
+    # NOTE: is_attacker is the TRUE ground-truth attacker label.
+    # It is SEPARATE from the dFF > eta_FF detection gate.
+    # The gate decides IF the agent is invoked (all training rows already passed it).
+    # is_attacker decides WHETHER penalizing was correct (r_sec) or a false positive (r_fp).
+    # In synthetic data, some innocent nodes (is_attacker=0) MUST also pass the gate,
+    # to create the false-positive group the agent needs to learn from.
     r_fp  (Eq. 3.55): 1 if action > a0 AND is_attacker == 0
                         AND (rho_recv < rho_recv_low OR lambda_t > lambda_high).
 
