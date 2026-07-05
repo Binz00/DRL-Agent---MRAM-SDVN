@@ -1,0 +1,48 @@
+===== SP =====
+rows=20000  nodes=200  attacker_rows=3000 (15.0%)
+  Group 1: nodes= 30  FFc=0.401  dFF=0.373  rho_recv=0.949  tau=0.901  lambda_t=0.2
+  Group 2: nodes= 30  FFc=0.402  dFF=0.373  rho_recv=0.349  tau=1.0  lambda_t=0.2
+  Group 3: nodes=140  FFc=0.95  dFF=0.041  rho_recv=0.949  tau=1.0  lambda_t=0.2
+  CHECK gate feature 'dFF': G1=0.373  G2=0.373  G3=0.041  (G1,G2 should be CLOSE; G3 should differ)
+  CHECK clue feature 'rho_recv': G1=0.949  G2=0.349  (G1,G2 should DIFFER)
+  NaNs: 0   attack_type column present: False
+
+===== ALS =====
+rows=20000  nodes=200  attacker_rows=3000 (15.0%)
+  Group 1: nodes= 30  SpoofDev=0.775  dFF=0.051  tau=0.901  lambda_t=0.251
+  Group 2: nodes= 30  SpoofDev=0.649  dFF=0.05  tau=1.0  lambda_t=0.853
+  Group 3: nodes=140  SpoofDev=0.151  dFF=0.041  tau=1.0  lambda_t=0.249
+  CHECK gate feature 'SpoofDev': G1=0.775  G2=0.649  G3=0.151  (G1,G2 should be CLOSE; G3 should differ)
+  CHECK clue feature 'lambda_t': G1=0.251  G2=0.853  (G1,G2 should DIFFER)
+  NaNs: 0   attack_type column present: False
+
+===== FS =====
+rows=20000  nodes=200  attacker_rows=3000 (15.0%)
+  Group 1: nodes= 30  FFc=0.702  dFF=0.35  DelayInfl=1.65  tau=0.901  lambda_t=0.25  rho_recv=0.949
+  Group 2: nodes= 30  FFc=0.695  dFF=0.35  DelayInfl=1.15  tau=1.0  lambda_t=0.542  rho_recv=0.639
+  Group 3: nodes=140  FFc=0.949  dFF=0.041  DelayInfl=1.0  tau=1.0  lambda_t=0.25  rho_recv=0.949
+  CHECK gate feature 'dFF': G1=0.350  G2=0.350  G3=0.041  (G1,G2 should be CLOSE; G3 should differ)
+  CHECK clue feature 'DelayInfl': G1=1.650  G2=1.150  (G1,G2 should DIFFER)
+  NaNs: 0   attack_type column present: False
+
+===== IGH =====
+rows=20000  nodes=200  attacker_rows=3000 (15.0%)
+  Group 1: nodes= 30  FFc=0.574  dFF=0.176  rho_recv=0.95  d_bar=49.972  tau=0.901  PDRVar=0.132  CoordScore=0.998  lambda_t=0.2
+  Group 2: nodes= 30  FFc=0.399  dFF=0.2  rho_recv=0.69  d_bar=49.982  tau=1.0  PDRVar=0.001  CoordScore=0.273  lambda_t=0.2
+  Group 3: nodes=140  FFc=0.949  dFF=0.012  rho_recv=0.95  d_bar=49.98  tau=1.0  PDRVar=0.001  CoordScore=0.274  lambda_t=0.2
+  CHECK gate feature 'PDRVar': G1=0.132  G2=0.001  G3=0.001  (G1,G2 should be CLOSE; G3 should differ)
+  CHECK clue feature 'CoordScore': G1=0.998  G2=0.273  (G1,G2 should DIFFER)
+  NaNs: 0   attack_type column present: False
+
+===== NOTE ON IGH GATE =====
+IGH is different from SP/ALS/FS. Its detection gate is NOT one single feature.
+It requires TWO features together: high PDRVar AND high CoordScore (report
+Definition 3 / Eq. 3.19-3.22). So the simple one-feature gate check above is
+misleading for IGH. Verified separately:
+  ATTACKER : PDRVar mean=0.132, CoordScore mean=0.998
+  INNOCENT : PDRVar mean=0.001, CoordScore mean=0.274
+  Attacker rows passing BOTH gate conditions: 2877/3000 (96%).
+  (The ~4% that do not pass are early cycles where the window is not yet full.)
+The false-positive victim group (Group 2) has LOW PDRVar (stable dropping) OR
+low rho_recv, so the agent must learn that a low FFc mean alone is NOT proof of
+IGH — only the ON/OFF variance + coordination signature is.
