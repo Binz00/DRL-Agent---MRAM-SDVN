@@ -142,7 +142,7 @@ AGENT_CONFIGS = {
         "eta_coord":  0.50,  # CoordScore detection threshold
         "eta_rho":    0.50,  # rho_recv lower bound (= rho_recv_low)
         # a*(E^IGH) mapping thresholds: E<e1→a1, e1≤E<e2→a2, e2≤E<e3→a3, E≥e3→a4
-        "e1": 0.25, "e2": 0.50, "e3": 0.75,  # placeholders; final via grid search
+        "e1": 0.20, "e2": 0.40, "e3": 0.55,  # calibrated for IGH attacker distribution
     },
 
     # -----------------------------------------------------------------------
@@ -161,7 +161,7 @@ AGENT_CONFIGS = {
         # ---- E^SP severity threshold (graded r_sec, supervisor Issue 1) ----
         # E^SP = normalised dFF excess above eta_dFF.
         "eta_dFF": 0.20,  # dFF detection gate threshold (placeholder; grid search)
-        "e1": 0.25, "e2": 0.50, "e3": 0.75,
+        "e1": 0.10, "e2": 0.20, "e3": 0.30,  # calibrated for SP attacker distribution
     },
 
     # -----------------------------------------------------------------------
@@ -180,7 +180,7 @@ AGENT_CONFIGS = {
         # ---- E^ALS severity threshold (graded r_sec, supervisor Issue 1) ----
         # E^ALS = normalised SpoofDev excess above eta_spoof.
         "eta_spoof": 0.50,  # SpoofDev detection threshold (placeholder; grid search)
-        "e1": 0.25, "e2": 0.50, "e3": 0.75,
+        "e1": 0.20, "e2": 0.40, "e3": 0.60,  # calibrated for ALS attacker distribution
     },
 
     # -----------------------------------------------------------------------
@@ -201,7 +201,7 @@ AGENT_CONFIGS = {
         "eta_dFF":   0.20,  # dFF detection threshold (placeholder; grid search)
         "eta_delay": 1.30,  # DelayInfl detection threshold (spec: attackers > 1.3)
         "delay_max": 2.00,  # upper clamp for DelayInfl normalisation
-        "e1": 0.25, "e2": 0.50, "e3": 0.75,
+        "e1": 0.10, "e2": 0.20, "e3": 0.30,  # calibrated for FS attacker distribution
     },
 }
 
