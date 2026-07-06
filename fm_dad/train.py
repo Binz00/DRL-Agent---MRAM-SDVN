@@ -148,21 +148,37 @@ def compute_reward_for_agent(agent_name: str, action: int, transition: dict, cfg
     rho_recv          = transition["rho_recv"]
     lambda_t          = transition["lambda_t"]
 
+    # Extract features from the state vector s (which contains the exact ordered features)
+    s = transition["s"]
+    features = cfg["features"]
+    feat_map = {feat: float(s[i]) for i, feat in enumerate(features)}
+
     if agent_name == "igh":
+        pdr_var     = feat_map["PDRVar"]
+        coord_score = feat_map["CoordScore"]
+        rho_recv_s  = feat_map["rho_recv"]
         return REWARD_FN_MAP["igh"](
-            action, is_attacker, rho_recv, d_bar_t, PDR_t, blockchain_reject, cfg
+            action, is_attacker, rho_recv_s, pdr_var, coord_score, d_bar_t, PDR_t, blockchain_reject, cfg
         )
     elif agent_name == "sp":
+        dFF        = feat_map["dFF"]
+        rho_recv_s = feat_map["rho_recv"]
         return REWARD_FN_MAP["sp"](
-            action, is_attacker, rho_recv, d_bar_t, PDR_t, blockchain_reject, cfg
+            action, is_attacker, rho_recv_s, dFF, d_bar_t, PDR_t, blockchain_reject, cfg
         )
     elif agent_name == "als":
+        spoof_dev  = feat_map["SpoofDev"]
+        lambda_t_s = feat_map["lambda_t"]
         return REWARD_FN_MAP["als"](
-            action, is_attacker, lambda_t, d_bar_t, PDR_t, blockchain_reject, cfg
+            action, is_attacker, lambda_t_s, spoof_dev, d_bar_t, PDR_t, blockchain_reject, cfg
         )
     elif agent_name == "fs":
+        dFF        = feat_map["dFF"]
+        delay_infl = feat_map["DelayInfl"]
+        lambda_t_s = feat_map["lambda_t"]
+        # Note: rho_recv is from the transition/CSV, not state vector features
         return REWARD_FN_MAP["fs"](
-            action, is_attacker, rho_recv, lambda_t, d_bar_t, PDR_t, blockchain_reject, cfg
+            action, is_attacker, rho_recv, lambda_t_s, dFF, delay_infl, d_bar_t, PDR_t, blockchain_reject, cfg
         )
     else:
         raise ValueError(f"Unknown agent name: {agent_name}")

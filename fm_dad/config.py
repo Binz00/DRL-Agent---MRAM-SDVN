@@ -6,11 +6,30 @@ inside logic files. Final values will be determined via grid search; these are
 placeholder defaults as specified in Sections 4–8 of the report.
 
 Equations referenced:
-  - Agent state vectors: Eqs. 3.41–3.44
-  - Action space:        Eq.  3.45
-  - Reward weights:      Eq.  3.46
-  - Network topology:    Eq.  3.57
-  - Training algorithm:  Eqs. 3.58–3.63 (Algorithm 2)
+  - Agent state vectors:  Eqs. 3.41–3.44
+  - Action space:         Eq.  3.45
+  - Reward weights:       Eq.  3.46
+  - Graded r_sec (E^X):   Supervisor patch (replaces binary Eqs. 3.48/3.50/3.52/3.54)
+  - Network topology:     Eq.  3.57
+  - Training algorithm:   Eqs. 3.58–3.63 (Algorithm 2)
+
+Supervisor review changes (Issue 1):
+  - r_sec^X is now proportional: 1 - |a_t - a*(E^X)| / 4, where E^X ∈ [0,1]
+    measures how strongly the state evidence exceeds the detection threshold.
+  - Each agent config now includes per-feature detection thresholds (eta_*)
+    and action-mapping thresholds e1 < e2 < e3 (subject to grid search).
+
+Supervisor review changes (Issue 2):
+  - eps_per corrected to 0.001 (grid-search range {0.01, 0.001}).
+  - beta_per_init, eps_per, buffer_capacity are all now explicitly documented
+    in the hyperparameter table below.
+
+Supervisor review changes (Issue 3 — verified):
+  - PDRVar computed over fixed window W = 10 for synthetic data.
+    (Dynamic W* per Eq. 3.7 is applied only during real NS-3 preprocessing.)
+  - CoordScore implements the Eq. 3.22 double maximum: max over partner
+    nodes j ≠ i AND lag offsets τ ∈ [1, W] of the normalised cross-correlation
+    of FFc series. Verified consistent with attacker CoordScore ≈ 0.998 in data.
 """
 
 import logging
@@ -52,11 +71,13 @@ SHARED_HP = {
     "n_episodes":     500,       # default episodes (smoke test uses fewer)
 
     # -- Replay buffer (Eqs. 3.59–3.61) --
-    "buffer_capacity": 100_000,
+    # NOTE (Issue 2): beta_per_init, eps_per, and buffer_capacity are in the
+    # simulation-settings hyperparameter table in the report.
+    "buffer_capacity": 100_000,  # B_max; search space {50000, 100000}
     "buffer_min":      1_000,    # min transitions before training starts
-    "alpha_per":       0.6,      # PER priority exponent
-    "beta_per_init":   0.4,      # IS weight exponent initial value (anneals → 1.0)
-    "eps_per":         1e-5,     # small constant to avoid zero priority
+    "alpha_per":       0.6,      # PER priority exponent (α)
+    "beta_per_init":   0.4,      # IS exponent initial value (β), annealed → 1.0
+    "eps_per":         0.001,    # priority floor ε_per; search space {0.01, 0.001}
 
     # -- Huber loss (Eq. 3.62) --
     "delta_huber":     1.0,
@@ -101,6 +122,9 @@ AGENT_CONFIGS = {
     # -----------------------------------------------------------------------
     # IGH — Interleaved Grey Hole agent   (Eq. 3.41, state dim = 8)
     # -----------------------------------------------------------------------
+    # Issue 3 note: PDRVar and CoordScore were computed with W=10 for synthetic
+    # data. CoordScore uses the Eq. 3.22 double maximum over partner nodes j≠i
+    # AND lag offsets τ ∈ [1, W]. Dynamic W* applies to real NS-3 data only.
     "igh": {
         "name":      "igh",
         "features":  ["FFc", "dFF", "rho_recv", "d_bar", "tau",
@@ -112,6 +136,13 @@ AGENT_CONFIGS = {
         "w2": 0.3,   # weight for r_fp
         "w3": 0.2,   # weight for r_qos
         "w4": 0.1,   # weight for r_end
+        # ---- E^IGH severity thresholds (graded r_sec, supervisor Issue 1) ----
+        # E^IGH = mean of normalised PDRVar, CoordScore, rho_recv excesses.
+        "eta_pdrvar": 0.05,  # PDRVar detection threshold (placeholder; grid search)
+        "eta_coord":  0.50,  # CoordScore detection threshold
+        "eta_rho":    0.50,  # rho_recv lower bound (= rho_recv_low)
+        # a*(E^IGH) mapping thresholds: E<e1→a1, e1≤E<e2→a2, e2≤E<e3→a3, E≥e3→a4
+        "e1": 0.25, "e2": 0.50, "e3": 0.75,  # placeholders; final via grid search
     },
 
     # -----------------------------------------------------------------------
@@ -127,6 +158,10 @@ AGENT_CONFIGS = {
         "w2": 0.3,
         "w3": 0.2,
         "w4": 0.1,
+        # ---- E^SP severity threshold (graded r_sec, supervisor Issue 1) ----
+        # E^SP = normalised dFF excess above eta_dFF.
+        "eta_dFF": 0.20,  # dFF detection gate threshold (placeholder; grid search)
+        "e1": 0.25, "e2": 0.50, "e3": 0.75,
     },
 
     # -----------------------------------------------------------------------
@@ -142,6 +177,10 @@ AGENT_CONFIGS = {
         "w2": 0.3,
         "w3": 0.2,
         "w4": 0.1,
+        # ---- E^ALS severity threshold (graded r_sec, supervisor Issue 1) ----
+        # E^ALS = normalised SpoofDev excess above eta_spoof.
+        "eta_spoof": 0.50,  # SpoofDev detection threshold (placeholder; grid search)
+        "e1": 0.25, "e2": 0.50, "e3": 0.75,
     },
 
     # -----------------------------------------------------------------------
@@ -157,6 +196,12 @@ AGENT_CONFIGS = {
         "w2": 0.3,
         "w3": 0.2,
         "w4": 0.1,
+        # ---- E^FS severity thresholds (graded r_sec, supervisor Issue 1) ----
+        # E^FS = mean of normalised dFF excess and DelayInfl excess.
+        "eta_dFF":   0.20,  # dFF detection threshold (placeholder; grid search)
+        "eta_delay": 1.30,  # DelayInfl detection threshold (spec: attackers > 1.3)
+        "delay_max": 2.00,  # upper clamp for DelayInfl normalisation
+        "e1": 0.25, "e2": 0.50, "e3": 0.75,
     },
 }
 
