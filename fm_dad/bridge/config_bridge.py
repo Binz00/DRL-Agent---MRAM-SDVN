@@ -15,6 +15,7 @@ _FM_DAD_DIR = _BRIDGE_DIR.parent                   # fm_dad/
 
 RAW_CSV_FOLDER = str(_FM_DAD_DIR / "data" / "raw_csvs")
 LOG_FILE       = str(_FM_DAD_DIR / "logs" / "bridge.log")
+DELAY_REF_FILE = str(_FM_DAD_DIR / "data" / "raw_csvs" / "delay_reference.csv")
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +101,9 @@ AGG_MEAN = frozenset([
     "Jitter_ms",
     "lambda_t",
     "cpu_overhead_ms",
+    "inbound_ratio",
 ])
+
 
 AGG_MAX = frozenset([
     "ff_deviation",
@@ -122,5 +125,5 @@ DROP_POST_AGG = frozenset([
     "prev_hop_id",
     "mean_pdr_flow",
     "pdr_deviation",
-    "inbound_ratio",
 ])
+
