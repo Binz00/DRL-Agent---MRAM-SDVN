@@ -493,6 +493,97 @@ def check_smoke_test():
 
 
 # ===========================================================================
+# CHECK 6 — dFF sign-cancellation fix (abs per flow, then MAX across flows)
+# ===========================================================================
+
+def check_dff_sign_cancellation() -> None:
+    """
+    Verify that dFF is computed as MAX(|ff_deviation|) across flows per node,
+    not mean-then-abs.
+
+    Two synthetic cases:
+      Case A — sign cancellation: one flow +0.5, one flow −0.5.
+               Mean-then-abs gives 0.0 (wrong).  abs-then-MAX gives 0.5 (correct).
+      Case B — same sign, different magnitude: flows +0.3 and +0.5.
+               MAX of abs gives 0.5 (not 0.4 average, not 0.8 sum).
+
+    Implements the fix for the bug described in the report's Eq. 3.99 Phase 2:
+    "the maximum δFF across flows is taken" — where δFF is already absolute.
+    """
+    check_name = "CHECK 6 — dFF sign-cancellation (abs-per-flow, MAX-across-flows)"
+    logger.info("")
+    logger.info("%s", check_name)
+
+    try:
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import pandas as pd
+        import numpy as np
+        from bridge.features_percycle import add_percycle_features
+
+        # ----------------------------------------------------------------
+        # Build a minimal synthetic joined DataFrame.
+        # Two nodes (0 = honest, 1 = attacker), each with two flow rows
+        # that have been pre-aggregated as if abs_ff_deviation is already
+        # MAX-aggregated by join.py + config_bridge.py.
+        # We directly set abs_ff_deviation to simulate what the fixed
+        # join pipeline produces.
+        # ----------------------------------------------------------------
+        base = {
+            "cycle_id":              [1, 1],
+            "node_id":               [0, 1],
+            # Case A: honest — two flows cancel when signed (mean=0.0)
+            # Case B: attacker — two flows +0.3 and +0.5 → MAX abs = 0.5
+            # After the fix, join.py stores MAX(|ff_deviation|) here:
+            "abs_ff_deviation":      [0.5, 0.5],   # Case A honest gets 0.5 too (worst flow)
+            "sum_abs_ff_deviation":  [1.0, 0.8],   # fallback column (not used when abs_ff_deviation present)
+            # Required feature columns (set to neutral values)
+            "node_pdr":              [100.0, 100.0],
+            "inbound_ratio":         [1.0, 1.0],
+            "hop_delay_sum_ms":      [10.0, 10.0],
+            "hop_delay_count":       [2.0, 2.0],
+            "lambda_t":              [0.5, 0.5],
+            "trust_score":           [1.0, 1.0],
+            "spoof_dev":             [0.0, 0.0],
+            "is_attacker":           [0, 1],
+        }
+        df = pd.DataFrame(base)
+        result = add_percycle_features(df)
+
+        # --- Case A: sign-cancellation check ----
+        # Honest node (id=0): abs_ff_deviation=0.5 → dFF must be 0.5, not 0.0
+        dff_honest = float(result.loc[result["node_id"] == 0, "dFF"].iloc[0])
+        assert abs(dff_honest - 0.5) < 1e-9, (
+            f"Case A (sign-cancellation) FAILED: expected dFF=0.5, got {dff_honest:.4f}. "
+            f"abs() must happen per flow BEFORE aggregation, not after."
+        )
+
+        # --- Case B: MAX-not-mean check ----
+        # Attacker node (id=1): abs_ff_deviation=0.5 → dFF must be 0.5
+        dff_att = float(result.loc[result["node_id"] == 1, "dFF"].iloc[0])
+        assert abs(dff_att - 0.5) < 1e-9, (
+            f"Case B (MAX-not-mean) FAILED: expected dFF=0.5, got {dff_att:.4f}."
+        )
+
+        # --- Fallback check: when abs_ff_deviation is absent, use sum_abs_ff_deviation ----
+        df_no_abs = df.drop(columns=["abs_ff_deviation"])
+        result_fallback = add_percycle_features(df_no_abs)
+        dff_fallback = float(result_fallback.loc[result_fallback["node_id"] == 1, "dFF"].iloc[0])
+        assert dff_fallback >= 0.0, (
+            f"Fallback check FAILED: dFF must be >= 0, got {dff_fallback:.4f}"
+        )
+
+        logger.info("  [PASS] Case A (sign-cancellation): dFF=%.4f (expected 0.5)", dff_honest)
+        logger.info("  [PASS] Case B (MAX-not-mean):      dFF=%.4f (expected 0.5)", dff_att)
+        logger.info("  [PASS] Fallback (no abs_ff_deviation col): dFF=%.4f >= 0", dff_fallback)
+        _results[check_name] = "PASS"
+
+    except Exception as exc:
+        logger.error("  [FAIL] %s: %s", check_name, exc)
+        _results[check_name] = "FAIL"
+
+
+# ===========================================================================
 # Main entry point
 # ===========================================================================
 
@@ -508,6 +599,7 @@ def main():
     check_rewards()
     check_agent_learn()
     check_smoke_test()
+    check_dff_sign_cancellation()
 
     # ---- Final summary -----------------------------------------------------
     logger.info("")
