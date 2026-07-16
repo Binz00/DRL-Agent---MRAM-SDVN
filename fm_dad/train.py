@@ -38,9 +38,12 @@ sys.path.insert(0, os.path.dirname(__file__))
 from config import (
     get_logger,
     SHARED_HP,
+    FINETUNE_HP,
     AGENT_CONFIGS,
     DATA_FILES,
     MODEL_FILES,
+    FINETUNE_MODEL_FILES,
+    FINETUNE_DATA_FILES,
     RANDOM_SEED,
 )
 from agent import DQNAgent
@@ -193,6 +196,7 @@ def train_agent(
     n_episodes:  int     = None,
     smoke_test:  bool    = False,
     csv_path:    str     = None,
+    finetune:    bool    = False,
 ) -> list[float]:
     """
     Run the full offline training loop for one FM-DAD agent (Algorithm 2).
@@ -204,9 +208,11 @@ def train_agent(
 
     Args:
         agent_name : One of 'sp', 'als', 'igh', 'fs'.
-        n_episodes : Number of training episodes. Defaults to SHARED_HP['n_episodes'].
+        n_episodes : Number of training episodes. Defaults to hp['n_episodes'].
         smoke_test : If True, uses minimal settings (5 episodes) for Stage 1 check.
-        csv_path   : Path to CSV. If None, uses default from DATA_FILES.
+        csv_path   : Path to CSV. If None, uses default from DATA_FILES / FINETUNE_DATA_FILES.
+        finetune   : If True, loads pretrained synthetic weights and trains with
+                     FINETUNE_HP on real NS-3 data. Saves to FINETUNE_MODEL_FILES.
 
     Returns:
         list[float]: Per-episode total reward history (for plotting in Stage 3).
@@ -215,7 +221,22 @@ def train_agent(
     """
     set_seeds(RANDOM_SEED)
 
-    hp  = SHARED_HP
+    # Select hyperparameters and paths based on mode
+    if finetune:
+        hp           = FINETUNE_HP
+        data_default = FINETUNE_DATA_FILES[agent_name]
+        model_out    = FINETUNE_MODEL_FILES[agent_name]
+        pretrain_src = MODEL_FILES[agent_name]   # synthetic weights to load
+        logger.info(
+            "=== FINE-TUNE MODE | loading pretrained weights from %s ===",
+            pretrain_src,
+        )
+    else:
+        hp           = SHARED_HP
+        data_default = DATA_FILES[agent_name]
+        model_out    = MODEL_FILES[agent_name]
+        pretrain_src = None
+
     cfg = AGENT_CONFIGS[agent_name]
 
     # Override episodes for smoke test
@@ -227,7 +248,7 @@ def train_agent(
 
     # CSV path
     if csv_path is None:
-        csv_path = DATA_FILES[agent_name]
+        csv_path = data_default
 
     logger.info(
         "=== Starting training | agent=%s, episodes=%d, csv=%s ===",
@@ -246,6 +267,20 @@ def train_agent(
     logger.info("[PIPELINE] Stage 2/4: Initialising agent...")
     agent = DQNAgent(agent_cfg=cfg, hp=hp)
     logger.info("[PIPELINE] Agent initialised: %s", agent_name.upper())
+
+    # Fine-tune: load synthetic-trained weights before training starts
+    if finetune:
+        if not os.path.exists(pretrain_src):
+            raise FileNotFoundError(
+                f"[FINETUNE] Pretrained model not found: {pretrain_src}\n"
+                f"Run standard training first: python train.py --agent {agent_name}"
+            )
+        agent.load(pretrain_src)
+        agent.target_net.load_state_dict(agent.main_net.state_dict())
+        logger.info(
+            "[FINETUNE] Loaded pretrained weights from %s | target net synced",
+            pretrain_src,
+        )
 
     # ---- Training loop (Algorithm 2) ---------------------------------------
     logger.info("[PIPELINE] Stage 3/4: Training loop starting...")
@@ -308,8 +343,9 @@ def train_agent(
 
     # ---- Save model --------------------------------------------------------
     logger.info("[PIPELINE] Stage 4/4: Saving model...")
-    os.makedirs(os.path.dirname(MODEL_FILES[agent_name]), exist_ok=True)
-    agent.save(MODEL_FILES[agent_name])
+    os.makedirs(os.path.dirname(model_out), exist_ok=True)
+    agent.save(model_out)
+    logger.info("Model saved → %s", model_out)
     logger.info("=== Training complete | agent=%s ===", agent_name)
 
     return episode_rewards
@@ -340,13 +376,58 @@ if __name__ == "__main__":
         "--csv", default=None,
         help="Path to training CSV (overrides default from config).",
     )
+    parser.add_argument(
+        "--finetune", action="store_true",
+        help=(
+            "Fine-tune existing synthetic-trained model on real NS-3 data. "
+            "Loads weights from MODEL_FILES[agent], trains with FINETUNE_HP, "
+            "saves to FINETUNE_MODEL_FILES[agent]. "
+            "Do not use --smoke_test together with --finetune."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.finetune and args.smoke_test:
+        parser.error("--finetune and --smoke_test cannot be used together.")
 
     rewards = train_agent(
         agent_name  = args.agent,
         n_episodes  = args.episodes,
         smoke_test  = args.smoke_test,
         csv_path    = args.csv,
+        finetune    = args.finetune,
     )
 
     logger.info("Episode rewards: %s", [round(r, 3) for r in rewards])
+
+    # Plot rewards
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+
+        arr = np.array(rewards, dtype=np.float64)
+        ma = np.full_like(arr, np.nan)
+        window = min(20, len(arr))
+        for i in range(len(arr)):
+            start = max(0, i - window + 1)
+            ma[i] = arr[start : i + 1].mean()
+
+        suffix = "_finetuned_reward.png" if args.finetune else "_reward.png"
+        out_path = os.path.join("models", f"{args.agent}{suffix}")
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(range(1, len(rewards) + 1), rewards, alpha=0.25, color="#5b9bd5", linewidth=0.8, label="Episode reward")
+        ax.plot(range(1, len(rewards) + 1), ma, color="#c00000", linewidth=2.0, label=f"{window}-ep moving avg")
+        mode_str = "Fine-Tuning" if args.finetune else "Training"
+        ax.set_title(f"FM-DAD — {args.agent.upper()} Agent {mode_str} Reward Curve", fontsize=13, fontweight="bold")
+        ax.set_xlabel("Episode")
+        ax.set_ylabel("Total Episode Reward")
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(out_path, dpi=150)
+        plt.close(fig)
+        logger.info("Reward plot saved to %s", out_path)
+    except ImportError:
+        logger.warning("matplotlib not installed, skipping reward plot.")

@@ -138,11 +138,11 @@ AGENT_CONFIGS = {
         "w4": 0.1,   # weight for r_end
         # ---- E^IGH severity thresholds (graded r_sec, supervisor Issue 1) ----
         # E^IGH = mean of normalised PDRVar, CoordScore, rho_recv excesses.
-        "eta_pdrvar": 0.05,  # PDRVar detection threshold (placeholder; grid search)
-        "eta_coord":  0.50,  # CoordScore detection threshold
-        "eta_rho":    0.50,  # rho_recv lower bound (= rho_recv_low)
+        "eta_pdrvar": 0.03,  # PDRVar detection threshold (calibrated by grid search)
+        "eta_coord":  0.30,  # CoordScore detection threshold
+        "eta_rho":    0.30,  # rho_recv lower bound (= rho_recv_low)
         # a*(E^IGH) mapping thresholds: E<e1→a1, e1≤E<e2→a2, e2≤E<e3→a3, E≥e3→a4
-        "e1": 0.20, "e2": 0.40, "e3": 0.55,  # calibrated for IGH attacker distribution
+        "e1": 0.76, "e2": 0.78, "e3": 0.80,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
     },
 
     # -----------------------------------------------------------------------
@@ -160,8 +160,8 @@ AGENT_CONFIGS = {
         "w4": 0.1,
         # ---- E^SP severity threshold (graded r_sec, supervisor Issue 1) ----
         # E^SP = normalised dFF excess above eta_dFF.
-        "eta_dFF": 0.20,  # dFF detection gate threshold (placeholder; grid search)
-        "e1": 0.10, "e2": 0.20, "e3": 0.30,  # calibrated for SP attacker distribution
+        "eta_dFF": 0.65,  # dFF detection gate threshold (calibrated by grid search)
+        "e1": 0.37, "e2": 0.58, "e3": 0.78,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
     },
 
     # -----------------------------------------------------------------------
@@ -179,8 +179,8 @@ AGENT_CONFIGS = {
         "w4": 0.1,
         # ---- E^ALS severity threshold (graded r_sec, supervisor Issue 1) ----
         # E^ALS = normalised SpoofDev excess above eta_spoof.
-        "eta_spoof": 0.50,  # SpoofDev detection threshold (placeholder; grid search)
-        "e1": 0.20, "e2": 0.40, "e3": 0.60,  # calibrated for ALS attacker distribution
+        "eta_spoof": 0.005,  # SpoofDev detection threshold (calibrated by grid search)
+        "e1": 0.42, "e2": 0.61, "e3": 0.81,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
     },
 
     # -----------------------------------------------------------------------
@@ -198,10 +198,10 @@ AGENT_CONFIGS = {
         "w4": 0.1,
         # ---- E^FS severity thresholds (graded r_sec, supervisor Issue 1) ----
         # E^FS = mean of normalised dFF excess and DelayInfl excess.
-        "eta_dFF":   0.20,  # dFF detection threshold (placeholder; grid search)
-        "eta_delay": 1.30,  # DelayInfl detection threshold (spec: attackers > 1.3)
+        "eta_dFF":   0.20,  # dFF detection threshold (calibrated by grid search)
+        "eta_delay": 1.50,  # DelayInfl detection threshold (spec: attackers > 1.3)
         "delay_max": 2.00,  # upper clamp for DelayInfl normalisation
-        "e1": 0.10, "e2": 0.20, "e3": 0.30,  # calibrated for FS attacker distribution
+        "e1": 0.35, "e2": 0.50, "e3": 0.65,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
     },
 }
 
@@ -223,4 +223,40 @@ MODEL_FILES = {
     "als": f"{MODELS_DIR}/als.pt",
     "igh": f"{MODELS_DIR}/igh.pt",
     "fs":  f"{MODELS_DIR}/fs.pt",
+}
+
+# ---------------------------------------------------------------------------
+# Fine-tuning hyperparameters (supervisor instruction: short run, real NS-3 data)
+# Inherits all values from SHARED_HP and overrides only what changes for fine-tuning.
+# Lower lr preserves synthetic knowledge. Low eps0 starts mostly greedy.
+# Short n_episodes per supervisor: "don't overtrain for a long time."
+# ---------------------------------------------------------------------------
+FINETUNE_HP = {
+    **SHARED_HP,              # inherit everything
+    "n_episodes":    100,     # short run — supervisor instruction
+    "lr":            0.0001,  # lower — preserve synthetic-trained weights
+    "eps0":          0.10,    # start mostly greedy — weights already learned
+    "eps_min":       0.02,
+    "eps_decay_frac": 0.50,
+    "beta_per_init": 0.60,    # start closer to full IS correction
+    "buffer_min":    200,     # less data — start training sooner
+}
+
+# Fine-tuned model output paths — separate from synthetic models
+# so original weights are preserved for comparison
+FINETUNE_MODEL_FILES = {
+    "sp":  f"{MODELS_DIR}/sp_finetuned.pt",
+    "als": f"{MODELS_DIR}/als_finetuned.pt",
+    "igh": f"{MODELS_DIR}/igh_finetuned.pt",
+    "fs":  f"{MODELS_DIR}/fs_finetuned.pt",
+}
+
+# Real NS-3 data paths for fine-tuning
+# These CSVs come from the bridge pipeline run on real NS-3 simulation data
+AGENT_INPUTS_DIR = "data/agent_inputs"
+FINETUNE_DATA_FILES = {
+    "sp":  f"{AGENT_INPUTS_DIR}/sp_state.csv",
+    "als": f"{AGENT_INPUTS_DIR}/als_state.csv",
+    "igh": f"{AGENT_INPUTS_DIR}/igh_state.csv",
+    "fs":  f"{AGENT_INPUTS_DIR}/fs_state.csv",
 }

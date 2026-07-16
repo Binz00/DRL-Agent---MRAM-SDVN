@@ -21,7 +21,7 @@ from __future__ import annotations
 from typing import List
 import numpy as np
 import pandas as pd
-from config import get_logger, AGENT_CONFIGS
+from config import get_logger, AGENT_CONFIGS, SHARED_HP
 
 logger = get_logger("data_loader")
 
@@ -73,6 +73,75 @@ def load_transitions(csv_path: str, agent_name: str) -> List[dict]:
     # ---- Read CSV ----------------------------------------------------------
     df = pd.read_csv(csv_path)
     logger.info("[%s] CSV loaded | rows=%d, columns=%s", agent_name, len(df), list(df.columns))
+
+    # ---------------------------------------------------------------------------
+    # Real NS-3 bridge compatibility fixes
+    # The bridge writes slightly different column names and omits some
+    # auxiliary columns that were present in synthetic training CSVs.
+    # All four fixes are grounded in what the bridge actually computes:
+    #   - lambda_t_norm: bridge normalizes raw lambda_t and writes as lambda_t_norm
+    #   - blockchain_reject: not written by NS-3 (mock only) — default 0, r_end = 0
+    #   - PDR_t: FFc = node_pdr/100 is exactly per-node PDR normalized to [0,1]
+    #   - d_bar_t: bridge computes d_bar = hop_delay_sum_ms/hop_delay_count;
+    #              present in IGH/FS CSVs, absent from SP/ALS — use d_ref as neutral
+    #              baseline so r_qos delay term = (d_ref - d_ref)/d_ref = 0
+    # ---------------------------------------------------------------------------
+
+    # Fix 1 — lambda_t_norm → lambda_t
+    # Bridge normalizes raw lambda_t and writes it as lambda_t_norm.
+    # data_loader expects lambda_t. Rename before validation check fires.
+    if "lambda_t_norm" in df.columns and "lambda_t" not in df.columns:
+        df.rename(columns={"lambda_t_norm": "lambda_t"}, inplace=True)
+        logger.info("[%s] Renamed lambda_t_norm → lambda_t", agent_name)
+
+    # Fix 2 — blockchain_reject
+    # Not written by NS-3 (real Fabric chaincode call is still mock).
+    # Default 0 = no rejection. r_end = 0 for all transitions during fine-tuning.
+    # This is honest: blockchain enforcement is not active in current pipeline.
+    if "blockchain_reject" not in df.columns:
+        df["blockchain_reject"] = 0
+        logger.info(
+            "[%s] blockchain_reject missing — defaulted to 0 "
+            "(mock blockchain, r_end = 0 for all transitions)",
+            agent_name,
+        )
+
+    # Fix 3 — PDR_t
+    # FFc = node_pdr/100 is already the per-node PDR normalized to [0,1].
+    # Present in SP/IGH/FS CSVs. ALS CSV does not carry FFc in its state
+    # columns — falls through to 1.0 default (r_qos PDR term = 0, neutral).
+    if "PDR_t" not in df.columns:
+        if "FFc" in df.columns:
+            df["PDR_t"] = df["FFc"]
+            logger.info(
+                "[%s] PDR_t derived from FFc (FFc = node_pdr/100 = per-node PDR)",
+                agent_name,
+            )
+        else:
+            df["PDR_t"] = 1.0
+            logger.info(
+                "[%s] PDR_t defaulted to 1.0 "
+                "(FFc not in %s CSV — r_qos PDR term = 0, neutral)",
+                agent_name, agent_name.upper(),
+            )
+
+    # Fix 4 — d_bar_t
+    # Bridge computes d_bar = hop_delay_sum_ms / hop_delay_count.
+    # Present in IGH and FS CSVs as 'd_bar'.
+    # Absent from SP and ALS CSVs (those agents don't carry hop delay).
+    # When absent, default to SHARED_HP["d_ref"] so that the r_qos delay
+    # term = (d_ref - d_ref) / d_ref = 0 — no artificial QoS distortion.
+    if "d_bar_t" not in df.columns:
+        if "d_bar" in df.columns:
+            df["d_bar_t"] = df["d_bar"]
+            logger.info("[%s] d_bar_t derived from d_bar column", agent_name)
+        else:
+            df["d_bar_t"] = SHARED_HP["d_ref"]
+            logger.info(
+                "[%s] d_bar_t not available — defaulted to d_ref=%.1f "
+                "(r_qos delay term = 0, no QoS distortion introduced)",
+                agent_name, SHARED_HP["d_ref"],
+            )
 
     # Validate required columns
     required = features + ["node_id", "cycle_id", "is_attacker", "blockchain_reject",
