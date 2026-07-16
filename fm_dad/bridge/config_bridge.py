@@ -17,6 +17,8 @@ RAW_CSV_FOLDER = str(_FM_DAD_DIR / "data" / "raw_csvs")
 LOG_FILE       = str(_FM_DAD_DIR / "logs" / "bridge.log")
 DELAY_REF_FILE = str(_FM_DAD_DIR / "data" / "raw_csvs" / "delay_reference.csv")
 
+LAMBDA_REF = 5000.0  # PLACEHOLDER — set from the max lambda_t across a full simulation run once available.
+
 
 # ---------------------------------------------------------------------------
 # File-name patterns — {cycle} is replaced with the integer cycle number
@@ -102,13 +104,32 @@ AGG_MEAN = frozenset([
     "lambda_t",
     "cpu_overhead_ms",
     "inbound_ratio",
+    # sum_abs_ff_deviation: NS-3 pre-summed absolute deviation across flows.
+    # Kept in MEAN as-is (separate review pending for SUM vs MEAN correctness).
+    "sum_abs_ff_deviation",
+    # NOTE: "ff_deviation" (signed) is intentionally NOT listed here.
+    # Aggregating the signed value then taking abs() causes sign cancellation:
+    # a node with one over-forwarding flow (+0.5) and one dropping flow (−0.5)
+    # would produce mean=0.0, completely hiding the attack.
+    # Instead, abs() is applied per flow row in join.py (producing abs_ff_deviation)
+    # and that column is MAX-aggregated below — capturing the worst-case departure
+    # from the committed forwarding plan (report Eq. 3.99, Phase 2 procedure).
 ])
 
 
 AGG_MAX = frozenset([
-    "ff_deviation",
-    "sum_abs_ff_deviation",
-    "detected",           # 1 if any flow flagged this node
+    # abs_ff_deviation: per-flow |ff_deviation|, computed in join.py before
+    # aggregation (see load_cycle() Step 1).  MAX across flows per node gives
+    # the worst-case departure from the committed plan — matching Phase 2 of
+    # the report's SP-DM procedure (Eq. 3.99).
+    "abs_ff_deviation",
+    # NOTE: 'detected' from ff_node_anomaly_scores is intentionally EXCLUDED.
+    # NS-3 sets 'detected' using: sum_abs_ff_deviation_normalized > 0.5
+    # This is the raw forwarding-fraction threshold the supervisor identified as wrong
+    # (Algorithm 3, Stage 2 should use δFF > η_FF, not a raw fraction threshold).
+    # The Python bridge computes its own gate in trigger.py using:
+    #   dFF = abs_ff_deviation > eta_dFF  (correct per-plan deviation, Eq. 3.99)
+    # The NS-3 pre-flag is therefore both wrong and unused — drop it.
 ])
 
 # Columns that are join/routing artifacts — dropped after aggregation
@@ -125,5 +146,25 @@ DROP_POST_AGG = frozenset([
     "prev_hop_id",
     "mean_pdr_flow",
     "pdr_deviation",
+    # 'detected' from ff_node_anomaly_scores: NS-3 pre-flag using wrong threshold
+    # (sum_abs_ff_deviation_normalized > 0.5 instead of δFF > η_FF).
+    # Bridge gate in trigger.py uses dFF = abs(ff_deviation) > eta_dFF instead.
+    "detected",
+    "sum_abs_ff_deviation_normalized",
+    "threshold",
 ])
 
+
+# ---------------------------------------------------------------------------
+# Dynamic window W* selection (Part 3 — windowed features)
+# ---------------------------------------------------------------------------
+# W* candidates: higher lambda_t (more topology change) → shorter window
+WINDOW_CANDIDATES = (10, 15, 20)
+
+# Thresholds on the cycle-wide median lambda_t:
+#   lambda_t >= LAMBDA_W_HIGH  →  W* = 10  (high mobility, short memory)
+#   lambda_t >= LAMBDA_W_MED   →  W* = 15  (moderate mobility)
+#   lambda_t <  LAMBDA_W_MED   →  W* = 20  (low mobility, long memory)
+LAMBDA_W_HIGH = 0.6   # lambda_t_norm >= 0.6 → W* = 10  (high mobility)
+LAMBDA_W_MED  = 0.2   # lambda_t_norm >= 0.2 → W* = 15  (moderate mobility)
+                      # lambda_t_norm <  0.2 → W* = 20  (low mobility)

@@ -9,7 +9,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from bridge.config_bridge import DELAY_REF_FILE
+from bridge.config_bridge import DELAY_REF_FILE, LAMBDA_REF
 
 logger = logging.getLogger("bridge")
 
@@ -59,11 +59,22 @@ def add_percycle_features(df: pd.DataFrame) -> pd.DataFrame:
     # 2. rho_recv = min(inbound_ratio, 1.0) (clipped to [0,1])
     df['rho_recv'] = df['inbound_ratio'].clip(0.0, 1.0)
 
-    # 3. dFF = ff_deviation if present, else sum_abs_ff_deviation (clipped to >= 0)
-    if 'ff_deviation' in df.columns:
-        df['dFF'] = df['ff_deviation'].fillna(df['sum_abs_ff_deviation']).clip(lower=0.0)
+    # 3. dFF = δFF per report Eq. 3.99 — maximum absolute per-flow deviation
+    #         from the committed forwarding plan, aggregated across flows.
+    #
+    # abs_ff_deviation is computed per flow row in join.py (before _aggregate_to_node)
+    # and MAX-aggregated via AGG_MAX in config_bridge.py.  At this point it is
+    # already: (a) absolute-valued, (b) the worst-case flow for this node, and
+    # (c) correctly non-negative — so no further .abs() or aggregation is needed.
+    #
+    # Fallback to sum_abs_ff_deviation for data loaded before this fix was applied.
+    if 'abs_ff_deviation' in df.columns:
+        df['dFF'] = df['abs_ff_deviation'].fillna(
+            df['sum_abs_ff_deviation'].abs()
+        ).clip(lower=0.0)
     else:
-        df['dFF'] = df['sum_abs_ff_deviation'].clip(lower=0.0)
+        # Fallback for older joined data that predates the abs_ff_deviation fix
+        df['dFF'] = df['sum_abs_ff_deviation'].abs().clip(lower=0.0)
 
     # 4. d_bar = hop_delay_sum_ms / hop_delay_count (guard against count <= 0)
     invalid_count = df['hop_delay_count'].isna() | (df['hop_delay_count'] <= 0)
@@ -91,14 +102,25 @@ def add_percycle_features(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("lambda_t missing values: %d before -> %d after (%d filled using cycle median)",
                 lambda_t_missing_before, lambda_t_missing_after, filled_count)
 
+    # 6b. lambda_t_norm = min(lambda_t / LAMBDA_REF, 1.0)  (normalised to 0–1)
+    df['lambda_t_norm'] = (df['lambda_t'] / LAMBDA_REF).clip(upper=1.0)
+
     # 7. tau = trust_score
-    df['tau'] = df['trust_score']
+    if 'trust_score' in df.columns:
+        df['tau'] = df['trust_score']
+    else:
+        df['tau'] = 1.0
 
     # 8. SpoofDev_raw = |reported_metric - neighbor_metric|
-    df['SpoofDev_raw'] = (df['reported_metric'] - df['neighbor_metric']).abs()
+    if 'spoof_dev' in df.columns:
+        df['SpoofDev_raw'] = df['spoof_dev']
+    elif 'reported_metric' in df.columns and 'neighbor_metric' in df.columns:
+        df['SpoofDev_raw'] = (df['reported_metric'] - df['neighbor_metric']).abs()
+    else:
+        df['SpoofDev_raw'] = 0.0
 
     # Log summary statistics of each new feature
-    new_features = ['FFc', 'rho_recv', 'dFF', 'd_bar', 'DelayInfl', 'lambda_t', 'tau', 'SpoofDev_raw']
+    new_features = ['FFc', 'rho_recv', 'dFF', 'd_bar', 'DelayInfl', 'lambda_t', 'lambda_t_norm', 'tau', 'SpoofDev_raw']
     for feat in new_features:
         feat_min = df[feat].min()
         feat_max = df[feat].max()

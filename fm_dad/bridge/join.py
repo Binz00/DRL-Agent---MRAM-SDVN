@@ -88,6 +88,13 @@ def _load_raw(cycle_no: int, file_key: str, folder: str) -> Optional[pd.DataFram
     path = Path(folder) / filename
 
     if not path.exists():
+        if file_key == "als":
+            alt_filename = f"spoof_{cycle_no}.csv"
+            alt_path = Path(folder) / alt_filename
+            if alt_path.exists():
+                df = pd.read_csv(alt_path)
+                logger.info("  [%s] Loaded %d rows  ← %s (using spoof_dev alternative)", file_key, len(df), alt_filename)
+                return df
         logger.warning("  [%s] NOT FOUND: %s", file_key, path.name)
         return None
 
@@ -96,7 +103,7 @@ def _load_raw(cycle_no: int, file_key: str, folder: str) -> Optional[pd.DataFram
     return df
 
 
-def _normalise_columns(df: pd.DataFrame, file_key: str) -> pd.DataFrame:
+def _normalise_columns(df: pd.DataFrame, file_key: str, cycle_no: int) -> pd.DataFrame:
     """
     Normalise cycle_id, node_id, and flow_id column names to standard tokens.
 
@@ -106,16 +113,21 @@ def _normalise_columns(df: pd.DataFrame, file_key: str) -> pd.DataFrame:
     Args:
         df       : Raw DataFrame just read from disk.
         file_key : Key in FILE_PATTERNS identifying which source this is.
+        cycle_no : The cycle number corresponding to this load.
 
     Returns:
         DataFrame with standardised column names (mutated copy).
     """
     df = df.copy()
+    df.columns = df.columns.str.strip()
 
     # cycle_id
     raw_cycle = CYCLE_ID_COL.get(file_key, "cycle_id")
-    if raw_cycle in df.columns and raw_cycle != "cycle_id":
-        df.rename(columns={raw_cycle: "cycle_id"}, inplace=True)
+    if raw_cycle in df.columns:
+        if raw_cycle != "cycle_id":
+            df.rename(columns={raw_cycle: "cycle_id"}, inplace=True)
+    else:
+        df["cycle_id"] = cycle_no
 
     # node_id
     raw_node = NODE_ID_COL.get(file_key)
@@ -241,7 +253,22 @@ def load_cycle(cycle_no: int, folder: str = RAW_CSV_FOLDER) -> pd.DataFrame:
     for key in FILE_PATTERNS:
         df = _load_raw(cycle_no, key, folder)
         if df is not None:
-            raw[key] = _normalise_columns(df, key)
+            df = _normalise_columns(df, key, cycle_no)
+            if key == "off" and "ff_deviation" in df.columns:
+                # Compute abs_ff_deviation PER FLOW ROW, before any aggregation.
+                #
+                # Bug fix: the report's Eq. 3.99 defines δFF as already-absolute.
+                # Phase 2 aggregates across flows via MAX of per-flow |δFF|, NOT
+                # mean-then-abs.  mean-then-abs allows sign cancellation: a node
+                # with one over-forwarding flow (+0.5) and one dropping flow (−0.5)
+                # would produce mean=0, hiding the attack entirely.
+                #
+                # By computing abs() here (before _aggregate_to_node collapses rows),
+                # and routing abs_ff_deviation through AGG_MAX, each node receives
+                # the MAXIMUM absolute per-flow deviation — correctly capturing the
+                # worst-case departure from the committed forwarding plan.
+                df["abs_ff_deviation"] = df["ff_deviation"].abs()
+            raw[key] = df
 
     if not raw:
         logger.warning("Cycle %d: no files found — returning empty DataFrame", cycle_no)
