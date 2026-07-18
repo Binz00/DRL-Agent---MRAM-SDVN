@@ -68,7 +68,10 @@ def add_percycle_features(df: pd.DataFrame) -> pd.DataFrame:
     # (c) correctly non-negative — so no further .abs() or aggregation is needed.
     #
     # Fallback to sum_abs_ff_deviation for data loaded before this fix was applied.
-    if 'abs_ff_deviation' in df.columns:
+    # Temporary change: use sum_abs_ff_deviation_normalized from anomaly file as dFF if available.
+    if 'sum_abs_ff_deviation_normalized' in df.columns:
+        df['dFF'] = df['sum_abs_ff_deviation_normalized'].fillna(0.0).clip(lower=0.0)
+    elif 'abs_ff_deviation' in df.columns:
         df['dFF'] = df['abs_ff_deviation'].fillna(
             df['sum_abs_ff_deviation'].abs()
         ).clip(lower=0.0)

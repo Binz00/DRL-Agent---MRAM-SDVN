@@ -107,6 +107,7 @@ AGG_MEAN = frozenset([
     # sum_abs_ff_deviation: NS-3 pre-summed absolute deviation across flows.
     # Kept in MEAN as-is (separate review pending for SUM vs MEAN correctness).
     "sum_abs_ff_deviation",
+    "sum_abs_ff_deviation_normalized",
     # NOTE: "ff_deviation" (signed) is intentionally NOT listed here.
     # Aggregating the signed value then taking abs() causes sign cancellation:
     # a node with one over-forwarding flow (+0.5) and one dropping flow (−0.5)
@@ -150,7 +151,6 @@ DROP_POST_AGG = frozenset([
     # (sum_abs_ff_deviation_normalized > 0.5 instead of δFF > η_FF).
     # Bridge gate in trigger.py uses dFF = abs(ff_deviation) > eta_dFF instead.
     "detected",
-    "sum_abs_ff_deviation_normalized",
     "threshold",
 ])
 
