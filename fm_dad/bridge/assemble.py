@@ -41,7 +41,7 @@ META_COLS = ["node_id", "cycle_id", "is_attacker"]
 EXTRA_COLS: Dict[str, list] = {
     "sp":  [],
     "als": [],
-    "fs":  ["rho_recv"],   # FS reward needs rho_recv for false-positive check
+    "fs":  ["rho_recv", "hop_excess"],   # hop_excess: gate-only, NOT part of Eq. 3.44 state vector
     "igh": [],
 }
 
@@ -90,7 +90,7 @@ def assemble_agent_tables(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     tables: Dict[str, pd.DataFrame] = {}
 
     for agent, state_feats in AGENT_STATE_FEATURES.items():
-        extras = EXTRA_COLS.get(agent, [])
+        extras = [c for c in EXTRA_COLS.get(agent, []) if c in df_labeled.columns]
 
         # Column order: meta → state features → is_attacker → extras
         cols = ["node_id", "cycle_id"] + state_feats + ["is_attacker"] + extras

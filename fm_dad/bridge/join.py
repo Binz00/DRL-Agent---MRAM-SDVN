@@ -25,6 +25,8 @@ from typing import Optional
 
 import pandas as pd
 
+from bridge.hopcount import compute_hop_excess
+
 from bridge.config_bridge import (
     RAW_CSV_FOLDER,
     LOG_FILE,
@@ -289,6 +291,12 @@ def load_cycle(cycle_no: int, folder: str = RAW_CSV_FOLDER) -> pd.DataFrame:
                 "  [%s] %d rows (already per-node, no aggregation needed)",
                 key, len(raw[key]),
             )
+
+    # --- 3b. Hop-count excess (Eq. 3.23 proxy) — graph-derived, not a raw CSV column ---
+    hop_df = compute_hop_excess(cycle_no, folder)
+    if not hop_df.empty:
+        per_node["hop_excess"] = hop_df
+        logger.info("  [hop_excess] %d rows (graph-derived, per-node)", len(hop_df))
 
     # --- 4. Broadcast per_flow_metrics to nodes via off's flow→node mapping --
     if "flow_metrics" in raw:

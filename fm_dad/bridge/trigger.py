@@ -66,10 +66,10 @@ GATE_CONDITIONS: Dict[str, List[Condition]] = {
         ("SpoofDev", ">", AGENT_CONFIGS["als"]["eta_spoof"]),
     ],
 
-    # FS — Flow Stretching gate (Algorithm 3, delay variant)
-    # DelayInfl > η_delay  (placeholder threshold)
+    # FS — Flow Stretching gate (Eq. 3.23 proxy: hop-count excess)
+    # hop_excess > eta_hop  (placeholder threshold, pending grid search)
     "fs": [
-        ("DelayInfl", ">", AGENT_CONFIGS["fs"]["eta_delay"]),
+        ("hop_excess", ">", AGENT_CONFIGS["fs"]["eta_hop"]),
     ],
 
     # IGH — Inter-flow Greedy Hoarding gate (Algorithm 4 line 9, Definition 3)
@@ -290,7 +290,7 @@ def process_cycle(
         List of result dicts, one per node.
     """
     import pandas as pd
-    from bridge.assemble import AGENT_STATE_FEATURES
+    from bridge.assemble import AGENT_STATE_FEATURES, EXTRA_COLS
 
     all_nodes: set = set()
     cycle_data: Dict[str, "pd.DataFrame"] = {}
@@ -326,6 +326,11 @@ def process_cycle(
             state_feats = AGENT_STATE_FEATURES[name]
             state_vec   = row[state_feats].values.astype(np.float32)
             feat_dict   = {f: row[f] for f in state_feats}
+            # Include gate-only extra cols (e.g. hop_excess) that are NOT
+            # part of the state vector but ARE needed by GATE_CONDITIONS.
+            for c in EXTRA_COLS.get(name, []):
+                if c in cdf.columns:
+                    feat_dict[c] = row[c]
 
             states_by_agent[name]     = state_vec
             feat_dicts_by_agent[name] = feat_dict

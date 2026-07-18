@@ -8,7 +8,9 @@ Usage:
     python3 validate_pipeline.py
 """
 
+import glob
 import math
+import re
 from pathlib import Path
 import pandas as pd
 
@@ -169,15 +171,49 @@ def validate_results() -> None:
     cycle_trust = df[["cycle_id", "node_id", "trust_score_after"]].copy()
 
     # ------------------------------------------------------------------
-    # Step 2 — Read ground truth from cycle 1
+    # Step 2 — Build ground truth as the UNION across all cycle GT files.
+    # SP/ALS/FS sets are static; IGH rotates per cycle (ON/OFF scheduling),
+    # so a node is an attacker if it was an attacker in ANY cycle.
     # ------------------------------------------------------------------
-    gt_file = RAW_CSV_DIR / "node_attack_ground_truth_1.csv"
-    if not gt_file.exists():
-        print(f"[ERROR] Ground truth file not found: {gt_file}")
+    gt_files = sorted(
+        glob.glob(str(RAW_CSV_DIR / "node_attack_ground_truth_*.csv")),
+        key=lambda p: int(re.search(r"_(\d+)\.csv$", p).group(1)),
+    )
+    if not gt_files:
+        print(f"[ERROR] No ground truth files found in {RAW_CSV_DIR}")
         return
 
-    gt_base = pd.read_csv(gt_file)
-    gt_base.columns = gt_base.columns.str.strip()
+    gt_all = pd.concat([pd.read_csv(f) for f in gt_files], ignore_index=True)
+    gt_all.columns = gt_all.columns.str.strip()
+
+    # Union: attacker in any cycle → attacker overall.
+    # attack_type: take the (unique) non-NONE type the node ever held.
+    def _resolve(group):
+        is_att = int(group["is_attacker"].max())
+        if is_att:
+            types = group.loc[group["is_attacker"] == 1, "attack_type"].unique()
+            atype = types[0]  # nodes hold exactly one attack type across cycles
+        else:
+            atype = "NONE"
+        return pd.Series({"is_attacker": is_att, "attack_type": atype})
+
+    gt_base = gt_all.groupby("node_id").apply(_resolve).reset_index()
+
+    # Sanity check: no node should have more than one distinct non-NONE attack_type
+    att_nodes = gt_all[gt_all["is_attacker"] == 1]
+    if not att_nodes.empty:
+        multi_type = (
+            att_nodes.groupby("node_id")["attack_type"]
+            .nunique()
+            .loc[lambda x: x > 1]
+        )
+        if not multi_type.empty:
+            print(f"[WARNING] Nodes with conflicting attack types across cycles: "
+                  f"{multi_type.index.tolist()}")
+
+    print(f"[GT] Union across {len(gt_files)} cycles | "
+          f"attackers={int(gt_base['is_attacker'].sum())} "
+          f"({gt_base[gt_base['is_attacker']==1]['attack_type'].value_counts().to_dict()})")
 
     # Merge min_trust ONCE before grid search.
     # NOTE: do NOT set gt["detected"] here — _evaluate_at_tau does it per tau.

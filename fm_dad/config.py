@@ -200,6 +200,7 @@ AGENT_CONFIGS = {
         # E^FS = mean of normalised dFF excess and DelayInfl excess.
         "eta_dFF":   0.20,  # dFF detection threshold (calibrated by grid search)
         "eta_delay": 1.50,  # DelayInfl detection threshold (spec: attackers > 1.3)
+        "eta_hop":   1,     # hop-count excess gate threshold (placeholder, pending grid search)
         "delay_max": 2.00,  # upper clamp for DelayInfl normalisation
         "e1": 0.35, "e2": 0.50, "e3": 0.65,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
     },
