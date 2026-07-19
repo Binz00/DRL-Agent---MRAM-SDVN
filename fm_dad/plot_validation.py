@@ -85,15 +85,22 @@ def build_per_attack_stats(df_mcc: pd.DataFrame) -> pd.DataFrame:
     """Compute TP/FP/FN/TN and MCC per attack type from node-level CSV."""
     records = []
     attack_types = sorted(df_mcc.loc[df_mcc["is_attacker"] == 1, "attack_type"].unique())
+    honest_mask = df_mcc["is_attacker"] == 0
 
     for atype in attack_types:
         is_target = (df_mcc["is_attacker"] == 1) & (df_mcc["attack_type"] == atype)
         detected  = df_mcc["detected"].astype(bool)
 
-        tp = int(( is_target &  detected).sum())
-        fp = int((~is_target &  detected).sum())
-        fn = int(( is_target & ~detected).sum())
-        tn = int((~is_target & ~detected).sum())
+        # Restrict to target attackers (positives) and honest nodes (negatives).
+        # Exclude attackers of other types from the confusion matrix.
+        relevant = is_target | honest_mask
+        rel_detected = detected[relevant]
+        rel_is_target = is_target[relevant]
+
+        tp = int(( rel_is_target &  rel_detected).sum())
+        fp = int((~rel_is_target &  rel_detected).sum())
+        fn = int(( rel_is_target & ~rel_detected).sum())
+        tn = int((~rel_is_target & ~rel_detected).sum())
         mcc = compute_mcc(tp, fp, fn, tn)
 
         records.append({"attack": atype, "TP": tp, "FP": fp, "FN": fn, "TN": tn, "MCC": mcc})
@@ -270,6 +277,12 @@ def main() -> None:
 
     df_mcc   = load_mcc_data(MCC_CSV)
     df_pen   = load_penalty_data(PEN_CSV)
+
+    global TAU_MIN
+    if "tau_min" in df_mcc.columns:
+        TAU_MIN = float(df_mcc["tau_min"].iloc[0])
+        print(f"[LOAD] Loaded dynamically selected τ_min = {TAU_MIN}")
+
     stats    = build_per_attack_stats(df_mcc)
     cyc_trust = build_cycle_trust(df_pen, df_mcc)
 

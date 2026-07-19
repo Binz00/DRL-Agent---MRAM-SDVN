@@ -283,6 +283,7 @@ def validate_results() -> None:
     out = gt[["node_id", "is_attacker", "attack_type",
               "min_trust_reached", "detected", "classification"]].copy()
     out["min_trust_reached"] = out["min_trust_reached"].round(6)
+    out["tau_min"] = best_tau
 
     out_path = FM_DAD_DIR / "data" / "pipeline_mcc_validation.csv"
     out.to_csv(out_path, index=False)

@@ -28,8 +28,7 @@ GATE_SEARCH_SPACE = {
         "eta_spoof": [0.001, 0.003, 0.005, 0.010, 0.050],
     },
     "fs": {
-        "eta_dFF":   [0.20, 0.35, 0.50, 0.65, 0.80],
-        "eta_delay": [0.80, 1.00, 1.10, 1.30, 1.50],
+        "eta_dff_norm": [0.10, 0.30, 0.50, 0.70, 0.90],
     },
     "igh": {
         "eta_pdrvar": [0.01, 0.03, 0.05, 0.10, 0.15],
@@ -114,19 +113,27 @@ def _patch_gate_conditions(agent_name: str, threshold_overrides: dict):
     Patch trigger.GATE_CONDITIONS for one agent with new threshold values.
     Returns the original conditions for that agent so they can be restored.
     """
-    original = trigger_module.GATE_CONDITIONS[agent_name][:]
-    new_conditions = []
-    for feat, op, thresh in original:
-        # Find if this feature has an override
-        override_key = None
-        for k in threshold_overrides:
-            # Match by threshold name pattern: eta_dFF → dFF, eta_spoof → SpoofDev etc.
-            if feat.lower() in k.lower() or k.lower().replace("eta_","") in feat.lower():
-                override_key = k
-                break
-        new_thresh = threshold_overrides.get(override_key, thresh) if override_key else thresh
-        new_conditions.append((feat, op, new_thresh))
-    trigger_module.GATE_CONDITIONS[agent_name] = new_conditions
+    import copy
+    original = copy.deepcopy(trigger_module.GATE_CONDITIONS[agent_name])
+
+    def patch_list(item_list):
+        new_list = []
+        for item in item_list:
+            if isinstance(item, list):
+                new_list.append(patch_list(item))
+            else:
+                feat, op, thresh = item
+                override_key = None
+                for k in threshold_overrides:
+                    # Match by threshold name pattern: eta_dFF → dFF, eta_spoof → SpoofDev etc.
+                    if feat.lower() in k.lower() or k.lower().replace("eta_","") in feat.lower():
+                        override_key = k
+                        break
+                new_thresh = threshold_overrides.get(override_key, thresh) if override_key else thresh
+                new_list.append((feat, op, new_thresh))
+        return new_list
+
+    trigger_module.GATE_CONDITIONS[agent_name] = patch_list(original)
     return original
 
 def _restore_gate_conditions(agent_name: str, original):
