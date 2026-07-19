@@ -41,7 +41,7 @@ META_COLS = ["node_id", "cycle_id", "is_attacker"]
 EXTRA_COLS: Dict[str, list] = {
     "sp":  [],
     "als": [],
-    "fs":  ["rho_recv", "hop_excess"],   # hop_excess: gate-only, NOT part of Eq. 3.44 state vector
+    "fs":  ["rho_recv", "hop_excess", "node_pdr", "sum_abs_ff_deviation_normalized"],   # hop_excess, node_pdr, sum_abs_ff_deviation_normalized: gate-only, NOT part of Eq. 3.44 state vector
     "igh": [],
 }
 

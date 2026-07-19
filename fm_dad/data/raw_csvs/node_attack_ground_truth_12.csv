@@ -1,11 +1,11 @@
 node_id,is_attacker,attack_type
 0,0,NONE
-1,0,NONE
+1,1,IGH
 2,1,ALS
 3,1,ALS
 4,1,FS
 5,1,SP
-6,0,NONE
+6,1,IGH
 7,0,NONE
 8,0,NONE
 9,1,ALS
@@ -35,9 +35,9 @@ node_id,is_attacker,attack_type
 33,1,ALS
 34,1,SP
 35,0,NONE
-36,0,NONE
+36,1,IGH
 37,1,ALS
-38,0,NONE
+38,1,IGH
 39,0,NONE
 40,1,ALS
 41,1,SP
@@ -74,7 +74,7 @@ node_id,is_attacker,attack_type
 72,1,SP
 73,0,NONE
 74,1,ALS
-75,0,NONE
+75,1,IGH
 76,0,NONE
 77,1,FS
 78,0,NONE
@@ -107,7 +107,7 @@ node_id,is_attacker,attack_type
 105,0,NONE
 106,1,FS
 107,0,NONE
-108,0,NONE
+108,1,IGH
 109,0,NONE
 110,1,ALS
 111,0,NONE
@@ -117,7 +117,7 @@ node_id,is_attacker,attack_type
 115,1,FS
 116,0,NONE
 117,1,ALS
-118,0,NONE
+118,1,IGH
 119,0,NONE
 120,0,NONE
 121,0,NONE
@@ -140,9 +140,9 @@ node_id,is_attacker,attack_type
 138,1,SP
 139,0,NONE
 140,0,NONE
-141,0,NONE
+141,1,IGH
 142,0,NONE
-143,0,NONE
+143,1,IGH
 144,1,FS
 145,1,SP
 146,0,NONE
@@ -154,7 +154,7 @@ node_id,is_attacker,attack_type
 152,1,SP
 153,0,NONE
 154,1,ALS
-155,0,NONE
+155,1,IGH
 156,0,NONE
 157,0,NONE
 158,0,NONE
@@ -187,7 +187,7 @@ node_id,is_attacker,attack_type
 185,0,NONE
 186,0,NONE
 187,1,ALS
-188,0,NONE
+188,1,IGH
 189,0,NONE
 190,0,NONE
 191,0,NONE
@@ -238,7 +238,7 @@ node_id,is_attacker,attack_type
 236,1,SP
 237,0,NONE
 238,0,NONE
-239,0,NONE
+239,1,IGH
 240,0,NONE
 241,0,NONE
 242,0,NONE
@@ -250,7 +250,7 @@ node_id,is_attacker,attack_type
 248,1,FS
 249,1,SP
 250,0,NONE
-251,0,NONE
+251,1,IGH
 252,0,NONE
 253,0,NONE
 254,0,NONE
@@ -260,7 +260,7 @@ node_id,is_attacker,attack_type
 258,0,NONE
 259,0,NONE
 260,0,NONE
-261,0,NONE
+261,1,IGH
 262,1,FS
 263,0,NONE
 264,0,NONE

@@ -1,114 +1,394 @@
-2026-07-15 00:17:55,841 | INFO | [AGGREGATOR] Starting — watching /tmp/ for vanet_raw_ready_N ...
-2026-07-15 00:17:55,843 | INFO | [AGGREGATOR] Ready — waiting for NS-3 sentinels...
-2026-07-15 00:26:10,896 | INFO | =======================================================
-2026-07-15 00:26:10,896 | INFO | [AGGREGATOR] Sentinel detected — cycle 1
-2026-07-15 00:26:11,433 | INFO | [AGGREGATOR] Cycle 1 | All 321 node files ready ✓
-2026-07-15 00:26:11,434 | INFO | Verifying cycle 1...
-2026-07-15 00:26:12,060 | INFO | Cycle 1: cid_flow_rules=QmchP6idbxXXz8kPbRkP... cid_planned_inbound=QmNPJ4uoyWaJWNrNL1qk... hash=d62359d7b54b9068...
-2026-07-15 00:26:12,078 | INFO | Cycle 1: INTACT ✓
-2026-07-15 00:26:12,088 | INFO | [AGGREGATOR] Cycle 1 | Blockchain verification PASSED ✓ | flow_rules=358
-2026-07-15 00:26:12,091 | INFO | [AGGREGATOR] Cycle 1 | verified flow rules saved (358 rows) → /tmp/ai_agent/verified_flow_rules_cycle_1.csv
-2026-07-15 00:26:12,229 | INFO | [AGGREGATOR] Cycle 1 | aggregated 6114 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_1.csv
-2026-07-15 00:26:12,231 | INFO | [AGGREGATOR] Cycle 1 | verified planned inbound saved (214 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_1.csv
-2026-07-15 00:26:12,315 | INFO | [AGGREGATOR] Cycle 1 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:26:12,325 | INFO | [FF-ANALYSIS] Cycle 1 | t=2.0001s | FF computed=134 | nodes detected=32 | zero-inbound nodes=0 | watchers=172
-2026-07-15 00:26:12,326 | INFO | [FF-ANALYSIS] Cycle 1 | → controller_overhear_pool_summary_1.csv, observed_forwarding_fractions_1.csv, ff_node_anomaly_scores_1.csv
-2026-07-15 00:26:12,326 | INFO | [AGGREGATOR] Cycle 1 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_1
-2026-07-15 00:30:02,026 | INFO | =======================================================
-2026-07-15 00:30:02,028 | INFO | [AGGREGATOR] Sentinel detected — cycle 2
-2026-07-15 00:30:02,531 | INFO | [AGGREGATOR] Cycle 2 | All 321 node files ready ✓
-2026-07-15 00:30:02,532 | INFO | Verifying cycle 2...
-2026-07-15 00:30:02,847 | INFO | Cycle 2: cid_flow_rules=Qma1BXdKyseDGrtHMxHv... cid_planned_inbound=QmRj2j8LVrbnewbfys4h... hash=470a5c3812135a05...
-2026-07-15 00:30:02,858 | INFO | Cycle 2: INTACT ✓
-2026-07-15 00:30:02,860 | INFO | [AGGREGATOR] Cycle 2 | Blockchain verification PASSED ✓ | flow_rules=305
-2026-07-15 00:30:02,862 | INFO | [AGGREGATOR] Cycle 2 | verified flow rules saved (305 rows) → /tmp/ai_agent/verified_flow_rules_cycle_2.csv
-2026-07-15 00:30:02,950 | INFO | [AGGREGATOR] Cycle 2 | aggregated 6409 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_2.csv
-2026-07-15 00:30:02,955 | INFO | [AGGREGATOR] Cycle 2 | verified planned inbound saved (159 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_2.csv
-2026-07-15 00:30:03,067 | INFO | [AGGREGATOR] Cycle 2 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:30:03,087 | INFO | [FF-ANALYSIS] Cycle 2 | t=3.0001s | FF computed=126 | nodes detected=23 | zero-inbound nodes=0 | watchers=147
-2026-07-15 00:30:03,088 | INFO | [FF-ANALYSIS] Cycle 2 | → controller_overhear_pool_summary_2.csv, observed_forwarding_fractions_2.csv, ff_node_anomaly_scores_2.csv
-2026-07-15 00:30:03,089 | INFO | [AGGREGATOR] Cycle 2 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_2
-2026-07-15 00:33:32,536 | INFO | =======================================================
-2026-07-15 00:33:32,536 | INFO | [AGGREGATOR] Sentinel detected — cycle 3
-2026-07-15 00:33:33,148 | INFO | [AGGREGATOR] Cycle 3 | All 321 node files ready ✓
-2026-07-15 00:33:33,149 | INFO | Verifying cycle 3...
-2026-07-15 00:33:33,402 | INFO | Cycle 3: cid_flow_rules=QmcH29gUsdn5stNkYCzw... cid_planned_inbound=QmPSE3am91xeTYtbQGVB... hash=e2ec0be17f8a789c...
-2026-07-15 00:33:33,411 | INFO | Cycle 3: INTACT ✓
-2026-07-15 00:33:33,412 | INFO | [AGGREGATOR] Cycle 3 | Blockchain verification PASSED ✓ | flow_rules=342
-2026-07-15 00:33:33,414 | INFO | [AGGREGATOR] Cycle 3 | verified flow rules saved (342 rows) → /tmp/ai_agent/verified_flow_rules_cycle_3.csv
-2026-07-15 00:33:33,464 | INFO | [AGGREGATOR] Cycle 3 | aggregated 5668 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_3.csv
-2026-07-15 00:33:33,465 | INFO | [AGGREGATOR] Cycle 3 | verified planned inbound saved (188 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_3.csv
-2026-07-15 00:33:33,500 | INFO | [AGGREGATOR] Cycle 3 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:33:33,509 | INFO | [FF-ANALYSIS] Cycle 3 | t=4.0001s | FF computed=125 | nodes detected=18 | zero-inbound nodes=0 | watchers=159
-2026-07-15 00:33:33,510 | INFO | [FF-ANALYSIS] Cycle 3 | → controller_overhear_pool_summary_3.csv, observed_forwarding_fractions_3.csv, ff_node_anomaly_scores_3.csv
-2026-07-15 00:33:33,511 | INFO | [AGGREGATOR] Cycle 3 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_3
-2026-07-15 00:39:05,064 | INFO | =======================================================
-2026-07-15 00:39:05,064 | INFO | [AGGREGATOR] Sentinel detected — cycle 4
-2026-07-15 00:39:05,645 | INFO | [AGGREGATOR] Cycle 4 | All 321 node files ready ✓
-2026-07-15 00:39:05,645 | INFO | Verifying cycle 4...
-2026-07-15 00:39:06,111 | INFO | Cycle 4: cid_flow_rules=QmZewoWwsvLozqSz3iYz... cid_planned_inbound=QmaY5XVth1gqzEuNUtn4... hash=67185b702be86256...
-2026-07-15 00:39:06,121 | INFO | Cycle 4: INTACT ✓
-2026-07-15 00:39:06,122 | INFO | [AGGREGATOR] Cycle 4 | Blockchain verification PASSED ✓ | flow_rules=415
-2026-07-15 00:39:06,125 | INFO | [AGGREGATOR] Cycle 4 | verified flow rules saved (415 rows) → /tmp/ai_agent/verified_flow_rules_cycle_4.csv
-2026-07-15 00:39:06,189 | INFO | [AGGREGATOR] Cycle 4 | aggregated 7285 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_4.csv
-2026-07-15 00:39:06,190 | INFO | [AGGREGATOR] Cycle 4 | verified planned inbound saved (242 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_4.csv
-2026-07-15 00:39:06,224 | INFO | [AGGREGATOR] Cycle 4 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:39:06,237 | INFO | [FF-ANALYSIS] Cycle 4 | t=5.0001s | FF computed=107 | nodes detected=17 | zero-inbound nodes=0 | watchers=180
-2026-07-15 00:39:06,237 | INFO | [FF-ANALYSIS] Cycle 4 | → controller_overhear_pool_summary_4.csv, observed_forwarding_fractions_4.csv, ff_node_anomaly_scores_4.csv
-2026-07-15 00:39:06,238 | INFO | [AGGREGATOR] Cycle 4 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_4
-2026-07-15 00:45:15,722 | INFO | =======================================================
-2026-07-15 00:45:15,731 | INFO | [AGGREGATOR] Sentinel detected — cycle 5
-2026-07-15 00:45:16,327 | INFO | [AGGREGATOR] Cycle 5 | All 321 node files ready ✓
-2026-07-15 00:45:16,327 | INFO | Verifying cycle 5...
-2026-07-15 00:45:17,629 | INFO | Cycle 5: cid_flow_rules=QmWLuj7VvCqU9Uwkda9d... cid_planned_inbound=QmPUw2E2sJPXfhye6xW5... hash=f2faf92d2be789d6...
-2026-07-15 00:45:17,640 | INFO | Cycle 5: INTACT ✓
-2026-07-15 00:45:17,641 | INFO | [AGGREGATOR] Cycle 5 | Blockchain verification PASSED ✓ | flow_rules=322
-2026-07-15 00:45:17,643 | INFO | [AGGREGATOR] Cycle 5 | verified flow rules saved (322 rows) → /tmp/ai_agent/verified_flow_rules_cycle_5.csv
-2026-07-15 00:45:17,714 | INFO | [AGGREGATOR] Cycle 5 | aggregated 6896 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_5.csv
-2026-07-15 00:45:17,716 | INFO | [AGGREGATOR] Cycle 5 | verified planned inbound saved (194 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_5.csv
-2026-07-15 00:45:17,771 | INFO | [AGGREGATOR] Cycle 5 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:45:17,787 | INFO | [FF-ANALYSIS] Cycle 5 | t=6.0001s | FF computed=125 | nodes detected=14 | zero-inbound nodes=0 | watchers=156
-2026-07-15 00:45:17,788 | INFO | [FF-ANALYSIS] Cycle 5 | → controller_overhear_pool_summary_5.csv, observed_forwarding_fractions_5.csv, ff_node_anomaly_scores_5.csv
-2026-07-15 00:45:17,789 | INFO | [AGGREGATOR] Cycle 5 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_5
-2026-07-15 00:49:58,016 | INFO | =======================================================
-2026-07-15 00:49:58,019 | INFO | [AGGREGATOR] Sentinel detected — cycle 6
-2026-07-15 00:49:58,574 | INFO | [AGGREGATOR] Cycle 6 | All 321 node files ready ✓
-2026-07-15 00:49:58,574 | INFO | Verifying cycle 6...
-2026-07-15 00:49:59,918 | INFO | Cycle 6: cid_flow_rules=Qmarg6gRSpjXxA74Jhgv... cid_planned_inbound=Qmd8BqWHBDTASra7U3aF... hash=90a9037d4b195db3...
-2026-07-15 00:49:59,936 | INFO | Cycle 6: INTACT ✓
-2026-07-15 00:49:59,937 | INFO | [AGGREGATOR] Cycle 6 | Blockchain verification PASSED ✓ | flow_rules=241
-2026-07-15 00:49:59,938 | INFO | [AGGREGATOR] Cycle 6 | verified flow rules saved (241 rows) → /tmp/ai_agent/verified_flow_rules_cycle_6.csv
-2026-07-15 00:50:00,040 | INFO | [AGGREGATOR] Cycle 6 | aggregated 6317 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_6.csv
-2026-07-15 00:50:00,041 | INFO | [AGGREGATOR] Cycle 6 | verified planned inbound saved (145 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_6.csv
-2026-07-15 00:50:00,101 | INFO | [AGGREGATOR] Cycle 6 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:50:00,111 | INFO | [FF-ANALYSIS] Cycle 6 | t=7.0001s | FF computed=99 | nodes detected=12 | zero-inbound nodes=0 | watchers=111
-2026-07-15 00:50:00,113 | INFO | [FF-ANALYSIS] Cycle 6 | → controller_overhear_pool_summary_6.csv, observed_forwarding_fractions_6.csv, ff_node_anomaly_scores_6.csv
-2026-07-15 00:50:00,113 | INFO | [AGGREGATOR] Cycle 6 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_6
-2026-07-15 00:55:29,181 | INFO | =======================================================
-2026-07-15 00:55:29,186 | INFO | [AGGREGATOR] Sentinel detected — cycle 7
-2026-07-15 00:55:29,688 | INFO | [AGGREGATOR] Cycle 7 | All 321 node files ready ✓
-2026-07-15 00:55:29,688 | INFO | Verifying cycle 7...
-2026-07-15 00:55:29,779 | INFO | Cycle 7: cid_flow_rules=Qmbu3LPvabYhDg96Z6LP... cid_planned_inbound=QmaAisLW3sUwnHkmRdCv... hash=f9ff3be3e5511f5a...
-2026-07-15 00:55:29,791 | INFO | Cycle 7: INTACT ✓
-2026-07-15 00:55:29,791 | INFO | [AGGREGATOR] Cycle 7 | Blockchain verification PASSED ✓ | flow_rules=356
-2026-07-15 00:55:29,794 | INFO | [AGGREGATOR] Cycle 7 | verified flow rules saved (356 rows) → /tmp/ai_agent/verified_flow_rules_cycle_7.csv
-2026-07-15 00:55:29,872 | INFO | [AGGREGATOR] Cycle 7 | aggregated 5177 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_7.csv
-2026-07-15 00:55:29,873 | INFO | [AGGREGATOR] Cycle 7 | verified planned inbound saved (225 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_7.csv
-2026-07-15 00:55:29,935 | INFO | [AGGREGATOR] Cycle 7 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 00:55:29,945 | INFO | [FF-ANALYSIS] Cycle 7 | t=8.0001s | FF computed=118 | nodes detected=26 | zero-inbound nodes=0 | watchers=167
-2026-07-15 00:55:29,946 | INFO | [FF-ANALYSIS] Cycle 7 | → controller_overhear_pool_summary_7.csv, observed_forwarding_fractions_7.csv, ff_node_anomaly_scores_7.csv
-2026-07-15 00:55:29,948 | INFO | [AGGREGATOR] Cycle 7 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_7
-2026-07-15 01:04:31,525 | INFO | =======================================================
-2026-07-15 01:04:31,526 | INFO | [AGGREGATOR] Sentinel detected — cycle 8
-2026-07-15 01:04:32,041 | INFO | [AGGREGATOR] Cycle 8 | All 321 node files ready ✓
-2026-07-15 01:04:32,041 | INFO | Verifying cycle 8...
-2026-07-15 01:04:32,484 | INFO | Cycle 8: cid_flow_rules=QmVj4t84aB1jGf5SuaNM... cid_planned_inbound=QmXmajSPPUB9bwXa1sX7... hash=5569b8e9f33b2172...
-2026-07-15 01:04:32,492 | INFO | Cycle 8: INTACT ✓
-2026-07-15 01:04:32,493 | INFO | [AGGREGATOR] Cycle 8 | Blockchain verification PASSED ✓ | flow_rules=315
-2026-07-15 01:04:32,496 | INFO | [AGGREGATOR] Cycle 8 | verified flow rules saved (315 rows) → /tmp/ai_agent/verified_flow_rules_cycle_8.csv
-2026-07-15 01:04:32,613 | INFO | [AGGREGATOR] Cycle 8 | aggregated 6216 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_8.csv
-2026-07-15 01:04:32,614 | INFO | [AGGREGATOR] Cycle 8 | verified planned inbound saved (177 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_8.csv
-2026-07-15 01:04:32,721 | INFO | [AGGREGATOR] Cycle 8 | cleaned up 321 per-node CSVs + sentinel
-2026-07-15 01:04:32,734 | INFO | [FF-ANALYSIS] Cycle 8 | t=9.0001s | FF computed=101 | nodes detected=19 | zero-inbound nodes=0 | watchers=140
-2026-07-15 01:04:32,736 | INFO | [FF-ANALYSIS] Cycle 8 | → controller_overhear_pool_summary_8.csv, observed_forwarding_fractions_8.csv, ff_node_anomaly_scores_8.csv
-2026-07-15 01:04:32,737 | INFO | [AGGREGATOR] Cycle 8 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_8
+2026-07-17 21:44:10,706 | INFO | [AGGREGATOR] Starting — watching /tmp/ for vanet_raw_ready_N ...
+2026-07-17 21:44:10,707 | INFO | [AGGREGATOR] Ready — waiting for NS-3 sentinels...
+2026-07-17 21:46:20,888 | INFO | =======================================================
+2026-07-17 21:46:20,889 | INFO | [AGGREGATOR] Sentinel detected — cycle 1
+2026-07-17 21:46:21,389 | INFO | [AGGREGATOR] Cycle 1 | All 321 node files ready ✓
+2026-07-17 21:46:21,389 | INFO | Verifying cycle 1...
+2026-07-17 21:46:21,433 | INFO | Cycle 1: cid_flow_rules=QmZ8CZFDb7VC2TyECvGC... cid_planned_inbound=QmaoRABpTg8t3KUcqfYD... hash=ef569dbe9d2afc0b...
+2026-07-17 21:46:21,436 | INFO | Cycle 1: INTACT ✓
+2026-07-17 21:46:21,436 | INFO | [AGGREGATOR] Cycle 1 | Blockchain verification PASSED ✓ | flow_rules=358
+2026-07-17 21:46:21,436 | INFO | [AGGREGATOR] Cycle 1 | verified flow rules saved (358 rows) → /tmp/ai_agent/verified_flow_rules_cycle_1.csv
+2026-07-17 21:46:21,453 | INFO | [AGGREGATOR] Cycle 1 | aggregated 3788 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_1.csv
+2026-07-17 21:46:21,453 | INFO | [AGGREGATOR] Cycle 1 | verified planned inbound saved (216 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_1.csv
+2026-07-17 21:46:21,460 | INFO | [AGGREGATOR] Cycle 1 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:46:21,462 | INFO | [FF-ANALYSIS] Cycle 1 | t=2.0001s | FF computed=71 | nodes detected=16 | zero-inbound nodes=0 | watchers=177
+2026-07-17 21:46:21,462 | INFO | [FF-ANALYSIS] Cycle 1 | → controller_overhear_pool_summary_1.csv, observed_forwarding_fractions_1.csv, ff_node_anomaly_scores_1.csv
+2026-07-17 21:46:21,462 | INFO | [AGGREGATOR] Cycle 1 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_1
+2026-07-17 21:47:16,950 | INFO | =======================================================
+2026-07-17 21:47:16,950 | INFO | [AGGREGATOR] Sentinel detected — cycle 2
+2026-07-17 21:47:17,451 | INFO | [AGGREGATOR] Cycle 2 | All 321 node files ready ✓
+2026-07-17 21:47:17,451 | INFO | Verifying cycle 2...
+2026-07-17 21:47:17,487 | INFO | Cycle 2: cid_flow_rules=QmUpPH3PVJergJA8erNd... cid_planned_inbound=QmWdpYVTY9w7ME5Qgepz... hash=72c78d684297c27c...
+2026-07-17 21:47:17,489 | INFO | Cycle 2: INTACT ✓
+2026-07-17 21:47:17,489 | INFO | [AGGREGATOR] Cycle 2 | Blockchain verification PASSED ✓ | flow_rules=316
+2026-07-17 21:47:17,490 | INFO | [AGGREGATOR] Cycle 2 | verified flow rules saved (316 rows) → /tmp/ai_agent/verified_flow_rules_cycle_2.csv
+2026-07-17 21:47:17,503 | INFO | [AGGREGATOR] Cycle 2 | aggregated 3169 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_2.csv
+2026-07-17 21:47:17,503 | INFO | [AGGREGATOR] Cycle 2 | verified planned inbound saved (163 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_2.csv
+2026-07-17 21:47:17,512 | INFO | [AGGREGATOR] Cycle 2 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:47:17,515 | INFO | [FF-ANALYSIS] Cycle 2 | t=3.0001s | FF computed=57 | nodes detected=14 | zero-inbound nodes=0 | watchers=110
+2026-07-17 21:47:17,515 | INFO | [FF-ANALYSIS] Cycle 2 | → controller_overhear_pool_summary_2.csv, observed_forwarding_fractions_2.csv, ff_node_anomaly_scores_2.csv
+2026-07-17 21:47:17,515 | INFO | [AGGREGATOR] Cycle 2 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_2
+2026-07-17 21:47:44,719 | INFO | =======================================================
+2026-07-17 21:47:44,719 | INFO | [AGGREGATOR] Sentinel detected — cycle 3
+2026-07-17 21:47:45,219 | INFO | [AGGREGATOR] Cycle 3 | All 321 node files ready ✓
+2026-07-17 21:47:45,220 | INFO | Verifying cycle 3...
+2026-07-17 21:47:45,250 | INFO | Cycle 3: cid_flow_rules=Qmar2QhmAhp7Z1o4ac3P... cid_planned_inbound=Qmdud2rBtfXhXQhNL3UN... hash=eb7a182f6a980d64...
+2026-07-17 21:47:45,253 | INFO | Cycle 3: INTACT ✓
+2026-07-17 21:47:45,253 | INFO | [AGGREGATOR] Cycle 3 | Blockchain verification PASSED ✓ | flow_rules=336
+2026-07-17 21:47:45,253 | INFO | [AGGREGATOR] Cycle 3 | verified flow rules saved (336 rows) → /tmp/ai_agent/verified_flow_rules_cycle_3.csv
+2026-07-17 21:47:45,267 | INFO | [AGGREGATOR] Cycle 3 | aggregated 2678 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_3.csv
+2026-07-17 21:47:45,267 | INFO | [AGGREGATOR] Cycle 3 | verified planned inbound saved (173 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_3.csv
+2026-07-17 21:47:45,272 | INFO | [AGGREGATOR] Cycle 3 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:47:45,274 | INFO | [FF-ANALYSIS] Cycle 3 | t=4.0001s | FF computed=54 | nodes detected=6 | zero-inbound nodes=0 | watchers=87
+2026-07-17 21:47:45,274 | INFO | [FF-ANALYSIS] Cycle 3 | → controller_overhear_pool_summary_3.csv, observed_forwarding_fractions_3.csv, ff_node_anomaly_scores_3.csv
+2026-07-17 21:47:45,274 | INFO | [AGGREGATOR] Cycle 3 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_3
+2026-07-17 21:48:16,376 | INFO | =======================================================
+2026-07-17 21:48:16,376 | INFO | [AGGREGATOR] Sentinel detected — cycle 4
+2026-07-17 21:48:16,877 | INFO | [AGGREGATOR] Cycle 4 | All 321 node files ready ✓
+2026-07-17 21:48:16,877 | INFO | Verifying cycle 4...
+2026-07-17 21:48:16,906 | INFO | Cycle 4: cid_flow_rules=QmfQfVuzjwVQ6rhbNAGS... cid_planned_inbound=QmTnsPo5nh7MkS3GvRc9... hash=718a0e35581a1857...
+2026-07-17 21:48:16,910 | INFO | Cycle 4: INTACT ✓
+2026-07-17 21:48:16,910 | INFO | [AGGREGATOR] Cycle 4 | Blockchain verification PASSED ✓ | flow_rules=411
+2026-07-17 21:48:16,911 | INFO | [AGGREGATOR] Cycle 4 | verified flow rules saved (411 rows) → /tmp/ai_agent/verified_flow_rules_cycle_4.csv
+2026-07-17 21:48:16,927 | INFO | [AGGREGATOR] Cycle 4 | aggregated 6907 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_4.csv
+2026-07-17 21:48:16,928 | INFO | [AGGREGATOR] Cycle 4 | verified planned inbound saved (247 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_4.csv
+2026-07-17 21:48:16,933 | INFO | [AGGREGATOR] Cycle 4 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:48:16,936 | INFO | [FF-ANALYSIS] Cycle 4 | t=5.0001s | FF computed=115 | nodes detected=16 | zero-inbound nodes=0 | watchers=189
+2026-07-17 21:48:16,936 | INFO | [FF-ANALYSIS] Cycle 4 | → controller_overhear_pool_summary_4.csv, observed_forwarding_fractions_4.csv, ff_node_anomaly_scores_4.csv
+2026-07-17 21:48:16,936 | INFO | [AGGREGATOR] Cycle 4 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_4
+2026-07-17 21:48:46,126 | INFO | =======================================================
+2026-07-17 21:48:46,126 | INFO | [AGGREGATOR] Sentinel detected — cycle 5
+2026-07-17 21:48:46,627 | INFO | [AGGREGATOR] Cycle 5 | All 321 node files ready ✓
+2026-07-17 21:48:46,627 | INFO | Verifying cycle 5...
+2026-07-17 21:48:46,654 | INFO | Cycle 5: cid_flow_rules=QmYXj47qcy3JTYcy9dCT... cid_planned_inbound=QmbYss4dDx7pS3ZNqv4T... hash=a89da666d5469a95...
+2026-07-17 21:48:46,657 | INFO | Cycle 5: INTACT ✓
+2026-07-17 21:48:46,657 | INFO | [AGGREGATOR] Cycle 5 | Blockchain verification PASSED ✓ | flow_rules=350
+2026-07-17 21:48:46,657 | INFO | [AGGREGATOR] Cycle 5 | verified flow rules saved (350 rows) → /tmp/ai_agent/verified_flow_rules_cycle_5.csv
+2026-07-17 21:48:46,670 | INFO | [AGGREGATOR] Cycle 5 | aggregated 4724 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_5.csv
+2026-07-17 21:48:46,670 | INFO | [AGGREGATOR] Cycle 5 | verified planned inbound saved (201 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_5.csv
+2026-07-17 21:48:46,676 | INFO | [AGGREGATOR] Cycle 5 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:48:46,678 | INFO | [FF-ANALYSIS] Cycle 5 | t=6.0001s | FF computed=106 | nodes detected=16 | zero-inbound nodes=0 | watchers=151
+2026-07-17 21:48:46,678 | INFO | [FF-ANALYSIS] Cycle 5 | → controller_overhear_pool_summary_5.csv, observed_forwarding_fractions_5.csv, ff_node_anomaly_scores_5.csv
+2026-07-17 21:48:46,678 | INFO | [AGGREGATOR] Cycle 5 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_5
+2026-07-17 21:49:13,756 | INFO | =======================================================
+2026-07-17 21:49:13,756 | INFO | [AGGREGATOR] Sentinel detected — cycle 6
+2026-07-17 21:49:14,256 | INFO | [AGGREGATOR] Cycle 6 | All 321 node files ready ✓
+2026-07-17 21:49:14,256 | INFO | Verifying cycle 6...
+2026-07-17 21:49:14,286 | INFO | Cycle 6: cid_flow_rules=QmRYAPZugD2emR1xk2gA... cid_planned_inbound=QmSt2h6oqvLHh6xJVFAE... hash=d2a5e298c4e59c17...
+2026-07-17 21:49:14,288 | INFO | Cycle 6: INTACT ✓
+2026-07-17 21:49:14,288 | INFO | [AGGREGATOR] Cycle 6 | Blockchain verification PASSED ✓ | flow_rules=283
+2026-07-17 21:49:14,288 | INFO | [AGGREGATOR] Cycle 6 | verified flow rules saved (283 rows) → /tmp/ai_agent/verified_flow_rules_cycle_6.csv
+2026-07-17 21:49:14,300 | INFO | [AGGREGATOR] Cycle 6 | aggregated 3543 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_6.csv
+2026-07-17 21:49:14,300 | INFO | [AGGREGATOR] Cycle 6 | verified planned inbound saved (178 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_6.csv
+2026-07-17 21:49:14,305 | INFO | [AGGREGATOR] Cycle 6 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:49:14,307 | INFO | [FF-ANALYSIS] Cycle 6 | t=7.0001s | FF computed=61 | nodes detected=5 | zero-inbound nodes=0 | watchers=77
+2026-07-17 21:49:14,307 | INFO | [FF-ANALYSIS] Cycle 6 | → controller_overhear_pool_summary_6.csv, observed_forwarding_fractions_6.csv, ff_node_anomaly_scores_6.csv
+2026-07-17 21:49:14,307 | INFO | [AGGREGATOR] Cycle 6 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_6
+2026-07-17 21:49:43,769 | INFO | =======================================================
+2026-07-17 21:49:43,769 | INFO | [AGGREGATOR] Sentinel detected — cycle 7
+2026-07-17 21:49:44,269 | INFO | [AGGREGATOR] Cycle 7 | All 321 node files ready ✓
+2026-07-17 21:49:44,270 | INFO | Verifying cycle 7...
+2026-07-17 21:49:44,298 | INFO | Cycle 7: cid_flow_rules=QmWgi7vRNZWL6CQuStVy... cid_planned_inbound=QmR9VNznSwc4Z49WjA8V... hash=4bdd1ec25eb59ee5...
+2026-07-17 21:49:44,301 | INFO | Cycle 7: INTACT ✓
+2026-07-17 21:49:44,301 | INFO | [AGGREGATOR] Cycle 7 | Blockchain verification PASSED ✓ | flow_rules=394
+2026-07-17 21:49:44,301 | INFO | [AGGREGATOR] Cycle 7 | verified flow rules saved (394 rows) → /tmp/ai_agent/verified_flow_rules_cycle_7.csv
+2026-07-17 21:49:44,313 | INFO | [AGGREGATOR] Cycle 7 | aggregated 4357 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_7.csv
+2026-07-17 21:49:44,313 | INFO | [AGGREGATOR] Cycle 7 | verified planned inbound saved (233 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_7.csv
+2026-07-17 21:49:44,318 | INFO | [AGGREGATOR] Cycle 7 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:49:44,321 | INFO | [FF-ANALYSIS] Cycle 7 | t=8.0001s | FF computed=93 | nodes detected=18 | zero-inbound nodes=0 | watchers=135
+2026-07-17 21:49:44,321 | INFO | [FF-ANALYSIS] Cycle 7 | → controller_overhear_pool_summary_7.csv, observed_forwarding_fractions_7.csv, ff_node_anomaly_scores_7.csv
+2026-07-17 21:49:44,321 | INFO | [AGGREGATOR] Cycle 7 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_7
+2026-07-17 21:50:10,750 | INFO | =======================================================
+2026-07-17 21:50:10,750 | INFO | [AGGREGATOR] Sentinel detected — cycle 8
+2026-07-17 21:50:11,251 | INFO | [AGGREGATOR] Cycle 8 | All 321 node files ready ✓
+2026-07-17 21:50:11,251 | INFO | Verifying cycle 8...
+2026-07-17 21:50:11,283 | INFO | Cycle 8: cid_flow_rules=QmSZVbGTPHYDEq4Q7o8Q... cid_planned_inbound=QmR9eWTFjEF8DxDfge4a... hash=6971af6765c7e73e...
+2026-07-17 21:50:11,286 | INFO | Cycle 8: INTACT ✓
+2026-07-17 21:50:11,286 | INFO | [AGGREGATOR] Cycle 8 | Blockchain verification PASSED ✓ | flow_rules=316
+2026-07-17 21:50:11,287 | INFO | [AGGREGATOR] Cycle 8 | verified flow rules saved (316 rows) → /tmp/ai_agent/verified_flow_rules_cycle_8.csv
+2026-07-17 21:50:11,298 | INFO | [AGGREGATOR] Cycle 8 | aggregated 2961 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_8.csv
+2026-07-17 21:50:11,298 | INFO | [AGGREGATOR] Cycle 8 | verified planned inbound saved (171 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_8.csv
+2026-07-17 21:50:11,303 | INFO | [AGGREGATOR] Cycle 8 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:50:11,304 | INFO | [FF-ANALYSIS] Cycle 8 | t=9.0001s | FF computed=45 | nodes detected=11 | zero-inbound nodes=0 | watchers=83
+2026-07-17 21:50:11,304 | INFO | [FF-ANALYSIS] Cycle 8 | → controller_overhear_pool_summary_8.csv, observed_forwarding_fractions_8.csv, ff_node_anomaly_scores_8.csv
+2026-07-17 21:50:11,304 | INFO | [AGGREGATOR] Cycle 8 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_8
+2026-07-17 21:50:40,738 | INFO | =======================================================
+2026-07-17 21:50:40,738 | INFO | [AGGREGATOR] Sentinel detected — cycle 9
+2026-07-17 21:50:41,238 | INFO | [AGGREGATOR] Cycle 9 | All 321 node files ready ✓
+2026-07-17 21:50:41,238 | INFO | Verifying cycle 9...
+2026-07-17 21:50:41,271 | INFO | Cycle 9: cid_flow_rules=QmQq3QuMFBa4fkEfmUpJ... cid_planned_inbound=QmUqAYbXkoAXjUUABLiw... hash=5a956d4316e24eb9...
+2026-07-17 21:50:41,273 | INFO | Cycle 9: INTACT ✓
+2026-07-17 21:50:41,273 | INFO | [AGGREGATOR] Cycle 9 | Blockchain verification PASSED ✓ | flow_rules=302
+2026-07-17 21:50:41,274 | INFO | [AGGREGATOR] Cycle 9 | verified flow rules saved (302 rows) → /tmp/ai_agent/verified_flow_rules_cycle_9.csv
+2026-07-17 21:50:41,288 | INFO | [AGGREGATOR] Cycle 9 | aggregated 3719 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_9.csv
+2026-07-17 21:50:41,288 | INFO | [AGGREGATOR] Cycle 9 | verified planned inbound saved (173 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_9.csv
+2026-07-17 21:50:41,295 | INFO | [AGGREGATOR] Cycle 9 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:50:41,297 | INFO | [FF-ANALYSIS] Cycle 9 | t=10.0001s | FF computed=69 | nodes detected=12 | zero-inbound nodes=0 | watchers=108
+2026-07-17 21:50:41,297 | INFO | [FF-ANALYSIS] Cycle 9 | → controller_overhear_pool_summary_9.csv, observed_forwarding_fractions_9.csv, ff_node_anomaly_scores_9.csv
+2026-07-17 21:50:41,297 | INFO | [AGGREGATOR] Cycle 9 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_9
+2026-07-17 21:51:09,161 | INFO | =======================================================
+2026-07-17 21:51:09,161 | INFO | [AGGREGATOR] Sentinel detected — cycle 10
+2026-07-17 21:51:09,662 | INFO | [AGGREGATOR] Cycle 10 | All 321 node files ready ✓
+2026-07-17 21:51:09,662 | INFO | Verifying cycle 10...
+2026-07-17 21:51:09,698 | INFO | Cycle 10: cid_flow_rules=QmTYabfnwj8fd4XFoiWC... cid_planned_inbound=QmPz9FmfzyhUSpt1UJnG... hash=8a6c7256151d437a...
+2026-07-17 21:51:09,701 | INFO | Cycle 10: INTACT ✓
+2026-07-17 21:51:09,701 | INFO | [AGGREGATOR] Cycle 10 | Blockchain verification PASSED ✓ | flow_rules=347
+2026-07-17 21:51:09,701 | INFO | [AGGREGATOR] Cycle 10 | verified flow rules saved (347 rows) → /tmp/ai_agent/verified_flow_rules_cycle_10.csv
+2026-07-17 21:51:09,715 | INFO | [AGGREGATOR] Cycle 10 | aggregated 2765 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_10.csv
+2026-07-17 21:51:09,715 | INFO | [AGGREGATOR] Cycle 10 | verified planned inbound saved (229 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_10.csv
+2026-07-17 21:51:09,720 | INFO | [AGGREGATOR] Cycle 10 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:51:09,722 | INFO | [FF-ANALYSIS] Cycle 10 | t=11.0001s | FF computed=40 | nodes detected=11 | zero-inbound nodes=0 | watchers=93
+2026-07-17 21:51:09,722 | INFO | [FF-ANALYSIS] Cycle 10 | → controller_overhear_pool_summary_10.csv, observed_forwarding_fractions_10.csv, ff_node_anomaly_scores_10.csv
+2026-07-17 21:51:09,722 | INFO | [AGGREGATOR] Cycle 10 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_10
+2026-07-17 21:51:36,246 | INFO | =======================================================
+2026-07-17 21:51:36,246 | INFO | [AGGREGATOR] Sentinel detected — cycle 11
+2026-07-17 21:51:36,747 | INFO | [AGGREGATOR] Cycle 11 | All 321 node files ready ✓
+2026-07-17 21:51:36,748 | INFO | Verifying cycle 11...
+2026-07-17 21:51:36,781 | INFO | Cycle 11: cid_flow_rules=Qma5xounJEHCrpkvRkCy... cid_planned_inbound=QmU9sfVQh2MKbpk2FcFB... hash=d54fdcbf6003a2e8...
+2026-07-17 21:51:36,785 | INFO | Cycle 11: INTACT ✓
+2026-07-17 21:51:36,785 | INFO | [AGGREGATOR] Cycle 11 | Blockchain verification PASSED ✓ | flow_rules=298
+2026-07-17 21:51:36,785 | INFO | [AGGREGATOR] Cycle 11 | verified flow rules saved (298 rows) → /tmp/ai_agent/verified_flow_rules_cycle_11.csv
+2026-07-17 21:51:36,799 | INFO | [AGGREGATOR] Cycle 11 | aggregated 2856 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_11.csv
+2026-07-17 21:51:36,799 | INFO | [AGGREGATOR] Cycle 11 | verified planned inbound saved (162 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_11.csv
+2026-07-17 21:51:36,804 | INFO | [AGGREGATOR] Cycle 11 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:51:36,805 | INFO | [FF-ANALYSIS] Cycle 11 | t=12.0001s | FF computed=39 | nodes detected=6 | zero-inbound nodes=0 | watchers=46
+2026-07-17 21:51:36,805 | INFO | [FF-ANALYSIS] Cycle 11 | → controller_overhear_pool_summary_11.csv, observed_forwarding_fractions_11.csv, ff_node_anomaly_scores_11.csv
+2026-07-17 21:51:36,805 | INFO | [AGGREGATOR] Cycle 11 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_11
+2026-07-17 21:52:04,962 | INFO | =======================================================
+2026-07-17 21:52:04,962 | INFO | [AGGREGATOR] Sentinel detected — cycle 12
+2026-07-17 21:52:05,463 | INFO | [AGGREGATOR] Cycle 12 | All 321 node files ready ✓
+2026-07-17 21:52:05,463 | INFO | Verifying cycle 12...
+2026-07-17 21:52:05,493 | INFO | Cycle 12: cid_flow_rules=QmRTJWU4TSEC2wnkEUmk... cid_planned_inbound=QmQ8D3oegkJ2nu49Nbvu... hash=26e252a32579c2ec...
+2026-07-17 21:52:05,496 | INFO | Cycle 12: INTACT ✓
+2026-07-17 21:52:05,496 | INFO | [AGGREGATOR] Cycle 12 | Blockchain verification PASSED ✓ | flow_rules=364
+2026-07-17 21:52:05,496 | INFO | [AGGREGATOR] Cycle 12 | verified flow rules saved (364 rows) → /tmp/ai_agent/verified_flow_rules_cycle_12.csv
+2026-07-17 21:52:05,509 | INFO | [AGGREGATOR] Cycle 12 | aggregated 3166 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_12.csv
+2026-07-17 21:52:05,509 | INFO | [AGGREGATOR] Cycle 12 | verified planned inbound saved (212 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_12.csv
+2026-07-17 21:52:05,515 | INFO | [AGGREGATOR] Cycle 12 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:52:05,516 | INFO | [FF-ANALYSIS] Cycle 12 | t=13.0001s | FF computed=60 | nodes detected=6 | zero-inbound nodes=0 | watchers=120
+2026-07-17 21:52:05,516 | INFO | [FF-ANALYSIS] Cycle 12 | → controller_overhear_pool_summary_12.csv, observed_forwarding_fractions_12.csv, ff_node_anomaly_scores_12.csv
+2026-07-17 21:52:05,516 | INFO | [AGGREGATOR] Cycle 12 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_12
+2026-07-17 21:52:35,165 | INFO | =======================================================
+2026-07-17 21:52:35,165 | INFO | [AGGREGATOR] Sentinel detected — cycle 13
+2026-07-17 21:52:35,666 | INFO | [AGGREGATOR] Cycle 13 | All 321 node files ready ✓
+2026-07-17 21:52:35,666 | INFO | Verifying cycle 13...
+2026-07-17 21:52:35,696 | INFO | Cycle 13: cid_flow_rules=QmQykBtezJhiU8BRGY7d... cid_planned_inbound=QmbhEPRGVa1rCz6ehE7J... hash=893b1f2f1472afce...
+2026-07-17 21:52:35,700 | INFO | Cycle 13: INTACT ✓
+2026-07-17 21:52:35,700 | INFO | [AGGREGATOR] Cycle 13 | Blockchain verification PASSED ✓ | flow_rules=435
+2026-07-17 21:52:35,700 | INFO | [AGGREGATOR] Cycle 13 | verified flow rules saved (435 rows) → /tmp/ai_agent/verified_flow_rules_cycle_13.csv
+2026-07-17 21:52:35,717 | INFO | [AGGREGATOR] Cycle 13 | aggregated 3508 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_13.csv
+2026-07-17 21:52:35,717 | INFO | [AGGREGATOR] Cycle 13 | verified planned inbound saved (247 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_13.csv
+2026-07-17 21:52:35,722 | INFO | [AGGREGATOR] Cycle 13 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:52:35,724 | INFO | [FF-ANALYSIS] Cycle 13 | t=14.0001s | FF computed=69 | nodes detected=16 | zero-inbound nodes=0 | watchers=151
+2026-07-17 21:52:35,724 | INFO | [FF-ANALYSIS] Cycle 13 | → controller_overhear_pool_summary_13.csv, observed_forwarding_fractions_13.csv, ff_node_anomaly_scores_13.csv
+2026-07-17 21:52:35,724 | INFO | [AGGREGATOR] Cycle 13 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_13
+2026-07-17 21:53:05,701 | INFO | =======================================================
+2026-07-17 21:53:05,702 | INFO | [AGGREGATOR] Sentinel detected — cycle 14
+2026-07-17 21:53:06,203 | INFO | [AGGREGATOR] Cycle 14 | All 321 node files ready ✓
+2026-07-17 21:53:06,203 | INFO | Verifying cycle 14...
+2026-07-17 21:53:06,233 | INFO | Cycle 14: cid_flow_rules=QmcazSBzjbVkN22Gy5Dc... cid_planned_inbound=QmZ468cxYaxAUQGH5sRk... hash=07a9dc781c94f604...
+2026-07-17 21:53:06,236 | INFO | Cycle 14: INTACT ✓
+2026-07-17 21:53:06,236 | INFO | [AGGREGATOR] Cycle 14 | Blockchain verification PASSED ✓ | flow_rules=291
+2026-07-17 21:53:06,236 | INFO | [AGGREGATOR] Cycle 14 | verified flow rules saved (291 rows) → /tmp/ai_agent/verified_flow_rules_cycle_14.csv
+2026-07-17 21:53:06,256 | INFO | [AGGREGATOR] Cycle 14 | aggregated 3526 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_14.csv
+2026-07-17 21:53:06,256 | INFO | [AGGREGATOR] Cycle 14 | verified planned inbound saved (141 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_14.csv
+2026-07-17 21:53:06,261 | INFO | [AGGREGATOR] Cycle 14 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:53:06,263 | INFO | [FF-ANALYSIS] Cycle 14 | t=15.0001s | FF computed=57 | nodes detected=13 | zero-inbound nodes=0 | watchers=98
+2026-07-17 21:53:06,263 | INFO | [FF-ANALYSIS] Cycle 14 | → controller_overhear_pool_summary_14.csv, observed_forwarding_fractions_14.csv, ff_node_anomaly_scores_14.csv
+2026-07-17 21:53:06,263 | INFO | [AGGREGATOR] Cycle 14 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_14
+2026-07-17 21:53:40,959 | INFO | =======================================================
+2026-07-17 21:53:40,959 | INFO | [AGGREGATOR] Sentinel detected — cycle 15
+2026-07-17 21:53:41,460 | INFO | [AGGREGATOR] Cycle 15 | All 321 node files ready ✓
+2026-07-17 21:53:41,460 | INFO | Verifying cycle 15...
+2026-07-17 21:53:41,488 | INFO | Cycle 15: cid_flow_rules=QmfMKd3SiKEt612KdnLD... cid_planned_inbound=QmYVpeyChDhaRLDX38ZH... hash=7b1eb94bd98a0280...
+2026-07-17 21:53:41,492 | INFO | Cycle 15: INTACT ✓
+2026-07-17 21:53:41,492 | INFO | [AGGREGATOR] Cycle 15 | Blockchain verification PASSED ✓ | flow_rules=462
+2026-07-17 21:53:41,492 | INFO | [AGGREGATOR] Cycle 15 | verified flow rules saved (462 rows) → /tmp/ai_agent/verified_flow_rules_cycle_15.csv
+2026-07-17 21:53:41,507 | INFO | [AGGREGATOR] Cycle 15 | aggregated 7843 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_15.csv
+2026-07-17 21:53:41,507 | INFO | [AGGREGATOR] Cycle 15 | verified planned inbound saved (293 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_15.csv
+2026-07-17 21:53:41,512 | INFO | [AGGREGATOR] Cycle 15 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:53:41,516 | INFO | [FF-ANALYSIS] Cycle 15 | t=16.0001s | FF computed=169 | nodes detected=20 | zero-inbound nodes=0 | watchers=254
+2026-07-17 21:53:41,516 | INFO | [FF-ANALYSIS] Cycle 15 | → controller_overhear_pool_summary_15.csv, observed_forwarding_fractions_15.csv, ff_node_anomaly_scores_15.csv
+2026-07-17 21:53:41,516 | INFO | [AGGREGATOR] Cycle 15 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_15
+2026-07-17 21:54:16,354 | INFO | =======================================================
+2026-07-17 21:54:16,354 | INFO | [AGGREGATOR] Sentinel detected — cycle 16
+2026-07-17 21:54:16,855 | INFO | [AGGREGATOR] Cycle 16 | All 321 node files ready ✓
+2026-07-17 21:54:16,855 | INFO | Verifying cycle 16...
+2026-07-17 21:54:16,887 | INFO | Cycle 16: cid_flow_rules=QmYCQUVWu2Bnjn2nGFS6... cid_planned_inbound=QmWbs5CaTWEHMGBGBn5t... hash=52884525503c41e2...
+2026-07-17 21:54:16,890 | INFO | Cycle 16: INTACT ✓
+2026-07-17 21:54:16,891 | INFO | [AGGREGATOR] Cycle 16 | Blockchain verification PASSED ✓ | flow_rules=344
+2026-07-17 21:54:16,891 | INFO | [AGGREGATOR] Cycle 16 | verified flow rules saved (344 rows) → /tmp/ai_agent/verified_flow_rules_cycle_16.csv
+2026-07-17 21:54:16,909 | INFO | [AGGREGATOR] Cycle 16 | aggregated 8455 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_16.csv
+2026-07-17 21:54:16,909 | INFO | [AGGREGATOR] Cycle 16 | verified planned inbound saved (208 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_16.csv
+2026-07-17 21:54:16,916 | INFO | [AGGREGATOR] Cycle 16 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:54:16,921 | INFO | [FF-ANALYSIS] Cycle 16 | t=17.0001s | FF computed=132 | nodes detected=20 | zero-inbound nodes=0 | watchers=244
+2026-07-17 21:54:16,921 | INFO | [FF-ANALYSIS] Cycle 16 | → controller_overhear_pool_summary_16.csv, observed_forwarding_fractions_16.csv, ff_node_anomaly_scores_16.csv
+2026-07-17 21:54:16,922 | INFO | [AGGREGATOR] Cycle 16 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_16
+2026-07-17 21:54:43,256 | INFO | =======================================================
+2026-07-17 21:54:43,256 | INFO | [AGGREGATOR] Sentinel detected — cycle 17
+2026-07-17 21:54:43,756 | INFO | [AGGREGATOR] Cycle 17 | All 321 node files ready ✓
+2026-07-17 21:54:43,756 | INFO | Verifying cycle 17...
+2026-07-17 21:54:43,783 | INFO | Cycle 17: cid_flow_rules=QmQgJmba9Lkb9y1T5vRk... cid_planned_inbound=QmSdTEzwADVLgYND915E... hash=f32096c49d57b08a...
+2026-07-17 21:54:43,785 | INFO | Cycle 17: INTACT ✓
+2026-07-17 21:54:43,786 | INFO | [AGGREGATOR] Cycle 17 | Blockchain verification PASSED ✓ | flow_rules=126
+2026-07-17 21:54:43,786 | INFO | [AGGREGATOR] Cycle 17 | verified flow rules saved (126 rows) → /tmp/ai_agent/verified_flow_rules_cycle_17.csv
+2026-07-17 21:54:43,800 | INFO | [AGGREGATOR] Cycle 17 | aggregated 1505 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_17.csv
+2026-07-17 21:54:43,800 | INFO | [AGGREGATOR] Cycle 17 | verified planned inbound saved (87 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_17.csv
+2026-07-17 21:54:43,807 | INFO | [AGGREGATOR] Cycle 17 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:54:43,808 | INFO | [FF-ANALYSIS] Cycle 17 | t=18.0001s | FF computed=19 | nodes detected=3 | zero-inbound nodes=0 | watchers=47
+2026-07-17 21:54:43,808 | INFO | [FF-ANALYSIS] Cycle 17 | → controller_overhear_pool_summary_17.csv, observed_forwarding_fractions_17.csv, ff_node_anomaly_scores_17.csv
+2026-07-17 21:54:43,808 | INFO | [AGGREGATOR] Cycle 17 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_17
+2026-07-17 21:55:13,588 | INFO | =======================================================
+2026-07-17 21:55:13,589 | INFO | [AGGREGATOR] Sentinel detected — cycle 18
+2026-07-17 21:55:14,090 | INFO | [AGGREGATOR] Cycle 18 | All 321 node files ready ✓
+2026-07-17 21:55:14,090 | INFO | Verifying cycle 18...
+2026-07-17 21:55:14,132 | INFO | Cycle 18: cid_flow_rules=QmPt2sMdRdtrzS1S72Qa... cid_planned_inbound=QmdRngdmZKX1kLQZqrdA... hash=d8f733db1b0787d1...
+2026-07-17 21:55:14,135 | INFO | Cycle 18: INTACT ✓
+2026-07-17 21:55:14,135 | INFO | [AGGREGATOR] Cycle 18 | Blockchain verification PASSED ✓ | flow_rules=312
+2026-07-17 21:55:14,136 | INFO | [AGGREGATOR] Cycle 18 | verified flow rules saved (312 rows) → /tmp/ai_agent/verified_flow_rules_cycle_18.csv
+2026-07-17 21:55:14,149 | INFO | [AGGREGATOR] Cycle 18 | aggregated 3439 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_18.csv
+2026-07-17 21:55:14,149 | INFO | [AGGREGATOR] Cycle 18 | verified planned inbound saved (167 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_18.csv
+2026-07-17 21:55:14,154 | INFO | [AGGREGATOR] Cycle 18 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:55:14,156 | INFO | [FF-ANALYSIS] Cycle 18 | t=19.0001s | FF computed=97 | nodes detected=19 | zero-inbound nodes=0 | watchers=145
+2026-07-17 21:55:14,156 | INFO | [FF-ANALYSIS] Cycle 18 | → controller_overhear_pool_summary_18.csv, observed_forwarding_fractions_18.csv, ff_node_anomaly_scores_18.csv
+2026-07-17 21:55:14,156 | INFO | [AGGREGATOR] Cycle 18 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_18
+2026-07-17 21:55:45,574 | INFO | =======================================================
+2026-07-17 21:55:45,574 | INFO | [AGGREGATOR] Sentinel detected — cycle 19
+2026-07-17 21:55:46,075 | INFO | [AGGREGATOR] Cycle 19 | All 321 node files ready ✓
+2026-07-17 21:55:46,075 | INFO | Verifying cycle 19...
+2026-07-17 21:55:46,111 | INFO | Cycle 19: cid_flow_rules=QmRHdrQyFSqEeVcxNp8Y... cid_planned_inbound=QmTFcUxQq4kbGWfQELyX... hash=d121cda09c152128...
+2026-07-17 21:55:46,114 | INFO | Cycle 19: INTACT ✓
+2026-07-17 21:55:46,114 | INFO | [AGGREGATOR] Cycle 19 | Blockchain verification PASSED ✓ | flow_rules=377
+2026-07-17 21:55:46,115 | INFO | [AGGREGATOR] Cycle 19 | verified flow rules saved (377 rows) → /tmp/ai_agent/verified_flow_rules_cycle_19.csv
+2026-07-17 21:55:46,135 | INFO | [AGGREGATOR] Cycle 19 | aggregated 4666 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_19.csv
+2026-07-17 21:55:46,136 | INFO | [AGGREGATOR] Cycle 19 | verified planned inbound saved (228 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_19.csv
+2026-07-17 21:55:46,143 | INFO | [AGGREGATOR] Cycle 19 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:55:46,146 | INFO | [FF-ANALYSIS] Cycle 19 | t=20.0001s | FF computed=107 | nodes detected=16 | zero-inbound nodes=0 | watchers=196
+2026-07-17 21:55:46,146 | INFO | [FF-ANALYSIS] Cycle 19 | → controller_overhear_pool_summary_19.csv, observed_forwarding_fractions_19.csv, ff_node_anomaly_scores_19.csv
+2026-07-17 21:55:46,146 | INFO | [AGGREGATOR] Cycle 19 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_19
+2026-07-17 21:56:17,666 | INFO | =======================================================
+2026-07-17 21:56:17,666 | INFO | [AGGREGATOR] Sentinel detected — cycle 20
+2026-07-17 21:56:18,167 | INFO | [AGGREGATOR] Cycle 20 | All 321 node files ready ✓
+2026-07-17 21:56:18,167 | INFO | Verifying cycle 20...
+2026-07-17 21:56:18,206 | INFO | Cycle 20: cid_flow_rules=QmYyNqBYjxYwQX4ZrWsh... cid_planned_inbound=QmPZKeVmLWoKAmwti2VZ... hash=9346d8afeac6bf96...
+2026-07-17 21:56:18,209 | INFO | Cycle 20: INTACT ✓
+2026-07-17 21:56:18,209 | INFO | [AGGREGATOR] Cycle 20 | Blockchain verification PASSED ✓ | flow_rules=348
+2026-07-17 21:56:18,209 | INFO | [AGGREGATOR] Cycle 20 | verified flow rules saved (348 rows) → /tmp/ai_agent/verified_flow_rules_cycle_20.csv
+2026-07-17 21:56:18,229 | INFO | [AGGREGATOR] Cycle 20 | aggregated 5664 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_20.csv
+2026-07-17 21:56:18,229 | INFO | [AGGREGATOR] Cycle 20 | verified planned inbound saved (200 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_20.csv
+2026-07-17 21:56:18,234 | INFO | [AGGREGATOR] Cycle 20 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:56:18,237 | INFO | [FF-ANALYSIS] Cycle 20 | t=21.0001s | FF computed=95 | nodes detected=13 | zero-inbound nodes=0 | watchers=143
+2026-07-17 21:56:18,237 | INFO | [FF-ANALYSIS] Cycle 20 | → controller_overhear_pool_summary_20.csv, observed_forwarding_fractions_20.csv, ff_node_anomaly_scores_20.csv
+2026-07-17 21:56:18,237 | INFO | [AGGREGATOR] Cycle 20 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_20
+2026-07-17 21:56:49,861 | INFO | =======================================================
+2026-07-17 21:56:49,862 | INFO | [AGGREGATOR] Sentinel detected — cycle 21
+2026-07-17 21:56:50,362 | INFO | [AGGREGATOR] Cycle 21 | All 321 node files ready ✓
+2026-07-17 21:56:50,362 | INFO | Verifying cycle 21...
+2026-07-17 21:56:50,393 | INFO | Cycle 21: cid_flow_rules=QmexPvagSmqmrMQLheMy... cid_planned_inbound=QmQmYUzgmM4YDcEzVvcq... hash=129b535fce3c29cd...
+2026-07-17 21:56:50,397 | INFO | Cycle 21: INTACT ✓
+2026-07-17 21:56:50,397 | INFO | [AGGREGATOR] Cycle 21 | Blockchain verification PASSED ✓ | flow_rules=382
+2026-07-17 21:56:50,397 | INFO | [AGGREGATOR] Cycle 21 | verified flow rules saved (382 rows) → /tmp/ai_agent/verified_flow_rules_cycle_21.csv
+2026-07-17 21:56:50,412 | INFO | [AGGREGATOR] Cycle 21 | aggregated 6167 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_21.csv
+2026-07-17 21:56:50,412 | INFO | [AGGREGATOR] Cycle 21 | verified planned inbound saved (208 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_21.csv
+2026-07-17 21:56:50,417 | INFO | [AGGREGATOR] Cycle 21 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:56:50,420 | INFO | [FF-ANALYSIS] Cycle 21 | t=22.0001s | FF computed=87 | nodes detected=16 | zero-inbound nodes=0 | watchers=180
+2026-07-17 21:56:50,420 | INFO | [FF-ANALYSIS] Cycle 21 | → controller_overhear_pool_summary_21.csv, observed_forwarding_fractions_21.csv, ff_node_anomaly_scores_21.csv
+2026-07-17 21:56:50,420 | INFO | [AGGREGATOR] Cycle 21 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_21
+2026-07-17 21:57:19,386 | INFO | =======================================================
+2026-07-17 21:57:19,387 | INFO | [AGGREGATOR] Sentinel detected — cycle 22
+2026-07-17 21:57:19,888 | INFO | [AGGREGATOR] Cycle 22 | All 321 node files ready ✓
+2026-07-17 21:57:19,888 | INFO | Verifying cycle 22...
+2026-07-17 21:57:19,918 | INFO | Cycle 22: cid_flow_rules=QmUTVZxNrHuEW3aBhYQU... cid_planned_inbound=QmcdkjzjkRM4WMHxDnBb... hash=49fea1202b2e2d07...
+2026-07-17 21:57:19,920 | INFO | Cycle 22: INTACT ✓
+2026-07-17 21:57:19,920 | INFO | [AGGREGATOR] Cycle 22 | Blockchain verification PASSED ✓ | flow_rules=315
+2026-07-17 21:57:19,920 | INFO | [AGGREGATOR] Cycle 22 | verified flow rules saved (315 rows) → /tmp/ai_agent/verified_flow_rules_cycle_22.csv
+2026-07-17 21:57:19,933 | INFO | [AGGREGATOR] Cycle 22 | aggregated 4050 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_22.csv
+2026-07-17 21:57:19,933 | INFO | [AGGREGATOR] Cycle 22 | verified planned inbound saved (186 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_22.csv
+2026-07-17 21:57:19,938 | INFO | [AGGREGATOR] Cycle 22 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:57:19,940 | INFO | [FF-ANALYSIS] Cycle 22 | t=23.0001s | FF computed=77 | nodes detected=18 | zero-inbound nodes=0 | watchers=137
+2026-07-17 21:57:19,940 | INFO | [FF-ANALYSIS] Cycle 22 | → controller_overhear_pool_summary_22.csv, observed_forwarding_fractions_22.csv, ff_node_anomaly_scores_22.csv
+2026-07-17 21:57:19,941 | INFO | [AGGREGATOR] Cycle 22 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_22
+2026-07-17 21:57:48,838 | INFO | =======================================================
+2026-07-17 21:57:48,839 | INFO | [AGGREGATOR] Sentinel detected — cycle 23
+2026-07-17 21:57:49,340 | INFO | [AGGREGATOR] Cycle 23 | All 321 node files ready ✓
+2026-07-17 21:57:49,340 | INFO | Verifying cycle 23...
+2026-07-17 21:57:49,368 | INFO | Cycle 23: cid_flow_rules=QmUraeD1q4xSVZnZUE6S... cid_planned_inbound=QmSovUsm2SG675BUj16n... hash=c0d3dbee87337dd0...
+2026-07-17 21:57:49,372 | INFO | Cycle 23: INTACT ✓
+2026-07-17 21:57:49,372 | INFO | [AGGREGATOR] Cycle 23 | Blockchain verification PASSED ✓ | flow_rules=228
+2026-07-17 21:57:49,372 | INFO | [AGGREGATOR] Cycle 23 | verified flow rules saved (228 rows) → /tmp/ai_agent/verified_flow_rules_cycle_23.csv
+2026-07-17 21:57:49,386 | INFO | [AGGREGATOR] Cycle 23 | aggregated 3635 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_23.csv
+2026-07-17 21:57:49,386 | INFO | [AGGREGATOR] Cycle 23 | verified planned inbound saved (138 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_23.csv
+2026-07-17 21:57:49,392 | INFO | [AGGREGATOR] Cycle 23 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:57:49,394 | INFO | [FF-ANALYSIS] Cycle 23 | t=24.0001s | FF computed=67 | nodes detected=12 | zero-inbound nodes=0 | watchers=181
+2026-07-17 21:57:49,394 | INFO | [FF-ANALYSIS] Cycle 23 | → controller_overhear_pool_summary_23.csv, observed_forwarding_fractions_23.csv, ff_node_anomaly_scores_23.csv
+2026-07-17 21:57:49,395 | INFO | [AGGREGATOR] Cycle 23 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_23
+2026-07-17 21:58:18,256 | INFO | =======================================================
+2026-07-17 21:58:18,256 | INFO | [AGGREGATOR] Sentinel detected — cycle 24
+2026-07-17 21:58:18,757 | INFO | [AGGREGATOR] Cycle 24 | All 321 node files ready ✓
+2026-07-17 21:58:18,758 | INFO | Verifying cycle 24...
+2026-07-17 21:58:18,786 | INFO | Cycle 24: cid_flow_rules=QmQ5zpXEMTq8waoc49er... cid_planned_inbound=QmdDZgiTZvqV6AHGfY6z... hash=d02fc7be0e4859e1...
+2026-07-17 21:58:18,788 | INFO | Cycle 24: INTACT ✓
+2026-07-17 21:58:18,788 | INFO | [AGGREGATOR] Cycle 24 | Blockchain verification PASSED ✓ | flow_rules=270
+2026-07-17 21:58:18,788 | INFO | [AGGREGATOR] Cycle 24 | verified flow rules saved (270 rows) → /tmp/ai_agent/verified_flow_rules_cycle_24.csv
+2026-07-17 21:58:18,803 | INFO | [AGGREGATOR] Cycle 24 | aggregated 3318 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_24.csv
+2026-07-17 21:58:18,803 | INFO | [AGGREGATOR] Cycle 24 | verified planned inbound saved (153 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_24.csv
+2026-07-17 21:58:18,809 | INFO | [AGGREGATOR] Cycle 24 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:58:18,812 | INFO | [FF-ANALYSIS] Cycle 24 | t=25.0001s | FF computed=53 | nodes detected=13 | zero-inbound nodes=0 | watchers=114
+2026-07-17 21:58:18,812 | INFO | [FF-ANALYSIS] Cycle 24 | → controller_overhear_pool_summary_24.csv, observed_forwarding_fractions_24.csv, ff_node_anomaly_scores_24.csv
+2026-07-17 21:58:18,812 | INFO | [AGGREGATOR] Cycle 24 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_24
+2026-07-17 21:58:47,575 | INFO | =======================================================
+2026-07-17 21:58:47,575 | INFO | [AGGREGATOR] Sentinel detected — cycle 25
+2026-07-17 21:58:48,076 | INFO | [AGGREGATOR] Cycle 25 | All 321 node files ready ✓
+2026-07-17 21:58:48,076 | INFO | Verifying cycle 25...
+2026-07-17 21:58:48,103 | INFO | Cycle 25: cid_flow_rules=QmQzycWFQTeSHn4s8Mf6... cid_planned_inbound=QmRhvyP8cL6TiiyMvkGo... hash=5259b7ae115c01ee...
+2026-07-17 21:58:48,106 | INFO | Cycle 25: INTACT ✓
+2026-07-17 21:58:48,106 | INFO | [AGGREGATOR] Cycle 25 | Blockchain verification PASSED ✓ | flow_rules=278
+2026-07-17 21:58:48,106 | INFO | [AGGREGATOR] Cycle 25 | verified flow rules saved (278 rows) → /tmp/ai_agent/verified_flow_rules_cycle_25.csv
+2026-07-17 21:58:48,122 | INFO | [AGGREGATOR] Cycle 25 | aggregated 3687 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_25.csv
+2026-07-17 21:58:48,122 | INFO | [AGGREGATOR] Cycle 25 | verified planned inbound saved (156 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_25.csv
+2026-07-17 21:58:48,126 | INFO | [AGGREGATOR] Cycle 25 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:58:48,128 | INFO | [FF-ANALYSIS] Cycle 25 | t=26.0001s | FF computed=73 | nodes detected=16 | zero-inbound nodes=0 | watchers=125
+2026-07-17 21:58:48,129 | INFO | [FF-ANALYSIS] Cycle 25 | → controller_overhear_pool_summary_25.csv, observed_forwarding_fractions_25.csv, ff_node_anomaly_scores_25.csv
+2026-07-17 21:58:48,129 | INFO | [AGGREGATOR] Cycle 25 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_25
+2026-07-17 21:59:15,895 | INFO | =======================================================
+2026-07-17 21:59:15,895 | INFO | [AGGREGATOR] Sentinel detected — cycle 26
+2026-07-17 21:59:16,396 | INFO | [AGGREGATOR] Cycle 26 | All 321 node files ready ✓
+2026-07-17 21:59:16,396 | INFO | Verifying cycle 26...
+2026-07-17 21:59:16,430 | INFO | Cycle 26: cid_flow_rules=QmT19arTJTt8JtmJZ538... cid_planned_inbound=Qmb9q4v1Z999Fpto2wUY... hash=842ab427bb0f393d...
+2026-07-17 21:59:16,433 | INFO | Cycle 26: INTACT ✓
+2026-07-17 21:59:16,433 | INFO | [AGGREGATOR] Cycle 26 | Blockchain verification PASSED ✓ | flow_rules=295
+2026-07-17 21:59:16,434 | INFO | [AGGREGATOR] Cycle 26 | verified flow rules saved (295 rows) → /tmp/ai_agent/verified_flow_rules_cycle_26.csv
+2026-07-17 21:59:16,445 | INFO | [AGGREGATOR] Cycle 26 | aggregated 4089 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_26.csv
+2026-07-17 21:59:16,445 | INFO | [AGGREGATOR] Cycle 26 | verified planned inbound saved (158 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_26.csv
+2026-07-17 21:59:16,450 | INFO | [AGGREGATOR] Cycle 26 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:59:16,452 | INFO | [FF-ANALYSIS] Cycle 26 | t=27.0001s | FF computed=70 | nodes detected=12 | zero-inbound nodes=0 | watchers=124
+2026-07-17 21:59:16,452 | INFO | [FF-ANALYSIS] Cycle 26 | → controller_overhear_pool_summary_26.csv, observed_forwarding_fractions_26.csv, ff_node_anomaly_scores_26.csv
+2026-07-17 21:59:16,453 | INFO | [AGGREGATOR] Cycle 26 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_26
+2026-07-17 21:59:47,090 | INFO | =======================================================
+2026-07-17 21:59:47,091 | INFO | [AGGREGATOR] Sentinel detected — cycle 27
+2026-07-17 21:59:47,591 | INFO | [AGGREGATOR] Cycle 27 | All 321 node files ready ✓
+2026-07-17 21:59:47,591 | INFO | Verifying cycle 27...
+2026-07-17 21:59:47,621 | INFO | Cycle 27: cid_flow_rules=Qme5zLuEEYvLZSU2HuyT... cid_planned_inbound=QmPbbv8KWy6BzDZf6G9R... hash=55cad9f331fc4cf5...
+2026-07-17 21:59:47,623 | INFO | Cycle 27: INTACT ✓
+2026-07-17 21:59:47,623 | INFO | [AGGREGATOR] Cycle 27 | Blockchain verification PASSED ✓ | flow_rules=300
+2026-07-17 21:59:47,623 | INFO | [AGGREGATOR] Cycle 27 | verified flow rules saved (300 rows) → /tmp/ai_agent/verified_flow_rules_cycle_27.csv
+2026-07-17 21:59:47,637 | INFO | [AGGREGATOR] Cycle 27 | aggregated 5853 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_27.csv
+2026-07-17 21:59:47,637 | INFO | [AGGREGATOR] Cycle 27 | verified planned inbound saved (178 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_27.csv
+2026-07-17 21:59:47,645 | INFO | [AGGREGATOR] Cycle 27 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 21:59:47,649 | INFO | [FF-ANALYSIS] Cycle 27 | t=28.0001s | FF computed=100 | nodes detected=18 | zero-inbound nodes=0 | watchers=159
+2026-07-17 21:59:47,649 | INFO | [FF-ANALYSIS] Cycle 27 | → controller_overhear_pool_summary_27.csv, observed_forwarding_fractions_27.csv, ff_node_anomaly_scores_27.csv
+2026-07-17 21:59:47,649 | INFO | [AGGREGATOR] Cycle 27 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_27
+2026-07-17 22:00:19,123 | INFO | =======================================================
+2026-07-17 22:00:19,123 | INFO | [AGGREGATOR] Sentinel detected — cycle 28
+2026-07-17 22:00:19,624 | INFO | [AGGREGATOR] Cycle 28 | All 321 node files ready ✓
+2026-07-17 22:00:19,624 | INFO | Verifying cycle 28...
+2026-07-17 22:00:19,650 | INFO | Cycle 28: cid_flow_rules=QmTw1qjckQtCL6SByzrf... cid_planned_inbound=QmbTW3jJDABaU4SokuGj... hash=59b998fcf73192c4...
+2026-07-17 22:00:19,653 | INFO | Cycle 28: INTACT ✓
+2026-07-17 22:00:19,653 | INFO | [AGGREGATOR] Cycle 28 | Blockchain verification PASSED ✓ | flow_rules=238
+2026-07-17 22:00:19,653 | INFO | [AGGREGATOR] Cycle 28 | verified flow rules saved (238 rows) → /tmp/ai_agent/verified_flow_rules_cycle_28.csv
+2026-07-17 22:00:19,667 | INFO | [AGGREGATOR] Cycle 28 | aggregated 4781 rows from 321 nodes → /tmp/ai_agent/aggregated_cycle_28.csv
+2026-07-17 22:00:19,667 | INFO | [AGGREGATOR] Cycle 28 | verified planned inbound saved (126 rows) → /tmp/ai_agent/verified_planned_inbound_cycle_28.csv
+2026-07-17 22:00:19,673 | INFO | [AGGREGATOR] Cycle 28 | cleaned up 321 per-node CSVs + sentinel
+2026-07-17 22:00:19,675 | INFO | [FF-ANALYSIS] Cycle 28 | t=29.0001s | FF computed=91 | nodes detected=17 | zero-inbound nodes=0 | watchers=165
+2026-07-17 22:00:19,675 | INFO | [FF-ANALYSIS] Cycle 28 | → controller_overhear_pool_summary_28.csv, observed_forwarding_fractions_28.csv, ff_node_anomaly_scores_28.csv
+2026-07-17 22:00:19,675 | INFO | [AGGREGATOR] Cycle 28 | attack-detection sentinel written → /tmp/ai_agent/vanet_attack_ready_28

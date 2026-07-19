@@ -46,12 +46,18 @@ def load_transitions(csv_path: str, agent_name: str) -> List[dict]:
         's'                : np.ndarray, state vector at t       (input_dim,)
         's_next'           : np.ndarray, state vector at t+1     (input_dim,)
         'done'             : bool, True only on last cycle of a node
+        'cycle_id'         : int, cycle index of this transition (lookup key only)
+        'node_id'          : int, node identifier (lookup key only)
         'is_attacker'      : int  (0 or 1)
         'blockchain_reject': int  (0 or 1)
         'PDR_t'            : float
         'd_bar_t'          : float
         'rho_recv'         : float  (0.0 if column absent)
         'lambda_t'         : float  (0.0 if column absent)
+
+    NOTE: 'cycle_id' and 'node_id' are lookup keys for the MCC difference-reward
+    term (r_mcc^X, supervisor patch). They are NEVER part of state vectors s or
+    s_next — state vector length is invariant.
 
     NOTE: 'action' and 'reward' are NOT stored — they are computed on the fly
     during training (Section 9 of the report).
@@ -181,6 +187,8 @@ def load_transitions(csv_path: str, agent_name: str) -> List[dict]:
                 "s":                 s,
                 "s_next":            s_next,
                 "done":              False,
+                "cycle_id":          int(row_t["cycle_id"]),
+                "node_id":           int(row_t["node_id"]),
                 "is_attacker":       int(row_t["is_attacker"]),
                 "blockchain_reject": int(row_t["blockchain_reject"]),
                 "PDR_t":             float(row_t["PDR_t"]),
@@ -196,6 +204,8 @@ def load_transitions(csv_path: str, agent_name: str) -> List[dict]:
             "s":                 last_row[features].values.astype(np.float32),
             "s_next":            np.zeros(len(features), dtype=np.float32),
             "done":              True,
+            "cycle_id":          int(last_row["cycle_id"]),
+            "node_id":           int(last_row["node_id"]),
             "is_attacker":       int(last_row["is_attacker"]),
             "blockchain_reject": int(last_row["blockchain_reject"]),
             "PDR_t":             float(last_row["PDR_t"]),

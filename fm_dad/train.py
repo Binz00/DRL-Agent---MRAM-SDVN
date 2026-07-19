@@ -24,6 +24,7 @@ the Stage 1 smoke test. Real training requires synthetic CSVs from Stage 2.
 """
 
 import argparse
+import math
 import os
 import random
 import sys
@@ -51,6 +52,9 @@ from data_loader import load_transitions
 from rewards import REWARD_FN_MAP
 
 logger = get_logger("train")
+
+# episode_eval is imported lazily inside train_agent() when finetune=True
+# to avoid circular import and to keep startup overhead minimal for non-finetune runs.
 
 
 # ---------------------------------------------------------------------------
@@ -188,15 +192,100 @@ def compute_reward_for_agent(agent_name: str, action: int, transition: dict, cfg
 
 
 # ---------------------------------------------------------------------------
+# MCC helpers (supervisor r_mcc patch) — lives in train.py per spec
+# ---------------------------------------------------------------------------
+
+def mcc_from_counts(tp: int, fp: int, fn: int, tn: int) -> float:
+    """Equation 4.1 — MCC. Guard against zero denominator (degenerate case)."""
+    denom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    return ((tp * tn) - (fp * fn)) / denom if denom > 0 else 0.0
+
+
+def build_difference_rewards(outcome, agent_name: str) -> dict:
+    """
+    Build per-(cycle_id, node_id) difference rewards  D_i.
+
+    D_i = MCC(actual) − MCC(counterfactual: live agent’s decision → a0).
+
+    Only nodes where the live agent’s gate fired AND action > 0 AND the live
+    agent was the MAX contributor (its delta ≥ every other agent’s delta at
+    least once during the trajectory) can have non-zero D_i.
+
+    Approximation (documented): “X’s delta was the max at least once” is
+    used as the MAX-contribution condition rather than tracking which specific
+    cycle’s delta was decisive. This is conservative: we may under-attribute
+    D_i to some transitions, but we never false-attribute it.
+
+    Counterfactual mapping:
+      TP (attacker correctly blacklisted)
+          → a0 would not have contributed → counterfactual: tp-1, fn+1
+          D_i > 0  (real was better than a0)
+      FP (honest node wrongly blacklisted)
+          → a0 would not have contributed → counterfactual: fp-1, tn+1
+          D_i < 0  (real was worse than a0  — penalises the false positive)
+      FN / TN / gate closed / action==0 / not max-contributor
+          → D_i = 0
+
+    Returns:
+        dict: (cycle_id, node_id) → D_i (float).  Only non-zero entries stored.
+    """
+    from episode_eval import EpochOutcome
+
+    tp, fp, fn, tn = outcome.counts
+    mcc_actual     = outcome.mcc
+
+    d_rewards: dict = {}
+    n_nonzero = 0
+
+    for (cycle_id, node_id), rec in outcome.node_outcomes.items():
+        # Skip if gate did not fire or action was a0 (delta=0)
+        if not rec["gate_fired"]:
+            continue
+        action = rec["action"]
+        if action is None or action == 0:
+            continue
+
+        final_outcome = rec["outcome"]
+        if final_outcome not in ("TP", "FP"):
+            # FN / TN / EXCLUDED — D_i = 0
+            continue
+
+        # MAX-contribution check: was this node’s live delta ≥ max at least once?
+        if node_id not in outcome.max_contributor:
+            continue
+
+        # Compute counterfactual MCC (O(1) — closed-form over 4 integers)
+        if final_outcome == "TP":
+            # Without live agent, this TP becomes FN
+            cf_mcc = mcc_from_counts(tp - 1, fp, fn + 1, tn)
+        else:  # FP
+            # Without live agent, this FP becomes TN
+            cf_mcc = mcc_from_counts(tp, fp - 1, fn, tn + 1)
+
+        d_i = mcc_actual - cf_mcc
+        if d_i != 0.0:
+            d_rewards[(cycle_id, node_id)] = d_i
+            n_nonzero += 1
+
+    logger.info(
+        "[D_i] Variant=%s | non-zero D_i entries: %d / %d cycle-node visits",
+        agent_name.upper(), n_nonzero, len(outcome.node_outcomes),
+    )
+    return d_rewards
+
+
+# ---------------------------------------------------------------------------
 # Main training loop (Algorithm 2)
 # ---------------------------------------------------------------------------
 
 def train_agent(
-    agent_name:  str,
-    n_episodes:  int     = None,
-    smoke_test:  bool    = False,
-    csv_path:    str     = None,
-    finetune:    bool    = False,
+    agent_name:       str,
+    n_episodes:       int     = None,
+    smoke_test:       bool    = False,
+    csv_path:         str     = None,
+    finetune:         bool    = False,
+    w5_override:      float   = None,   # overrides cfg["w5"] for Step 4 grid verification
+    model_out_override: str   = None,   # redirects checkpoint output path
 ) -> list[float]:
     """
     Run the full offline training loop for one FM-DAD agent (Algorithm 2).
@@ -237,7 +326,37 @@ def train_agent(
         model_out    = MODEL_FILES[agent_name]
         pretrain_src = None
 
+    # Allow CLI to redirect output path (e.g. for w5=0.0 regression check)
+    if model_out_override is not None:
+        model_out = model_out_override
+        logger.info("[model_out] Output path OVERRIDDEN via CLI: %s", model_out)
+
     cfg = AGENT_CONFIGS[agent_name]
+
+    # ------------------------------------------------------------------
+    # (1−w5) rescaling of w1..w4 to keep sum(w1..w5)=1 (supervisor patch).
+    # This is done at USE TIME on a local copy — config.py values are NEVER
+    # mutated.  Only applies when finetune=True (w5 is a finetune hyperparameter).
+    # When finetune=False, w5=0.0 so the scaling factor is 1.0 (no change).
+    # w5_override (CLI --w5) lets Step 4 grid runs override w5 without editing config.
+    # ------------------------------------------------------------------
+    if w5_override is not None:
+        w5 = float(w5_override)
+        logger.info("[w5] w5 OVERRIDDEN via CLI: %.2f (config value ignored)", w5)
+    else:
+        w5 = cfg.get("w5", 0.0) if finetune else 0.0
+    scale       = 1.0 - w5
+    cfg_scaled  = dict(cfg)  # shallow copy
+    for wi in ("w1", "w2", "w3", "w4"):
+        if wi in cfg_scaled:
+            cfg_scaled[wi] = cfg_scaled[wi] * scale
+    logger.info(
+        "[w5] agent=%s | w5=%.2f | scale=%.2f | "
+        "w1=%.3f w2=%.3f w3=%.3f w4=%.3f (rescaled)",
+        agent_name, w5, scale,
+        cfg_scaled.get("w1", 0), cfg_scaled.get("w2", 0),
+        cfg_scaled.get("w3", 0), cfg_scaled.get("w4", 0),
+    )
 
     # Override episodes for smoke test
     if smoke_test:
@@ -282,6 +401,28 @@ def train_agent(
             pretrain_src,
         )
 
+    # ---- Fine-tune setup: episode_eval tables + frozen agents ---------------
+    if finetune:
+        from episode_eval import (
+            evaluate_policy_epoch, load_tables, load_gt, load_frozen_agents,
+            EpochOutcome,
+        )
+        import pandas as pd
+
+        eval_tables      = load_tables()
+        eval_gt          = load_gt()
+        frozen_agents    = load_frozen_agents(exclude=agent_name)
+
+        mcc_eval_every   = hp.get("mcc_eval_every", 5)
+        best_mcc         = -2.0          # worst possible MCC is −1
+        best_ep          = 0
+        d_reward_lookup: dict = {}       # (cycle_id, node_id) → D_i; rebuilt periodically
+        logger.info(
+            "[FINETUNE] MCC checkpoint selection enabled | "
+            "eval every %d episodes | w5=%.2f",
+            mcc_eval_every, w5,
+        )
+
     # ---- Training loop (Algorithm 2) ---------------------------------------
     logger.info("[PIPELINE] Stage 3/4: Training loop starting...")
     episode_rewards: list[float] = []
@@ -291,6 +432,46 @@ def train_agent(
         epsilon    = compute_epsilon(ep, n_episodes, hp)
         beta       = compute_beta(ep, n_episodes, hp)
         agent.beta = beta
+
+        # ------------------------------------------------------------------
+        # MCC evaluation — every mcc_eval_every episodes (and final episode)
+        # Runs BEFORE the episode's gradient steps to keep evaluation clean.
+        # ------------------------------------------------------------------
+        if finetune:
+            is_final_ep   = (ep == n_episodes - 1)
+            is_eval_ep    = (ep % mcc_eval_every == 0) or is_final_ep
+            if is_eval_ep:
+                outcome = evaluate_policy_epoch(
+                    agent_name    = agent_name,
+                    live_agent    = agent,
+                    frozen_agents = frozen_agents,
+                    tables        = eval_tables,
+                    ground_truth  = eval_gt,
+                    tau_min       = 0.3,   # grid-searched best tau_min
+                )
+                ep_mcc = outcome.mcc
+                tp_ep, fp_ep, fn_ep, tn_ep = outcome.counts
+
+                # Rebuild difference-reward lookup from new evaluation
+                d_reward_lookup = build_difference_rewards(outcome, agent_name)
+
+                logger.info(
+                    "[MCC EVAL] ep=%d/%d | MCC^%s=%.4f | TP=%d FP=%d FN=%d TN=%d | "
+                    "nonzero_D_i=%d",
+                    ep + 1, n_episodes, agent_name.upper(), ep_mcc,
+                    tp_ep, fp_ep, fn_ep, tn_ep, len(d_reward_lookup),
+                )
+
+                # Best-checkpoint selection: save if new best MCC
+                if ep_mcc > best_mcc:
+                    best_mcc = ep_mcc
+                    best_ep  = ep + 1
+                    os.makedirs(os.path.dirname(model_out), exist_ok=True)
+                    agent.save(model_out)
+                    logger.info(
+                        "[BEST CKPT] New best MCC^%s=%.4f at ep=%d — saved to %s",
+                        agent_name.upper(), best_mcc, best_ep, model_out,
+                    )
 
         # Shuffle transitions within each episode (offline i.i.d. assumption)
         episode_transitions = transitions.copy()
@@ -306,6 +487,8 @@ def train_agent(
             ep + 1, n_episodes, epsilon, beta, len(agent.buffer),
         )
 
+        ep_rewards_list: list = []  # for per-episode reward variance logging
+
         for transition in episode_transitions:
             s      = transition["s"]
             s_next = transition["s_next"]
@@ -315,8 +498,21 @@ def train_agent(
             action = agent.act(s, epsilon=epsilon)
 
             # Step 2: Compute reward from ground-truth columns
-            reward = compute_reward_for_agent(agent_name, action, transition, cfg)
+            # r_base uses the (1-w5)-rescaled cfg so that w1..w4 weights
+            # already incorporate the budget reallocation.
+            r_base = compute_reward_for_agent(agent_name, action, transition, cfg_scaled)
+
+            # Difference-reward term: D_i from the last MCC evaluation.
+            # Between evaluations d_reward_lookup is held fixed (per spec).
+            # For non-finetune mode or before first eval, D_i = 0.
+            d_i = 0.0
+            if finetune:
+                key = (transition.get("cycle_id"), transition.get("node_id"))
+                d_i = d_reward_lookup.get(key, 0.0)
+
+            reward     = r_base + w5 * d_i
             ep_reward += reward
+            ep_rewards_list.append(reward)
 
             # Step 3: Store in buffer
             agent.remember(s, action, reward, s_next, done)
@@ -334,18 +530,43 @@ def train_agent(
 
         episode_rewards.append(ep_reward)
 
-        logger.info(
-            "[Ep %d/%d] DONE | total_reward=%.4f, steps=%d, learns=%d, "
-            "avg_loss=%.6f, buffer=%d, time=%.2fs",
-            ep + 1, n_episodes, ep_reward, n_steps, n_learns,
-            avg_loss, len(agent.buffer), ep_duration,
-        )
+        # Non-stationary reward variance monitoring (spec risk 1)
+        if finetune and len(ep_rewards_list) > 1:
+            import statistics
+            ep_var = statistics.variance(ep_rewards_list)
+            logger.info(
+                "[Ep %d/%d] DONE | total_reward=%.4f, reward_var=%.6f, "
+                "steps=%d, learns=%d, avg_loss=%.6f, buffer=%d, time=%.2fs",
+                ep + 1, n_episodes, ep_reward, ep_var, n_steps, n_learns,
+                avg_loss, len(agent.buffer), ep_duration,
+            )
+        else:
+            logger.info(
+                "[Ep %d/%d] DONE | total_reward=%.4f, steps=%d, learns=%d, "
+                "avg_loss=%.6f, buffer=%d, time=%.2fs",
+                ep + 1, n_episodes, ep_reward, n_steps, n_learns,
+                avg_loss, len(agent.buffer), ep_duration,
+            )
 
     # ---- Save model --------------------------------------------------------
     logger.info("[PIPELINE] Stage 4/4: Saving model...")
-    os.makedirs(os.path.dirname(model_out), exist_ok=True)
-    agent.save(model_out)
-    logger.info("Model saved → %s", model_out)
+    if not finetune:
+        # Standard training: always save at end
+        os.makedirs(os.path.dirname(model_out), exist_ok=True)
+        agent.save(model_out)
+        logger.info("Model saved → %s", model_out)
+    else:
+        # Fine-tune: best checkpoint was already saved during evaluation loop.
+        # If no eval ran (e.g. smoke test with 0 episodes), save now.
+        if best_ep == 0:
+            os.makedirs(os.path.dirname(model_out), exist_ok=True)
+            agent.save(model_out)
+            logger.info("Model saved (no eval ran) → %s", model_out)
+        else:
+            logger.info(
+                "[FINETUNE DONE] Best checkpoint: ep=%d, MCC^%s=%.4f — already saved to %s",
+                best_ep, agent_name.upper(), best_mcc, model_out,
+            )
     logger.info("=== Training complete | agent=%s ===", agent_name)
 
     return episode_rewards
@@ -385,17 +606,30 @@ if __name__ == "__main__":
             "Do not use --smoke_test together with --finetune."
         ),
     )
+    parser.add_argument(
+        "--w5", type=float, default=None,
+        help=(
+            "Override w5 for this run (supervisor r_mcc grid: {0.0, 0.1, 0.2, 0.3}). "
+            "Does not modify config.py. Used for Step 4 regression verification."
+        ),
+    )
+    parser.add_argument(
+        "--model_out", type=str, default=None,
+        help="Override output checkpoint path (e.g. 'models/fs_finetuned_w5_0.pt').",
+    )
     args = parser.parse_args()
 
     if args.finetune and args.smoke_test:
         parser.error("--finetune and --smoke_test cannot be used together.")
 
     rewards = train_agent(
-        agent_name  = args.agent,
-        n_episodes  = args.episodes,
-        smoke_test  = args.smoke_test,
-        csv_path    = args.csv,
-        finetune    = args.finetune,
+        agent_name        = args.agent,
+        n_episodes        = args.episodes,
+        smoke_test        = args.smoke_test,
+        csv_path          = args.csv,
+        finetune          = args.finetune,
+        w5_override       = args.w5,
+        model_out_override= args.model_out,
     )
 
     logger.info("Episode rewards: %s", [round(r, 3) for r in rewards])

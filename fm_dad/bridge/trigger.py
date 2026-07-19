@@ -66,10 +66,10 @@ GATE_CONDITIONS: Dict[str, List[Condition]] = {
         ("SpoofDev", ">", AGENT_CONFIGS["als"]["eta_spoof"]),
     ],
 
-    # FS — Flow Stretching gate (Eq. 3.23 proxy: hop-count excess)
-    # hop_excess > eta_hop  (placeholder threshold, pending grid search)
+    # FS — Flow Stretching gate
+    # Evaluates to True if sum_abs_ff_deviation_normalized > eta_dff_norm
     "fs": [
-        ("hop_excess", ">", AGENT_CONFIGS["fs"]["eta_hop"]),
+        ("sum_abs_ff_deviation_normalized", ">", AGENT_CONFIGS["fs"]["eta_dff_norm"]),
     ],
 
     # IGH — Inter-flow Greedy Hoarding gate (Algorithm 4 line 9, Definition 3)
@@ -100,22 +100,34 @@ ACTION_NAMES = ["a0", "a1", "a2", "a3", "a4"]
 def load_agents() -> Dict[str, DQNAgent]:
     """
     Load all four trained DQN agents from disk in eval mode (no exploration).
+    Prioritises fine-tuned models if they exist.
 
     Returns:
         Dict mapping agent name to a DQNAgent with loaded weights and epsilon=0.
     """
+    from config import FINETUNE_MODEL_FILES
     agents: Dict[str, DQNAgent] = {}
     for name in ["sp", "als", "fs", "igh"]:
         cfg   = AGENT_CONFIGS[name]
         agent = DQNAgent(cfg, SHARED_HP, device="cpu")
-        model_path = str(_FM_DAD_DIR / MODEL_FILES[name])
+        
+        ft_path  = _FM_DAD_DIR / FINETUNE_MODEL_FILES[name]
+        syn_path = _FM_DAD_DIR / MODEL_FILES[name]
+        
+        if ft_path.exists():
+            model_path = str(ft_path)
+            mode_str = "fine-tuned"
+        else:
+            model_path = str(syn_path)
+            mode_str = "synthetic"
+
         agent.load(model_path)
         agent.main_net.eval()
         agent.epsilon = 0.0   # pure greedy — no exploration
         agents[name] = agent
         logger.info(
-            "[LOAD] Agent '%s' loaded from %s (eval mode, eps=0)",
-            name.upper(), model_path,
+            "[LOAD] Agent '%s' loaded from %s (%s, eval mode, eps=0)",
+            name.upper(), model_path, mode_str,
         )
     return agents
 
@@ -128,36 +140,46 @@ def _check_gate(agent_name: str, state_dict: dict) -> bool:
     """
     Apply the detection gate for one agent on a node's features.
 
-    For SP / ALS / FS: single condition (one feature compared against one
-        threshold).  The gate fires when that condition holds.
+    For SP / ALS: single condition.
+    For IGH: three simultaneous conditions (AND gate).
+    For FS: OR of multiple clauses (nested lists).
 
-    For IGH: three simultaneous conditions (Definition 3, Eqs. 3.19–3.21,
-        Algorithm 4 line 9).  ALL must hold — any single condition alone is
-        explicable by non-attack causes (report, Section 3.3.5).
+    If GATE_CONDITIONS[agent_name] is a nested list:
+        It represents OR of ANDs. Evaluates to True if ANY sub-list (clause) evaluates to True.
+        Each sub-list is evaluated as an AND of all its conditions.
+    Otherwise (a flat list of tuples):
+        It represents a single AND of all conditions.
 
-    Returns True only if every condition in GATE_CONDITIONS[agent_name] holds.
+    Returns True only if the conditions hold.
     Returns False immediately if any monitored feature value is NaN.
-
-    Args:
-        agent_name : One of 'sp', 'als', 'fs', 'igh'.
-        state_dict : Feature name → value for this node.
-
-    Returns:
-        bool: True if the gate fires (agent should run inference).
     """
-    for feat, op, thresh in GATE_CONDITIONS[agent_name]:
-        val = state_dict.get(feat, np.nan)
-        if np.isnan(val):
-            logger.debug(
-                "[GATE] agent=%s feature=%s is NaN → gate closed",
-                agent_name.upper(), feat,
-            )
-            return False
-        if op == ">" and not (val > thresh):
-            return False
-        if op == ">=" and not (val >= thresh):
-            return False
-    return True
+    conditions = GATE_CONDITIONS[agent_name]
+    if not conditions:
+        return True
+
+    # Check if nested (list of lists/tuples)
+    is_nested = isinstance(conditions[0], list)
+
+    def check_clause(clause: List[Condition]) -> bool:
+        for feat, op, thresh in clause:
+            val = state_dict.get(feat, np.nan)
+            if np.isnan(val):
+                return False
+            if op == ">" and not (val > thresh):
+                return False
+            if op == ">=" and not (val >= thresh):
+                return False
+        return True
+
+    if is_nested:
+        # Evaluate OR of ANDs: True if any clause is satisfied
+        for clause in conditions:
+            if check_clause(clause):
+                return True
+        return False
+    else:
+        # Evaluate flat list: AND of all conditions
+        return check_clause(conditions)
 
 
 # ---------------------------------------------------------------------------
