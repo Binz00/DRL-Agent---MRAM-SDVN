@@ -1,0 +1,3 @@
+Cycle No., Flow No., PDR_k (%), d_k (ms), e2e_latency (ms), Jitter (ms), lambda_t, cpu_overhead (ms)
+50, 1, 12.2933, 7.8269, 412.314, 0, 44, 46.377
+50, 2, 24.7693, 36.3442, 177.839, 5.94107, 44, 46.377

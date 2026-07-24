@@ -12373,3 +12373,2006 @@
 [20:00:10][bridge][INFO]   Written als_state.csv (8988 rows, 7 cols)
 [20:00:10][bridge][INFO]   Written fs_state.csv (1384 rows, 11 cols)
 [20:00:10][bridge][INFO]   Written igh_state.csv (1384 rows, 11 cols)
+[00:33:38][bridge][INFO] Detected 58 cycle(s): [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58]
+[00:33:38][bridge][INFO] === load_cycle(1) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:38][bridge][INFO]   [off] Loaded 109 rows  ← observed_forwarding_fractions_1.csv
+[00:33:38][bridge][INFO]   [hop_delay] Loaded 121 rows  ← vanet_hop_delay_1.csv
+[00:33:38][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_1.csv
+[00:33:38][bridge][INFO]   [planned] Loaded 218 rows  ← verified_planned_inbound_cycle_1.csv
+[00:33:38][bridge][INFO]   [anomaly] Loaded 98 rows  ← ff_node_anomaly_scores_1.csv
+[00:33:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_1.csv
+[00:33:38][bridge][INFO]   [als] Loaded 321 rows  ← spoof_1.csv (using spoof_dev alternative)
+[00:33:38][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_1.csv
+[00:33:38][bridge][INFO]   [off] Aggregated 109 → 74 rows (per node)
+[00:33:38][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:38][bridge][INFO]   [hop_delay] Aggregated 121 → 74 rows (per node)
+[00:33:38][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:38][bridge][INFO]   [planned] Aggregated 218 → 172 rows (per node)
+[00:33:38][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   [anomaly] Aggregated 98 → 88 rows (per node)
+[00:33:38][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:38][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO] [hopcount] cycle=1: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:38][bridge][INFO]   [flow_metrics] Broadcast to 83 (cycle, flow, node) rows from 83 flow-node pairs
+[00:33:38][bridge][INFO]   [flow_metrics] Aggregated 83 → 74 rows (per node)
+[00:33:38][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:38][bridge][INFO]   After joining [hop_delay]: 74 → 74 rows
+[00:33:38][bridge][INFO]   After joining [planned]: 74 → 172 rows
+[00:33:38][bridge][INFO]   After joining [anomaly]: 172 → 172 rows
+[00:33:38][bridge][INFO]   After joining [als]: 172 → 321 rows
+[00:33:38][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:38][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:38][bridge][INFO]   Cycle 1 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:38][bridge][INFO] === load_cycle(2) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:38][bridge][INFO]   [off] Loaded 57 rows  ← observed_forwarding_fractions_2.csv
+[00:33:38][bridge][INFO]   [hop_delay] Loaded 57 rows  ← vanet_hop_delay_2.csv
+[00:33:38][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_2.csv
+[00:33:38][bridge][INFO]   [planned] Loaded 165 rows  ← verified_planned_inbound_cycle_2.csv
+[00:33:38][bridge][INFO]   [anomaly] Loaded 66 rows  ← ff_node_anomaly_scores_2.csv
+[00:33:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_2.csv
+[00:33:38][bridge][INFO]   [als] Loaded 321 rows  ← spoof_2.csv (using spoof_dev alternative)
+[00:33:38][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_2.csv
+[00:33:38][bridge][INFO]   [off] Aggregated 57 → 31 rows (per node)
+[00:33:38][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:38][bridge][INFO]   [hop_delay] Aggregated 57 → 31 rows (per node)
+[00:33:38][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:38][bridge][INFO]   [planned] Aggregated 165 → 122 rows (per node)
+[00:33:38][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   [anomaly] Aggregated 66 → 45 rows (per node)
+[00:33:38][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:38][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO] [hopcount] cycle=2: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:38][bridge][INFO]   [flow_metrics] Broadcast to 45 (cycle, flow, node) rows from 45 flow-node pairs
+[00:33:38][bridge][INFO]   [flow_metrics] Aggregated 45 → 31 rows (per node)
+[00:33:38][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:38][bridge][INFO]   After joining [hop_delay]: 31 → 31 rows
+[00:33:38][bridge][INFO]   After joining [planned]: 31 → 122 rows
+[00:33:38][bridge][INFO]   After joining [anomaly]: 122 → 122 rows
+[00:33:38][bridge][INFO]   After joining [als]: 122 → 321 rows
+[00:33:38][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:38][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:38][bridge][INFO]   Cycle 2 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:38][bridge][INFO] === load_cycle(3) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:38][bridge][INFO]   [off] Loaded 126 rows  ← observed_forwarding_fractions_3.csv
+[00:33:38][bridge][INFO]   [hop_delay] Loaded 123 rows  ← vanet_hop_delay_3.csv
+[00:33:38][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_3.csv
+[00:33:38][bridge][INFO]   [planned] Loaded 170 rows  ← verified_planned_inbound_cycle_3.csv
+[00:33:38][bridge][INFO]   [anomaly] Loaded 93 rows  ← ff_node_anomaly_scores_3.csv
+[00:33:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_3.csv
+[00:33:38][bridge][INFO]   [als] Loaded 321 rows  ← spoof_3.csv (using spoof_dev alternative)
+[00:33:38][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_3.csv
+[00:33:38][bridge][INFO]   [off] Aggregated 126 → 59 rows (per node)
+[00:33:38][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:38][bridge][INFO]   [hop_delay] Aggregated 123 → 58 rows (per node)
+[00:33:38][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:38][bridge][INFO]   [planned] Aggregated 170 → 129 rows (per node)
+[00:33:38][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   [anomaly] Aggregated 93 → 68 rows (per node)
+[00:33:38][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:38][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO] [hopcount] cycle=3: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:38][bridge][INFO]   [flow_metrics] Broadcast to 80 (cycle, flow, node) rows from 80 flow-node pairs
+[00:33:38][bridge][INFO]   [flow_metrics] Aggregated 80 → 59 rows (per node)
+[00:33:38][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:38][bridge][INFO]   After joining [hop_delay]: 59 → 59 rows
+[00:33:38][bridge][INFO]   After joining [planned]: 59 → 129 rows
+[00:33:38][bridge][INFO]   After joining [anomaly]: 129 → 129 rows
+[00:33:38][bridge][INFO]   After joining [als]: 129 → 321 rows
+[00:33:38][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:38][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:38][bridge][INFO]   Cycle 3 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:38][bridge][INFO] === load_cycle(4) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:38][bridge][INFO]   [off] Loaded 68 rows  ← observed_forwarding_fractions_4.csv
+[00:33:38][bridge][INFO]   [hop_delay] Loaded 79 rows  ← vanet_hop_delay_4.csv
+[00:33:38][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_4.csv
+[00:33:38][bridge][INFO]   [planned] Loaded 229 rows  ← verified_planned_inbound_cycle_4.csv
+[00:33:38][bridge][INFO]   [anomaly] Loaded 72 rows  ← ff_node_anomaly_scores_4.csv
+[00:33:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_4.csv
+[00:33:38][bridge][INFO]   [als] Loaded 321 rows  ← spoof_4.csv (using spoof_dev alternative)
+[00:33:38][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_4.csv
+[00:33:38][bridge][INFO]   [off] Aggregated 68 → 50 rows (per node)
+[00:33:38][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:38][bridge][INFO]   [hop_delay] Aggregated 79 → 49 rows (per node)
+[00:33:38][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:38][bridge][INFO]   [planned] Aggregated 229 → 167 rows (per node)
+[00:33:38][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   [anomaly] Aggregated 72 → 72 rows (per node)
+[00:33:38][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:38][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO] [hopcount] cycle=4: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:38][bridge][INFO]   [flow_metrics] Broadcast to 50 (cycle, flow, node) rows from 50 flow-node pairs
+[00:33:38][bridge][INFO]   [flow_metrics] Aggregated 50 → 50 rows (per node)
+[00:33:38][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:38][bridge][INFO]   After joining [hop_delay]: 50 → 50 rows
+[00:33:38][bridge][INFO]   After joining [planned]: 50 → 167 rows
+[00:33:38][bridge][INFO]   After joining [anomaly]: 167 → 167 rows
+[00:33:38][bridge][INFO]   After joining [als]: 167 → 321 rows
+[00:33:38][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:38][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:38][bridge][INFO]   Cycle 4 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:38][bridge][INFO] === load_cycle(5) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:38][bridge][INFO]   [off] Loaded 98 rows  ← observed_forwarding_fractions_5.csv
+[00:33:38][bridge][INFO]   [hop_delay] Loaded 96 rows  ← vanet_hop_delay_5.csv
+[00:33:38][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_5.csv
+[00:33:38][bridge][INFO]   [planned] Loaded 210 rows  ← verified_planned_inbound_cycle_5.csv
+[00:33:38][bridge][INFO]   [anomaly] Loaded 85 rows  ← ff_node_anomaly_scores_5.csv
+[00:33:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_5.csv
+[00:33:38][bridge][INFO]   [als] Loaded 321 rows  ← spoof_5.csv (using spoof_dev alternative)
+[00:33:38][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_5.csv
+[00:33:38][bridge][INFO]   [off] Aggregated 98 → 66 rows (per node)
+[00:33:38][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:38][bridge][INFO]   [hop_delay] Aggregated 96 → 65 rows (per node)
+[00:33:38][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:38][bridge][INFO]   [planned] Aggregated 210 → 165 rows (per node)
+[00:33:38][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:38][bridge][INFO]   [anomaly] Aggregated 85 → 82 rows (per node)
+[00:33:38][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:38][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:38][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO] [hopcount] cycle=5: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:39][bridge][INFO]   [flow_metrics] Broadcast to 68 (cycle, flow, node) rows from 68 flow-node pairs
+[00:33:39][bridge][INFO]   [flow_metrics] Aggregated 68 → 66 rows (per node)
+[00:33:39][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:39][bridge][INFO]   After joining [hop_delay]: 66 → 66 rows
+[00:33:39][bridge][INFO]   After joining [planned]: 66 → 165 rows
+[00:33:39][bridge][INFO]   After joining [anomaly]: 165 → 165 rows
+[00:33:39][bridge][INFO]   After joining [als]: 165 → 321 rows
+[00:33:39][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:39][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:39][bridge][INFO]   Cycle 5 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:39][bridge][INFO] === load_cycle(6) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:39][bridge][INFO]   [off] Loaded 59 rows  ← observed_forwarding_fractions_6.csv
+[00:33:39][bridge][INFO]   [hop_delay] Loaded 60 rows  ← vanet_hop_delay_6.csv
+[00:33:39][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_6.csv
+[00:33:39][bridge][INFO]   [planned] Loaded 155 rows  ← verified_planned_inbound_cycle_6.csv
+[00:33:39][bridge][INFO]   [anomaly] Loaded 66 rows  ← ff_node_anomaly_scores_6.csv
+[00:33:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_6.csv
+[00:33:39][bridge][INFO]   [als] Loaded 321 rows  ← spoof_6.csv (using spoof_dev alternative)
+[00:33:39][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_6.csv
+[00:33:39][bridge][INFO]   [off] Aggregated 59 → 38 rows (per node)
+[00:33:39][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:39][bridge][INFO]   [hop_delay] Aggregated 60 → 38 rows (per node)
+[00:33:39][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:39][bridge][INFO]   [planned] Aggregated 155 → 111 rows (per node)
+[00:33:39][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   [anomaly] Aggregated 66 → 55 rows (per node)
+[00:33:39][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:39][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO] [hopcount] cycle=6: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:39][bridge][INFO]   [flow_metrics] Broadcast to 43 (cycle, flow, node) rows from 43 flow-node pairs
+[00:33:39][bridge][INFO]   [flow_metrics] Aggregated 43 → 38 rows (per node)
+[00:33:39][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:39][bridge][INFO]   After joining [hop_delay]: 38 → 38 rows
+[00:33:39][bridge][INFO]   After joining [planned]: 38 → 111 rows
+[00:33:39][bridge][INFO]   After joining [anomaly]: 111 → 111 rows
+[00:33:39][bridge][INFO]   After joining [als]: 111 → 321 rows
+[00:33:39][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:39][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:39][bridge][INFO]   Cycle 6 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:39][bridge][INFO] === load_cycle(7) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:39][bridge][INFO]   [off] Loaded 63 rows  ← observed_forwarding_fractions_7.csv
+[00:33:39][bridge][INFO]   [hop_delay] Loaded 76 rows  ← vanet_hop_delay_7.csv
+[00:33:39][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_7.csv
+[00:33:39][bridge][INFO]   [planned] Loaded 179 rows  ← verified_planned_inbound_cycle_7.csv
+[00:33:39][bridge][INFO]   [anomaly] Loaded 64 rows  ← ff_node_anomaly_scores_7.csv
+[00:33:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_7.csv
+[00:33:39][bridge][INFO]   [als] Loaded 321 rows  ← spoof_7.csv (using spoof_dev alternative)
+[00:33:39][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_7.csv
+[00:33:39][bridge][INFO]   [off] Aggregated 63 → 50 rows (per node)
+[00:33:39][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:39][bridge][INFO]   [hop_delay] Aggregated 76 → 47 rows (per node)
+[00:33:39][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:39][bridge][INFO]   [planned] Aggregated 179 → 133 rows (per node)
+[00:33:39][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   [anomaly] Aggregated 64 → 62 rows (per node)
+[00:33:39][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:39][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO] [hopcount] cycle=7: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:39][bridge][INFO]   [flow_metrics] Broadcast to 51 (cycle, flow, node) rows from 51 flow-node pairs
+[00:33:39][bridge][INFO]   [flow_metrics] Aggregated 51 → 50 rows (per node)
+[00:33:39][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:39][bridge][INFO]   After joining [hop_delay]: 50 → 50 rows
+[00:33:39][bridge][INFO]   After joining [planned]: 50 → 133 rows
+[00:33:39][bridge][INFO]   After joining [anomaly]: 133 → 133 rows
+[00:33:39][bridge][INFO]   After joining [als]: 133 → 321 rows
+[00:33:39][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:39][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:39][bridge][INFO]   Cycle 7 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:39][bridge][INFO] === load_cycle(8) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:39][bridge][INFO]   [off] Loaded 78 rows  ← observed_forwarding_fractions_8.csv
+[00:33:39][bridge][INFO]   [hop_delay] Loaded 81 rows  ← vanet_hop_delay_8.csv
+[00:33:39][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_8.csv
+[00:33:39][bridge][INFO]   [planned] Loaded 156 rows  ← verified_planned_inbound_cycle_8.csv
+[00:33:39][bridge][INFO]   [anomaly] Loaded 84 rows  ← ff_node_anomaly_scores_8.csv
+[00:33:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_8.csv
+[00:33:39][bridge][INFO]   [als] Loaded 321 rows  ← spoof_8.csv (using spoof_dev alternative)
+[00:33:39][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_8.csv
+[00:33:39][bridge][INFO]   [off] Aggregated 78 → 45 rows (per node)
+[00:33:39][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:39][bridge][INFO]   [hop_delay] Aggregated 81 → 45 rows (per node)
+[00:33:39][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:39][bridge][INFO]   [planned] Aggregated 156 → 110 rows (per node)
+[00:33:39][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   [anomaly] Aggregated 84 → 59 rows (per node)
+[00:33:39][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:39][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO] [hopcount] cycle=8: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:39][bridge][INFO]   [flow_metrics] Broadcast to 63 (cycle, flow, node) rows from 63 flow-node pairs
+[00:33:39][bridge][INFO]   [flow_metrics] Aggregated 63 → 45 rows (per node)
+[00:33:39][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:39][bridge][INFO]   After joining [hop_delay]: 45 → 45 rows
+[00:33:39][bridge][INFO]   After joining [planned]: 45 → 110 rows
+[00:33:39][bridge][INFO]   After joining [anomaly]: 110 → 110 rows
+[00:33:39][bridge][INFO]   After joining [als]: 110 → 321 rows
+[00:33:39][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:39][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:39][bridge][INFO]   Cycle 8 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:39][bridge][INFO] === load_cycle(9) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:39][bridge][INFO]   [off] Loaded 54 rows  ← observed_forwarding_fractions_9.csv
+[00:33:39][bridge][INFO]   [hop_delay] Loaded 67 rows  ← vanet_hop_delay_9.csv
+[00:33:39][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_9.csv
+[00:33:39][bridge][INFO]   [planned] Loaded 169 rows  ← verified_planned_inbound_cycle_9.csv
+[00:33:39][bridge][INFO]   [anomaly] Loaded 55 rows  ← ff_node_anomaly_scores_9.csv
+[00:33:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_9.csv
+[00:33:39][bridge][INFO]   [als] Loaded 321 rows  ← spoof_9.csv (using spoof_dev alternative)
+[00:33:39][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_9.csv
+[00:33:39][bridge][INFO]   [off] Aggregated 54 → 37 rows (per node)
+[00:33:39][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:39][bridge][INFO]   [hop_delay] Aggregated 67 → 37 rows (per node)
+[00:33:39][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:39][bridge][INFO]   [planned] Aggregated 169 → 150 rows (per node)
+[00:33:39][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   [anomaly] Aggregated 55 → 49 rows (per node)
+[00:33:39][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:39][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO] [hopcount] cycle=9: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:39][bridge][INFO]   [flow_metrics] Broadcast to 40 (cycle, flow, node) rows from 40 flow-node pairs
+[00:33:39][bridge][INFO]   [flow_metrics] Aggregated 40 → 37 rows (per node)
+[00:33:39][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:39][bridge][INFO]   After joining [hop_delay]: 37 → 37 rows
+[00:33:39][bridge][INFO]   After joining [planned]: 37 → 150 rows
+[00:33:39][bridge][INFO]   After joining [anomaly]: 150 → 150 rows
+[00:33:39][bridge][INFO]   After joining [als]: 150 → 321 rows
+[00:33:39][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:39][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:39][bridge][INFO]   Cycle 9 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:39][bridge][INFO] === load_cycle(10) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:39][bridge][INFO]   [off] Loaded 50 rows  ← observed_forwarding_fractions_10.csv
+[00:33:39][bridge][INFO]   [hop_delay] Loaded 59 rows  ← vanet_hop_delay_10.csv
+[00:33:39][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_10.csv
+[00:33:39][bridge][INFO]   [planned] Loaded 218 rows  ← verified_planned_inbound_cycle_10.csv
+[00:33:39][bridge][INFO]   [anomaly] Loaded 57 rows  ← ff_node_anomaly_scores_10.csv
+[00:33:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_10.csv
+[00:33:39][bridge][INFO]   [als] Loaded 321 rows  ← spoof_10.csv (using spoof_dev alternative)
+[00:33:39][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_10.csv
+[00:33:39][bridge][INFO]   [off] Aggregated 50 → 44 rows (per node)
+[00:33:39][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:39][bridge][INFO]   [hop_delay] Aggregated 59 → 44 rows (per node)
+[00:33:39][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:39][bridge][INFO]   [planned] Aggregated 218 → 145 rows (per node)
+[00:33:39][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:39][bridge][INFO]   [anomaly] Aggregated 57 → 55 rows (per node)
+[00:33:39][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:39][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:39][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:40][bridge][INFO] [hopcount] cycle=10: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:40][bridge][INFO]   [flow_metrics] Broadcast to 44 (cycle, flow, node) rows from 44 flow-node pairs
+[00:33:40][bridge][INFO]   [flow_metrics] Aggregated 44 → 44 rows (per node)
+[00:33:40][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:40][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:40][bridge][INFO]   After joining [hop_delay]: 44 → 44 rows
+[00:33:40][bridge][INFO]   After joining [planned]: 44 → 145 rows
+[00:33:40][bridge][INFO]   After joining [anomaly]: 145 → 145 rows
+[00:33:40][bridge][INFO]   After joining [als]: 145 → 321 rows
+[00:33:40][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:40][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:40][bridge][INFO]   Cycle 10 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:40][bridge][INFO] === load_cycle(11) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:40][bridge][INFO]   [off] Loaded 41 rows  ← observed_forwarding_fractions_11.csv
+[00:33:40][bridge][INFO]   [hop_delay] Loaded 52 rows  ← vanet_hop_delay_11.csv
+[00:33:40][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_11.csv
+[00:33:40][bridge][INFO]   [planned] Loaded 151 rows  ← verified_planned_inbound_cycle_11.csv
+[00:33:40][bridge][INFO]   [anomaly] Loaded 55 rows  ← ff_node_anomaly_scores_11.csv
+[00:33:40][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_11.csv
+[00:33:40][bridge][INFO]   [als] Loaded 321 rows  ← spoof_11.csv (using spoof_dev alternative)
+[00:33:40][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_11.csv
+[00:33:40][bridge][INFO]   [off] Aggregated 41 → 20 rows (per node)
+[00:33:40][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:40][bridge][INFO]   [hop_delay] Aggregated 52 → 20 rows (per node)
+[00:33:40][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:40][bridge][INFO]   [planned] Aggregated 151 → 114 rows (per node)
+[00:33:40][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:40][bridge][INFO]   [anomaly] Aggregated 55 → 33 rows (per node)
+[00:33:40][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:40][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:40][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:40][bridge][INFO] [hopcount] cycle=11: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:40][bridge][INFO]   [flow_metrics] Broadcast to 32 (cycle, flow, node) rows from 32 flow-node pairs
+[00:33:40][bridge][INFO]   [flow_metrics] Aggregated 32 → 20 rows (per node)
+[00:33:40][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:40][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:40][bridge][INFO]   After joining [hop_delay]: 20 → 20 rows
+[00:33:40][bridge][INFO]   After joining [planned]: 20 → 114 rows
+[00:33:40][bridge][INFO]   After joining [anomaly]: 114 → 114 rows
+[00:33:40][bridge][INFO]   After joining [als]: 114 → 321 rows
+[00:33:40][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:40][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:40][bridge][INFO]   Cycle 11 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:40][bridge][INFO] === load_cycle(12) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:40][bridge][INFO]   [off] Loaded 63 rows  ← observed_forwarding_fractions_12.csv
+[00:33:40][bridge][INFO]   [hop_delay] Loaded 60 rows  ← vanet_hop_delay_12.csv
+[00:33:40][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_12.csv
+[00:33:40][bridge][INFO]   [planned] Loaded 213 rows  ← verified_planned_inbound_cycle_12.csv
+[00:33:40][bridge][INFO]   [anomaly] Loaded 61 rows  ← ff_node_anomaly_scores_12.csv
+[00:33:40][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_12.csv
+[00:33:40][bridge][INFO]   [als] Loaded 321 rows  ← spoof_12.csv (using spoof_dev alternative)
+[00:33:40][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_12.csv
+[00:33:40][bridge][INFO]   [off] Aggregated 63 → 41 rows (per node)
+[00:33:40][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:40][bridge][INFO]   [hop_delay] Aggregated 60 → 41 rows (per node)
+[00:33:40][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:40][bridge][INFO]   [planned] Aggregated 213 → 136 rows (per node)
+[00:33:40][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:40][bridge][INFO]   [anomaly] Aggregated 61 → 55 rows (per node)
+[00:33:40][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:40][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:40][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:45][bridge][INFO] [hopcount] cycle=12: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:45][bridge][INFO]   [flow_metrics] Broadcast to 44 (cycle, flow, node) rows from 44 flow-node pairs
+[00:33:45][bridge][INFO]   [flow_metrics] Aggregated 44 → 41 rows (per node)
+[00:33:45][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:45][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:45][bridge][INFO]   After joining [hop_delay]: 41 → 41 rows
+[00:33:45][bridge][INFO]   After joining [planned]: 41 → 136 rows
+[00:33:45][bridge][INFO]   After joining [anomaly]: 136 → 136 rows
+[00:33:45][bridge][INFO]   After joining [als]: 136 → 321 rows
+[00:33:45][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:45][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:45][bridge][INFO]   Cycle 12 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:45][bridge][INFO] === load_cycle(13) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:45][bridge][INFO]   [off] Loaded 76 rows  ← observed_forwarding_fractions_13.csv
+[00:33:45][bridge][INFO]   [hop_delay] Loaded 78 rows  ← vanet_hop_delay_13.csv
+[00:33:45][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_13.csv
+[00:33:45][bridge][INFO]   [planned] Loaded 146 rows  ← verified_planned_inbound_cycle_13.csv
+[00:33:45][bridge][INFO]   [anomaly] Loaded 58 rows  ← ff_node_anomaly_scores_13.csv
+[00:33:45][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_13.csv
+[00:33:45][bridge][INFO]   [als] Loaded 321 rows  ← spoof_13.csv (using spoof_dev alternative)
+[00:33:45][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_13.csv
+[00:33:45][bridge][INFO]   [off] Aggregated 76 → 45 rows (per node)
+[00:33:45][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:45][bridge][INFO]   [hop_delay] Aggregated 78 → 45 rows (per node)
+[00:33:45][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:45][bridge][INFO]   [planned] Aggregated 146 → 146 rows (per node)
+[00:33:45][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:45][bridge][INFO]   [anomaly] Aggregated 58 → 58 rows (per node)
+[00:33:45][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:45][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:45][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:46][bridge][INFO] [hopcount] cycle=13: 0/1 flows matched, hop_excess computed for 0 nodes
+[00:33:46][bridge][INFO]   [flow_metrics] Broadcast to 45 (cycle, flow, node) rows from 45 flow-node pairs
+[00:33:46][bridge][INFO]   [flow_metrics] Aggregated 45 → 45 rows (per node)
+[00:33:46][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:46][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:46][bridge][INFO]   After joining [hop_delay]: 45 → 45 rows
+[00:33:46][bridge][INFO]   After joining [planned]: 45 → 146 rows
+[00:33:46][bridge][INFO]   After joining [anomaly]: 146 → 146 rows
+[00:33:46][bridge][INFO]   After joining [als]: 146 → 321 rows
+[00:33:46][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:46][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:46][bridge][INFO]   Cycle 13 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:46][bridge][INFO] === load_cycle(14) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:46][bridge][INFO]   [off] Loaded 86 rows  ← observed_forwarding_fractions_14.csv
+[00:33:46][bridge][INFO]   [hop_delay] Loaded 84 rows  ← vanet_hop_delay_14.csv
+[00:33:46][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_14.csv
+[00:33:46][bridge][INFO]   [planned] Loaded 145 rows  ← verified_planned_inbound_cycle_14.csv
+[00:33:46][bridge][INFO]   [anomaly] Loaded 77 rows  ← ff_node_anomaly_scores_14.csv
+[00:33:46][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_14.csv
+[00:33:46][bridge][INFO]   [als] Loaded 321 rows  ← spoof_14.csv (using spoof_dev alternative)
+[00:33:46][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_14.csv
+[00:33:46][bridge][INFO]   [off] Aggregated 86 → 41 rows (per node)
+[00:33:46][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:46][bridge][INFO]   [hop_delay] Aggregated 84 → 40 rows (per node)
+[00:33:46][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:46][bridge][INFO]   [planned] Aggregated 145 → 103 rows (per node)
+[00:33:46][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:46][bridge][INFO]   [anomaly] Aggregated 77 → 58 rows (per node)
+[00:33:46][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:46][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:46][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:33:46][bridge][INFO] [hopcount] cycle=14: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:33:46][bridge][INFO]   [flow_metrics] Broadcast to 51 (cycle, flow, node) rows from 51 flow-node pairs
+[00:33:46][bridge][INFO]   [flow_metrics] Aggregated 51 → 41 rows (per node)
+[00:33:46][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:33:46][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:33:46][bridge][INFO]   After joining [hop_delay]: 41 → 41 rows
+[00:33:46][bridge][INFO]   After joining [planned]: 41 → 103 rows
+[00:33:46][bridge][INFO]   After joining [anomaly]: 103 → 103 rows
+[00:33:46][bridge][INFO]   After joining [als]: 103 → 321 rows
+[00:33:46][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:33:46][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:33:46][bridge][INFO]   Cycle 14 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:33:46][bridge][INFO] === load_cycle(15) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:33:46][bridge][INFO]   [off] Loaded 180 rows  ← observed_forwarding_fractions_15.csv
+[00:33:46][bridge][INFO]   [hop_delay] Loaded 188 rows  ← vanet_hop_delay_15.csv
+[00:33:46][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_15.csv
+[00:33:46][bridge][INFO]   [planned] Loaded 314 rows  ← verified_planned_inbound_cycle_15.csv
+[00:33:46][bridge][INFO]   [anomaly] Loaded 137 rows  ← ff_node_anomaly_scores_15.csv
+[00:33:46][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_15.csv
+[00:33:46][bridge][INFO]   [als] Loaded 321 rows  ← spoof_15.csv (using spoof_dev alternative)
+[00:33:46][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_15.csv
+[00:33:46][bridge][INFO]   [off] Aggregated 180 → 110 rows (per node)
+[00:33:46][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:33:46][bridge][INFO]   [hop_delay] Aggregated 188 → 108 rows (per node)
+[00:33:46][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:33:46][bridge][INFO]   [planned] Aggregated 314 → 238 rows (per node)
+[00:33:46][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:33:46][bridge][INFO]   [anomaly] Aggregated 137 → 129 rows (per node)
+[00:33:46][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:33:46][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:33:46][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO] [hopcount] cycle=15: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:21][bridge][INFO]   [flow_metrics] Broadcast to 118 (cycle, flow, node) rows from 118 flow-node pairs
+[00:34:21][bridge][INFO]   [flow_metrics] Aggregated 118 → 110 rows (per node)
+[00:34:21][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:21][bridge][INFO]   After joining [hop_delay]: 110 → 110 rows
+[00:34:21][bridge][INFO]   After joining [planned]: 110 → 238 rows
+[00:34:21][bridge][INFO]   After joining [anomaly]: 238 → 238 rows
+[00:34:21][bridge][INFO]   After joining [als]: 238 → 321 rows
+[00:34:21][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:21][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:21][bridge][INFO]   Cycle 15 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:21][bridge][INFO] === load_cycle(16) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:21][bridge][INFO]   [off] Loaded 116 rows  ← observed_forwarding_fractions_16.csv
+[00:34:21][bridge][INFO]   [hop_delay] Loaded 115 rows  ← vanet_hop_delay_16.csv
+[00:34:21][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_16.csv
+[00:34:21][bridge][INFO]   [planned] Loaded 209 rows  ← verified_planned_inbound_cycle_16.csv
+[00:34:21][bridge][INFO]   [anomaly] Loaded 93 rows  ← ff_node_anomaly_scores_16.csv
+[00:34:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_16.csv
+[00:34:21][bridge][INFO]   [als] Loaded 321 rows  ← spoof_16.csv (using spoof_dev alternative)
+[00:34:21][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_16.csv
+[00:34:21][bridge][INFO]   [off] Aggregated 116 → 78 rows (per node)
+[00:34:21][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:21][bridge][INFO]   [hop_delay] Aggregated 115 → 75 rows (per node)
+[00:34:21][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:21][bridge][INFO]   [planned] Aggregated 209 → 201 rows (per node)
+[00:34:21][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   [anomaly] Aggregated 93 → 93 rows (per node)
+[00:34:21][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:21][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO] [hopcount] cycle=16: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:21][bridge][INFO]   [flow_metrics] Broadcast to 78 (cycle, flow, node) rows from 78 flow-node pairs
+[00:34:21][bridge][INFO]   [flow_metrics] Aggregated 78 → 78 rows (per node)
+[00:34:21][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:21][bridge][INFO]   After joining [hop_delay]: 78 → 78 rows
+[00:34:21][bridge][INFO]   After joining [planned]: 78 → 201 rows
+[00:34:21][bridge][INFO]   After joining [anomaly]: 201 → 201 rows
+[00:34:21][bridge][INFO]   After joining [als]: 201 → 321 rows
+[00:34:21][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:21][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:21][bridge][INFO]   Cycle 16 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:21][bridge][INFO] === load_cycle(17) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:21][bridge][INFO]   [off] Loaded 21 rows  ← observed_forwarding_fractions_17.csv
+[00:34:21][bridge][INFO]   [hop_delay] Loaded 29 rows  ← vanet_hop_delay_17.csv
+[00:34:21][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_17.csv
+[00:34:21][bridge][INFO]   [planned] Loaded 76 rows  ← verified_planned_inbound_cycle_17.csv
+[00:34:21][bridge][INFO]   [anomaly] Loaded 32 rows  ← ff_node_anomaly_scores_17.csv
+[00:34:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_17.csv
+[00:34:21][bridge][INFO]   [als] Loaded 321 rows  ← spoof_17.csv (using spoof_dev alternative)
+[00:34:21][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_17.csv
+[00:34:21][bridge][INFO]   [off] Aggregated 21 → 21 rows (per node)
+[00:34:21][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:21][bridge][INFO]   [hop_delay] Aggregated 29 → 21 rows (per node)
+[00:34:21][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:21][bridge][INFO]   [planned] Aggregated 76 → 76 rows (per node)
+[00:34:21][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   [anomaly] Aggregated 32 → 32 rows (per node)
+[00:34:21][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:21][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO] [hopcount] cycle=17: 0/1 flows matched, hop_excess computed for 0 nodes
+[00:34:21][bridge][INFO]   [flow_metrics] Broadcast to 21 (cycle, flow, node) rows from 21 flow-node pairs
+[00:34:21][bridge][INFO]   [flow_metrics] Aggregated 21 → 21 rows (per node)
+[00:34:21][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:21][bridge][INFO]   After joining [hop_delay]: 21 → 21 rows
+[00:34:21][bridge][INFO]   After joining [planned]: 21 → 76 rows
+[00:34:21][bridge][INFO]   After joining [anomaly]: 76 → 76 rows
+[00:34:21][bridge][INFO]   After joining [als]: 76 → 321 rows
+[00:34:21][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:21][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:21][bridge][INFO]   Cycle 17 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:21][bridge][INFO] === load_cycle(18) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:21][bridge][INFO]   [off] Loaded 74 rows  ← observed_forwarding_fractions_18.csv
+[00:34:21][bridge][INFO]   [hop_delay] Loaded 81 rows  ← vanet_hop_delay_18.csv
+[00:34:21][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_18.csv
+[00:34:21][bridge][INFO]   [planned] Loaded 165 rows  ← verified_planned_inbound_cycle_18.csv
+[00:34:21][bridge][INFO]   [anomaly] Loaded 64 rows  ← ff_node_anomaly_scores_18.csv
+[00:34:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_18.csv
+[00:34:21][bridge][INFO]   [als] Loaded 321 rows  ← spoof_18.csv (using spoof_dev alternative)
+[00:34:21][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_18.csv
+[00:34:21][bridge][INFO]   [off] Aggregated 74 → 50 rows (per node)
+[00:34:21][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:21][bridge][INFO]   [hop_delay] Aggregated 81 → 50 rows (per node)
+[00:34:21][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:21][bridge][INFO]   [planned] Aggregated 165 → 140 rows (per node)
+[00:34:21][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   [anomaly] Aggregated 64 → 62 rows (per node)
+[00:34:21][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:21][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO] [hopcount] cycle=18: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:21][bridge][INFO]   [flow_metrics] Broadcast to 52 (cycle, flow, node) rows from 52 flow-node pairs
+[00:34:21][bridge][INFO]   [flow_metrics] Aggregated 52 → 50 rows (per node)
+[00:34:21][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:21][bridge][INFO]   After joining [hop_delay]: 50 → 50 rows
+[00:34:21][bridge][INFO]   After joining [planned]: 50 → 140 rows
+[00:34:21][bridge][INFO]   After joining [anomaly]: 140 → 140 rows
+[00:34:21][bridge][INFO]   After joining [als]: 140 → 321 rows
+[00:34:21][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:21][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:21][bridge][INFO]   Cycle 18 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:21][bridge][INFO] === load_cycle(19) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:21][bridge][INFO]   [off] Loaded 131 rows  ← observed_forwarding_fractions_19.csv
+[00:34:21][bridge][INFO]   [hop_delay] Loaded 147 rows  ← vanet_hop_delay_19.csv
+[00:34:21][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_19.csv
+[00:34:21][bridge][INFO]   [planned] Loaded 217 rows  ← verified_planned_inbound_cycle_19.csv
+[00:34:21][bridge][INFO]   [anomaly] Loaded 108 rows  ← ff_node_anomaly_scores_19.csv
+[00:34:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_19.csv
+[00:34:21][bridge][INFO]   [als] Loaded 321 rows  ← spoof_19.csv (using spoof_dev alternative)
+[00:34:21][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_19.csv
+[00:34:21][bridge][INFO]   [off] Aggregated 131 → 71 rows (per node)
+[00:34:21][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:21][bridge][INFO]   [hop_delay] Aggregated 147 → 71 rows (per node)
+[00:34:21][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:21][bridge][INFO]   [planned] Aggregated 217 → 167 rows (per node)
+[00:34:21][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   [anomaly] Aggregated 108 → 79 rows (per node)
+[00:34:21][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:21][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO] [hopcount] cycle=19: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:21][bridge][INFO]   [flow_metrics] Broadcast to 95 (cycle, flow, node) rows from 95 flow-node pairs
+[00:34:21][bridge][INFO]   [flow_metrics] Aggregated 95 → 71 rows (per node)
+[00:34:21][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:21][bridge][INFO]   After joining [hop_delay]: 71 → 71 rows
+[00:34:21][bridge][INFO]   After joining [planned]: 71 → 167 rows
+[00:34:21][bridge][INFO]   After joining [anomaly]: 167 → 167 rows
+[00:34:21][bridge][INFO]   After joining [als]: 167 → 321 rows
+[00:34:21][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:21][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:21][bridge][INFO]   Cycle 19 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:21][bridge][INFO] === load_cycle(20) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:21][bridge][INFO]   [off] Loaded 81 rows  ← observed_forwarding_fractions_20.csv
+[00:34:21][bridge][INFO]   [hop_delay] Loaded 73 rows  ← vanet_hop_delay_20.csv
+[00:34:21][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_20.csv
+[00:34:21][bridge][INFO]   [planned] Loaded 217 rows  ← verified_planned_inbound_cycle_20.csv
+[00:34:21][bridge][INFO]   [anomaly] Loaded 75 rows  ← ff_node_anomaly_scores_20.csv
+[00:34:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_20.csv
+[00:34:21][bridge][INFO]   [als] Loaded 321 rows  ← spoof_20.csv (using spoof_dev alternative)
+[00:34:21][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_20.csv
+[00:34:21][bridge][INFO]   [off] Aggregated 81 → 61 rows (per node)
+[00:34:21][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:21][bridge][INFO]   [hop_delay] Aggregated 73 → 57 rows (per node)
+[00:34:21][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:21][bridge][INFO]   [planned] Aggregated 217 → 184 rows (per node)
+[00:34:21][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   [anomaly] Aggregated 75 → 70 rows (per node)
+[00:34:21][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:21][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO] [hopcount] cycle=20: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:21][bridge][INFO]   [flow_metrics] Broadcast to 66 (cycle, flow, node) rows from 66 flow-node pairs
+[00:34:21][bridge][INFO]   [flow_metrics] Aggregated 66 → 61 rows (per node)
+[00:34:21][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:21][bridge][INFO]   After joining [hop_delay]: 61 → 61 rows
+[00:34:21][bridge][INFO]   After joining [planned]: 61 → 184 rows
+[00:34:21][bridge][INFO]   After joining [anomaly]: 184 → 184 rows
+[00:34:21][bridge][INFO]   After joining [als]: 184 → 321 rows
+[00:34:21][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:21][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:21][bridge][INFO]   Cycle 20 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:21][bridge][INFO] === load_cycle(21) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:21][bridge][INFO]   [off] Loaded 124 rows  ← observed_forwarding_fractions_21.csv
+[00:34:21][bridge][INFO]   [hop_delay] Loaded 114 rows  ← vanet_hop_delay_21.csv
+[00:34:21][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_21.csv
+[00:34:21][bridge][INFO]   [planned] Loaded 198 rows  ← verified_planned_inbound_cycle_21.csv
+[00:34:21][bridge][INFO]   [anomaly] Loaded 92 rows  ← ff_node_anomaly_scores_21.csv
+[00:34:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_21.csv
+[00:34:21][bridge][INFO]   [als] Loaded 321 rows  ← spoof_21.csv (using spoof_dev alternative)
+[00:34:21][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_21.csv
+[00:34:21][bridge][INFO]   [off] Aggregated 124 → 72 rows (per node)
+[00:34:21][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:21][bridge][INFO]   [hop_delay] Aggregated 114 → 69 rows (per node)
+[00:34:21][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:21][bridge][INFO]   [planned] Aggregated 198 → 172 rows (per node)
+[00:34:21][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:21][bridge][INFO]   [anomaly] Aggregated 92 → 90 rows (per node)
+[00:34:21][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:21][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:21][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=21: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 73 (cycle, flow, node) rows from 73 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 73 → 72 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 72 → 72 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 72 → 172 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 172 → 172 rows
+[00:34:25][bridge][INFO]   After joining [als]: 172 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 21 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(22) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 122 rows  ← observed_forwarding_fractions_22.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 138 rows  ← vanet_hop_delay_22.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_22.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 172 rows  ← verified_planned_inbound_cycle_22.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 98 rows  ← ff_node_anomaly_scores_22.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_22.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_22.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_22.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 122 → 77 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 138 → 73 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 172 → 139 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 98 → 89 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=22: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 85 (cycle, flow, node) rows from 85 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 85 → 77 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 77 → 77 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 77 → 139 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 139 → 139 rows
+[00:34:25][bridge][INFO]   After joining [als]: 139 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 22 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(23) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 72 rows  ← observed_forwarding_fractions_23.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 80 rows  ← vanet_hop_delay_23.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_23.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 117 rows  ← verified_planned_inbound_cycle_23.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 65 rows  ← ff_node_anomaly_scores_23.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_23.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_23.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_23.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 72 → 56 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 80 → 54 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 117 → 117 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 65 → 65 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=23: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 56 (cycle, flow, node) rows from 56 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 56 → 56 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 56 → 56 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 56 → 117 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 117 → 117 rows
+[00:34:25][bridge][INFO]   After joining [als]: 117 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 23 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(24) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 89 rows  ← observed_forwarding_fractions_24.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 93 rows  ← vanet_hop_delay_24.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_24.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 150 rows  ← verified_planned_inbound_cycle_24.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 83 rows  ← ff_node_anomaly_scores_24.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_24.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_24.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_24.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 89 → 53 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 93 → 53 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 150 → 113 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 83 → 68 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=24: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 61 (cycle, flow, node) rows from 61 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 61 → 53 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 53 → 53 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 53 → 113 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 113 → 113 rows
+[00:34:25][bridge][INFO]   After joining [als]: 113 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 24 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(25) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 86 rows  ← observed_forwarding_fractions_25.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 83 rows  ← vanet_hop_delay_25.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_25.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 152 rows  ← verified_planned_inbound_cycle_25.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 78 rows  ← ff_node_anomaly_scores_25.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_25.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_25.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_25.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 86 → 61 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 83 → 59 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 152 → 130 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 78 → 73 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=25: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 64 (cycle, flow, node) rows from 64 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 64 → 61 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 61 → 61 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 61 → 130 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 130 → 130 rows
+[00:34:25][bridge][INFO]   After joining [als]: 130 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 25 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(26) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 121 rows  ← observed_forwarding_fractions_26.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 132 rows  ← vanet_hop_delay_26.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_26.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 171 rows  ← verified_planned_inbound_cycle_26.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 95 rows  ← ff_node_anomaly_scores_26.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_26.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_26.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_26.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 121 → 79 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 132 → 79 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 171 → 168 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 95 → 95 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=26: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 79 (cycle, flow, node) rows from 79 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 79 → 79 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 79 → 79 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 79 → 168 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 168 → 168 rows
+[00:34:25][bridge][INFO]   After joining [als]: 168 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 26 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(27) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 80 rows  ← observed_forwarding_fractions_27.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 79 rows  ← vanet_hop_delay_27.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_27.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 157 rows  ← verified_planned_inbound_cycle_27.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 78 rows  ← ff_node_anomaly_scores_27.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_27.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_27.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_27.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 80 → 49 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 79 → 45 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 157 → 125 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 78 → 63 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=27: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 57 (cycle, flow, node) rows from 57 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 57 → 49 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 49 → 49 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 49 → 125 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 125 → 125 rows
+[00:34:25][bridge][INFO]   After joining [als]: 125 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 27 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(28) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 86 rows  ← observed_forwarding_fractions_28.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 103 rows  ← vanet_hop_delay_28.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_28.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 134 rows  ← verified_planned_inbound_cycle_28.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 78 rows  ← ff_node_anomaly_scores_28.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_28.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_28.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_28.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 86 → 64 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:25][bridge][INFO]   [hop_delay] Aggregated 103 → 63 rows (per node)
+[00:34:25][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:25][bridge][INFO]   [planned] Aggregated 134 → 134 rows (per node)
+[00:34:25][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   [anomaly] Aggregated 78 → 78 rows (per node)
+[00:34:25][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:25][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:25][bridge][INFO] [hopcount] cycle=28: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:25][bridge][INFO]   [flow_metrics] Broadcast to 64 (cycle, flow, node) rows from 64 flow-node pairs
+[00:34:25][bridge][INFO]   [flow_metrics] Aggregated 64 → 64 rows (per node)
+[00:34:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:25][bridge][INFO]   After joining [hop_delay]: 64 → 64 rows
+[00:34:25][bridge][INFO]   After joining [planned]: 64 → 134 rows
+[00:34:25][bridge][INFO]   After joining [anomaly]: 134 → 134 rows
+[00:34:25][bridge][INFO]   After joining [als]: 134 → 321 rows
+[00:34:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:25][bridge][INFO]   Cycle 28 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:25][bridge][INFO] === load_cycle(29) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:25][bridge][INFO]   [off] Loaded 75 rows  ← observed_forwarding_fractions_29.csv
+[00:34:25][bridge][INFO]   [hop_delay] Loaded 94 rows  ← vanet_hop_delay_29.csv
+[00:34:25][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_29.csv
+[00:34:25][bridge][INFO]   [planned] Loaded 194 rows  ← verified_planned_inbound_cycle_29.csv
+[00:34:25][bridge][INFO]   [anomaly] Loaded 70 rows  ← ff_node_anomaly_scores_29.csv
+[00:34:25][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_29.csv
+[00:34:25][bridge][INFO]   [als] Loaded 321 rows  ← spoof_29.csv (using spoof_dev alternative)
+[00:34:25][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_29.csv
+[00:34:25][bridge][INFO]   [off] Aggregated 75 → 57 rows (per node)
+[00:34:25][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 94 → 55 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 194 → 160 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 70 → 69 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=29: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 57 (cycle, flow, node) rows from 57 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 57 → 57 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 57 → 57 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 57 → 160 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 160 → 160 rows
+[00:34:26][bridge][INFO]   After joining [als]: 160 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 29 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(30) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 85 rows  ← observed_forwarding_fractions_30.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 82 rows  ← vanet_hop_delay_30.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_30.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 194 rows  ← verified_planned_inbound_cycle_30.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 84 rows  ← ff_node_anomaly_scores_30.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_30.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_30.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_30.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 85 → 67 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 82 → 64 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 194 → 186 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 84 → 84 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=30: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 67 (cycle, flow, node) rows from 67 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 67 → 67 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 67 → 67 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 67 → 186 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 186 → 186 rows
+[00:34:26][bridge][INFO]   After joining [als]: 186 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 30 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(31) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 76 rows  ← observed_forwarding_fractions_31.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 88 rows  ← vanet_hop_delay_31.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_31.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 239 rows  ← verified_planned_inbound_cycle_31.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 79 rows  ← ff_node_anomaly_scores_31.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_31.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_31.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_31.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 76 → 48 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 88 → 46 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 239 → 178 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 79 → 61 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=31: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 61 (cycle, flow, node) rows from 61 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 61 → 48 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 48 → 48 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 48 → 178 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 178 → 178 rows
+[00:34:26][bridge][INFO]   After joining [als]: 178 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 31 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(32) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 65 rows  ← observed_forwarding_fractions_32.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 84 rows  ← vanet_hop_delay_32.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_32.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 141 rows  ← verified_planned_inbound_cycle_32.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 75 rows  ← ff_node_anomaly_scores_32.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_32.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_32.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_32.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 65 → 54 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 84 → 54 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 141 → 94 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 75 → 69 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=32: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 58 (cycle, flow, node) rows from 58 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 58 → 54 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 54 → 54 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 54 → 94 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 94 → 94 rows
+[00:34:26][bridge][INFO]   After joining [als]: 94 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 32 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(33) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 75 rows  ← observed_forwarding_fractions_33.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 91 rows  ← vanet_hop_delay_33.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_33.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 150 rows  ← verified_planned_inbound_cycle_33.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 67 rows  ← ff_node_anomaly_scores_33.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_33.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_33.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_33.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 75 → 56 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 91 → 55 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 150 → 140 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 67 → 67 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=33: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 56 (cycle, flow, node) rows from 56 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 56 → 56 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 56 → 56 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 56 → 140 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 140 → 140 rows
+[00:34:26][bridge][INFO]   After joining [als]: 140 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 33 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(34) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 42 rows  ← observed_forwarding_fractions_34.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 54 rows  ← vanet_hop_delay_34.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_34.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 94 rows  ← verified_planned_inbound_cycle_34.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 47 rows  ← ff_node_anomaly_scores_34.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_34.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_34.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_34.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 42 → 31 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 54 → 30 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 94 → 94 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 47 → 47 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=34: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 31 (cycle, flow, node) rows from 31 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 31 → 31 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 31 → 31 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 31 → 94 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 94 → 94 rows
+[00:34:26][bridge][INFO]   After joining [als]: 94 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 34 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(35) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 69 rows  ← observed_forwarding_fractions_35.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 86 rows  ← vanet_hop_delay_35.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_35.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 165 rows  ← verified_planned_inbound_cycle_35.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 64 rows  ← ff_node_anomaly_scores_35.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_35.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_35.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_35.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 69 → 52 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 86 → 52 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 165 → 151 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 64 → 64 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=35: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 52 (cycle, flow, node) rows from 52 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 52 → 52 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 52 → 52 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 52 → 151 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 151 → 151 rows
+[00:34:26][bridge][INFO]   After joining [als]: 151 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 35 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(36) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 42 rows  ← observed_forwarding_fractions_36.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 50 rows  ← vanet_hop_delay_36.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_36.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 134 rows  ← verified_planned_inbound_cycle_36.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 44 rows  ← ff_node_anomaly_scores_36.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_36.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_36.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_36.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 42 → 32 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 50 → 31 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 134 → 104 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 44 → 42 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=36: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 33 (cycle, flow, node) rows from 33 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 33 → 32 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 32 → 32 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 32 → 104 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 104 → 104 rows
+[00:34:26][bridge][INFO]   After joining [als]: 104 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 36 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(37) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 103 rows  ← observed_forwarding_fractions_37.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 103 rows  ← vanet_hop_delay_37.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_37.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 181 rows  ← verified_planned_inbound_cycle_37.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 87 rows  ← ff_node_anomaly_scores_37.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_37.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_37.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_37.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 103 → 66 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 103 → 66 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 181 → 151 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 87 → 81 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=37: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 70 (cycle, flow, node) rows from 70 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 70 → 66 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 66 → 66 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 66 → 151 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 151 → 151 rows
+[00:34:26][bridge][INFO]   After joining [als]: 151 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 37 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(38) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 62 rows  ← observed_forwarding_fractions_38.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 73 rows  ← vanet_hop_delay_38.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_38.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 133 rows  ← verified_planned_inbound_cycle_38.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 64 rows  ← ff_node_anomaly_scores_38.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_38.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_38.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_38.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 62 → 47 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 73 → 44 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 133 → 113 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 64 → 60 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO] [hopcount] cycle=38: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:26][bridge][INFO]   [flow_metrics] Broadcast to 50 (cycle, flow, node) rows from 50 flow-node pairs
+[00:34:26][bridge][INFO]   [flow_metrics] Aggregated 50 → 47 rows (per node)
+[00:34:26][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:26][bridge][INFO]   After joining [hop_delay]: 47 → 47 rows
+[00:34:26][bridge][INFO]   After joining [planned]: 47 → 113 rows
+[00:34:26][bridge][INFO]   After joining [anomaly]: 113 → 113 rows
+[00:34:26][bridge][INFO]   After joining [als]: 113 → 321 rows
+[00:34:26][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:26][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:26][bridge][INFO]   Cycle 38 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:26][bridge][INFO] === load_cycle(39) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:26][bridge][INFO]   [off] Loaded 64 rows  ← observed_forwarding_fractions_39.csv
+[00:34:26][bridge][INFO]   [hop_delay] Loaded 62 rows  ← vanet_hop_delay_39.csv
+[00:34:26][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_39.csv
+[00:34:26][bridge][INFO]   [planned] Loaded 235 rows  ← verified_planned_inbound_cycle_39.csv
+[00:34:26][bridge][INFO]   [anomaly] Loaded 55 rows  ← ff_node_anomaly_scores_39.csv
+[00:34:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_39.csv
+[00:34:26][bridge][INFO]   [als] Loaded 321 rows  ← spoof_39.csv (using spoof_dev alternative)
+[00:34:26][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_39.csv
+[00:34:26][bridge][INFO]   [off] Aggregated 64 → 41 rows (per node)
+[00:34:26][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:26][bridge][INFO]   [hop_delay] Aggregated 62 → 40 rows (per node)
+[00:34:26][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:26][bridge][INFO]   [planned] Aggregated 235 → 167 rows (per node)
+[00:34:26][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:26][bridge][INFO]   [anomaly] Aggregated 55 → 54 rows (per node)
+[00:34:26][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:26][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:26][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=39: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 41 (cycle, flow, node) rows from 41 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 41 → 41 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 41 → 41 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 41 → 167 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 167 → 167 rows
+[00:34:31][bridge][INFO]   After joining [als]: 167 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 39 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(40) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 79 rows  ← observed_forwarding_fractions_40.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 100 rows  ← vanet_hop_delay_40.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_40.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 155 rows  ← verified_planned_inbound_cycle_40.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 71 rows  ← ff_node_anomaly_scores_40.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_40.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_40.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_40.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 79 → 56 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 100 → 56 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 155 → 142 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 71 → 68 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=40: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 59 (cycle, flow, node) rows from 59 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 59 → 56 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 56 → 56 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 56 → 142 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 142 → 142 rows
+[00:34:31][bridge][INFO]   After joining [als]: 142 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 40 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(41) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 93 rows  ← observed_forwarding_fractions_41.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 110 rows  ← vanet_hop_delay_41.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_41.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 176 rows  ← verified_planned_inbound_cycle_41.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 80 rows  ← ff_node_anomaly_scores_41.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_41.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_41.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_41.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 93 → 64 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 110 → 61 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 176 → 156 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 80 → 74 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=41: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 70 (cycle, flow, node) rows from 70 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 70 → 64 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 64 → 64 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 64 → 156 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 156 → 156 rows
+[00:34:31][bridge][INFO]   After joining [als]: 156 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 41 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(42) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 79 rows  ← observed_forwarding_fractions_42.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 78 rows  ← vanet_hop_delay_42.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_42.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 155 rows  ← verified_planned_inbound_cycle_42.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 76 rows  ← ff_node_anomaly_scores_42.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_42.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_42.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_42.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 79 → 49 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 78 → 44 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 155 → 118 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 76 → 67 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=42: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 57 (cycle, flow, node) rows from 57 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 57 → 49 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 49 → 49 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 49 → 118 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 118 → 118 rows
+[00:34:31][bridge][INFO]   After joining [als]: 118 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 42 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(43) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 150 rows  ← observed_forwarding_fractions_43.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 151 rows  ← vanet_hop_delay_43.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_43.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 176 rows  ← verified_planned_inbound_cycle_43.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 108 rows  ← ff_node_anomaly_scores_43.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_43.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_43.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_43.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 150 → 83 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 151 → 82 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 176 → 140 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 108 → 97 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=43: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 94 (cycle, flow, node) rows from 94 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 94 → 83 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 83 → 83 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 83 → 140 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 140 → 140 rows
+[00:34:31][bridge][INFO]   After joining [als]: 140 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 43 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(44) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 103 rows  ← observed_forwarding_fractions_44.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 119 rows  ← vanet_hop_delay_44.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_44.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 158 rows  ← verified_planned_inbound_cycle_44.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 75 rows  ← ff_node_anomaly_scores_44.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_44.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_44.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_44.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 103 → 63 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 119 → 63 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 158 → 140 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 75 → 75 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=44: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 63 (cycle, flow, node) rows from 63 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 63 → 63 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 63 → 63 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 63 → 140 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 140 → 140 rows
+[00:34:31][bridge][INFO]   After joining [als]: 140 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 44 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(45) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 35 rows  ← observed_forwarding_fractions_45.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 41 rows  ← vanet_hop_delay_45.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_45.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 81 rows  ← verified_planned_inbound_cycle_45.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 38 rows  ← ff_node_anomaly_scores_45.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_45.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_45.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_45.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 35 → 28 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 41 → 28 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 81 → 81 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 38 → 38 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=45: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 28 (cycle, flow, node) rows from 28 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 28 → 28 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 28 → 28 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 28 → 81 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 81 → 81 rows
+[00:34:31][bridge][INFO]   After joining [als]: 81 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 45 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(46) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 65 rows  ← observed_forwarding_fractions_46.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 78 rows  ← vanet_hop_delay_46.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_46.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 159 rows  ← verified_planned_inbound_cycle_46.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 67 rows  ← ff_node_anomaly_scores_46.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_46.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_46.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_46.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 65 → 56 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 78 → 54 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 159 → 126 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 67 → 67 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=46: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 56 (cycle, flow, node) rows from 56 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 56 → 56 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 56 → 56 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 56 → 126 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 126 → 126 rows
+[00:34:31][bridge][INFO]   After joining [als]: 126 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 46 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(47) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 27 rows  ← observed_forwarding_fractions_47.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 34 rows  ← vanet_hop_delay_47.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_47.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 207 rows  ← verified_planned_inbound_cycle_47.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 33 rows  ← ff_node_anomaly_scores_47.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_47.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_47.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_47.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 27 → 25 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 34 → 22 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 207 → 163 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 33 → 32 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=47: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 25 (cycle, flow, node) rows from 25 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 25 → 25 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 25 → 25 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 25 → 163 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 163 → 163 rows
+[00:34:31][bridge][INFO]   After joining [als]: 163 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 47 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(48) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 37 rows  ← observed_forwarding_fractions_48.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 33 rows  ← vanet_hop_delay_48.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_48.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 204 rows  ← verified_planned_inbound_cycle_48.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 41 rows  ← ff_node_anomaly_scores_48.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_48.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_48.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_48.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 37 → 28 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 33 → 28 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 204 → 171 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 41 → 41 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=48: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 28 (cycle, flow, node) rows from 28 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 28 → 28 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 28 → 28 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 28 → 171 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 171 → 171 rows
+[00:34:31][bridge][INFO]   After joining [als]: 171 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 48 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(49) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 107 rows  ← observed_forwarding_fractions_49.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 117 rows  ← vanet_hop_delay_49.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_49.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 165 rows  ← verified_planned_inbound_cycle_49.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 76 rows  ← ff_node_anomaly_scores_49.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_49.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_49.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_49.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 107 → 66 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 117 → 64 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 165 → 138 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 76 → 74 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=49: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 66 (cycle, flow, node) rows from 66 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 66 → 66 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 66 → 66 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 66 → 138 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 138 → 138 rows
+[00:34:31][bridge][INFO]   After joining [als]: 138 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 49 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(50) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 89 rows  ← observed_forwarding_fractions_50.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 80 rows  ← vanet_hop_delay_50.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_50.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 155 rows  ← verified_planned_inbound_cycle_50.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 76 rows  ← ff_node_anomaly_scores_50.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_50.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_50.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_50.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 89 → 58 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 80 → 53 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 155 → 135 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 76 → 73 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=50: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 61 (cycle, flow, node) rows from 61 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 61 → 58 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 58 → 58 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 58 → 135 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 135 → 135 rows
+[00:34:31][bridge][INFO]   After joining [als]: 135 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 50 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(51) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 110 rows  ← observed_forwarding_fractions_51.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 114 rows  ← vanet_hop_delay_51.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_51.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 199 rows  ← verified_planned_inbound_cycle_51.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 84 rows  ← ff_node_anomaly_scores_51.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_51.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_51.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_51.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 110 → 70 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 114 → 69 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 199 → 171 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 84 → 82 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=51: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 72 (cycle, flow, node) rows from 72 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 72 → 70 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 70 → 70 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 70 → 171 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 171 → 171 rows
+[00:34:31][bridge][INFO]   After joining [als]: 171 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 51 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(52) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 57 rows  ← observed_forwarding_fractions_52.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 66 rows  ← vanet_hop_delay_52.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_52.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 114 rows  ← verified_planned_inbound_cycle_52.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 65 rows  ← ff_node_anomaly_scores_52.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_52.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_52.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_52.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 57 → 39 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 66 → 39 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 114 → 94 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 65 → 55 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=52: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 45 (cycle, flow, node) rows from 45 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 45 → 39 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 39 → 39 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 39 → 94 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 94 → 94 rows
+[00:34:31][bridge][INFO]   After joining [als]: 94 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 52 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(53) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 43 rows  ← observed_forwarding_fractions_53.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 48 rows  ← vanet_hop_delay_53.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_53.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 149 rows  ← verified_planned_inbound_cycle_53.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 51 rows  ← ff_node_anomaly_scores_53.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_53.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_53.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_53.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 43 → 30 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 48 → 30 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 149 → 107 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 51 → 42 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO] [hopcount] cycle=53: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:31][bridge][INFO]   [flow_metrics] Broadcast to 35 (cycle, flow, node) rows from 35 flow-node pairs
+[00:34:31][bridge][INFO]   [flow_metrics] Aggregated 35 → 30 rows (per node)
+[00:34:31][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:31][bridge][INFO]   After joining [hop_delay]: 30 → 30 rows
+[00:34:31][bridge][INFO]   After joining [planned]: 30 → 107 rows
+[00:34:31][bridge][INFO]   After joining [anomaly]: 107 → 107 rows
+[00:34:31][bridge][INFO]   After joining [als]: 107 → 321 rows
+[00:34:31][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:31][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:31][bridge][INFO]   Cycle 53 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:31][bridge][INFO] === load_cycle(54) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:31][bridge][INFO]   [off] Loaded 95 rows  ← observed_forwarding_fractions_54.csv
+[00:34:31][bridge][INFO]   [hop_delay] Loaded 90 rows  ← vanet_hop_delay_54.csv
+[00:34:31][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_54.csv
+[00:34:31][bridge][INFO]   [planned] Loaded 253 rows  ← verified_planned_inbound_cycle_54.csv
+[00:34:31][bridge][INFO]   [anomaly] Loaded 81 rows  ← ff_node_anomaly_scores_54.csv
+[00:34:31][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_54.csv
+[00:34:31][bridge][INFO]   [als] Loaded 321 rows  ← spoof_54.csv (using spoof_dev alternative)
+[00:34:31][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_54.csv
+[00:34:31][bridge][INFO]   [off] Aggregated 95 → 57 rows (per node)
+[00:34:31][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:31][bridge][INFO]   [hop_delay] Aggregated 90 → 57 rows (per node)
+[00:34:31][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:31][bridge][INFO]   [planned] Aggregated 253 → 184 rows (per node)
+[00:34:31][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:31][bridge][INFO]   [anomaly] Aggregated 81 → 68 rows (per node)
+[00:34:31][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:31][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:31][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO] [hopcount] cycle=54: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:32][bridge][INFO]   [flow_metrics] Broadcast to 67 (cycle, flow, node) rows from 67 flow-node pairs
+[00:34:32][bridge][INFO]   [flow_metrics] Aggregated 67 → 57 rows (per node)
+[00:34:32][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:32][bridge][INFO]   After joining [hop_delay]: 57 → 57 rows
+[00:34:32][bridge][INFO]   After joining [planned]: 57 → 184 rows
+[00:34:32][bridge][INFO]   After joining [anomaly]: 184 → 184 rows
+[00:34:32][bridge][INFO]   After joining [als]: 184 → 321 rows
+[00:34:32][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:32][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:32][bridge][INFO]   Cycle 54 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:32][bridge][INFO] === load_cycle(55) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:32][bridge][INFO]   [off] Loaded 32 rows  ← observed_forwarding_fractions_55.csv
+[00:34:32][bridge][INFO]   [hop_delay] Loaded 32 rows  ← vanet_hop_delay_55.csv
+[00:34:32][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_55.csv
+[00:34:32][bridge][INFO]   [planned] Loaded 128 rows  ← verified_planned_inbound_cycle_55.csv
+[00:34:32][bridge][INFO]   [anomaly] Loaded 36 rows  ← ff_node_anomaly_scores_55.csv
+[00:34:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_55.csv
+[00:34:32][bridge][INFO]   [als] Loaded 321 rows  ← spoof_55.csv (using spoof_dev alternative)
+[00:34:32][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_55.csv
+[00:34:32][bridge][INFO]   [off] Aggregated 32 → 26 rows (per node)
+[00:34:32][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:32][bridge][INFO]   [hop_delay] Aggregated 32 → 23 rows (per node)
+[00:34:32][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:32][bridge][INFO]   [planned] Aggregated 128 → 126 rows (per node)
+[00:34:32][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   [anomaly] Aggregated 36 → 36 rows (per node)
+[00:34:32][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:32][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO] [hopcount] cycle=55: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:32][bridge][INFO]   [flow_metrics] Broadcast to 26 (cycle, flow, node) rows from 26 flow-node pairs
+[00:34:32][bridge][INFO]   [flow_metrics] Aggregated 26 → 26 rows (per node)
+[00:34:32][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:32][bridge][INFO]   After joining [hop_delay]: 26 → 26 rows
+[00:34:32][bridge][INFO]   After joining [planned]: 26 → 126 rows
+[00:34:32][bridge][INFO]   After joining [anomaly]: 126 → 126 rows
+[00:34:32][bridge][INFO]   After joining [als]: 126 → 321 rows
+[00:34:32][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:32][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:32][bridge][INFO]   Cycle 55 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:32][bridge][INFO] === load_cycle(56) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:32][bridge][INFO]   [off] Loaded 86 rows  ← observed_forwarding_fractions_56.csv
+[00:34:32][bridge][INFO]   [hop_delay] Loaded 80 rows  ← vanet_hop_delay_56.csv
+[00:34:32][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_56.csv
+[00:34:32][bridge][INFO]   [planned] Loaded 221 rows  ← verified_planned_inbound_cycle_56.csv
+[00:34:32][bridge][INFO]   [anomaly] Loaded 75 rows  ← ff_node_anomaly_scores_56.csv
+[00:34:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_56.csv
+[00:34:32][bridge][INFO]   [als] Loaded 321 rows  ← spoof_56.csv (using spoof_dev alternative)
+[00:34:32][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_56.csv
+[00:34:32][bridge][INFO]   [off] Aggregated 86 → 62 rows (per node)
+[00:34:32][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:32][bridge][INFO]   [hop_delay] Aggregated 80 → 62 rows (per node)
+[00:34:32][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:32][bridge][INFO]   [planned] Aggregated 221 → 160 rows (per node)
+[00:34:32][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   [anomaly] Aggregated 75 → 74 rows (per node)
+[00:34:32][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:32][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO] [hopcount] cycle=56: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:32][bridge][INFO]   [flow_metrics] Broadcast to 62 (cycle, flow, node) rows from 62 flow-node pairs
+[00:34:32][bridge][INFO]   [flow_metrics] Aggregated 62 → 62 rows (per node)
+[00:34:32][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:32][bridge][INFO]   After joining [hop_delay]: 62 → 62 rows
+[00:34:32][bridge][INFO]   After joining [planned]: 62 → 160 rows
+[00:34:32][bridge][INFO]   After joining [anomaly]: 160 → 160 rows
+[00:34:32][bridge][INFO]   After joining [als]: 160 → 321 rows
+[00:34:32][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:32][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:32][bridge][INFO]   Cycle 56 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:32][bridge][INFO] === load_cycle(57) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:32][bridge][INFO]   [off] Loaded 83 rows  ← observed_forwarding_fractions_57.csv
+[00:34:32][bridge][INFO]   [hop_delay] Loaded 87 rows  ← vanet_hop_delay_57.csv
+[00:34:32][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_57.csv
+[00:34:32][bridge][INFO]   [planned] Loaded 128 rows  ← verified_planned_inbound_cycle_57.csv
+[00:34:32][bridge][INFO]   [anomaly] Loaded 51 rows  ← ff_node_anomaly_scores_57.csv
+[00:34:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_57.csv
+[00:34:32][bridge][INFO]   [als] Loaded 321 rows  ← spoof_57.csv (using spoof_dev alternative)
+[00:34:32][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_57.csv
+[00:34:32][bridge][INFO]   [off] Aggregated 83 → 44 rows (per node)
+[00:34:32][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:32][bridge][INFO]   [hop_delay] Aggregated 87 → 43 rows (per node)
+[00:34:32][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:32][bridge][INFO]   [planned] Aggregated 128 → 119 rows (per node)
+[00:34:32][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   [anomaly] Aggregated 51 → 51 rows (per node)
+[00:34:32][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:32][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO] [hopcount] cycle=57: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:32][bridge][INFO]   [flow_metrics] Broadcast to 44 (cycle, flow, node) rows from 44 flow-node pairs
+[00:34:32][bridge][INFO]   [flow_metrics] Aggregated 44 → 44 rows (per node)
+[00:34:32][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:32][bridge][INFO]   After joining [hop_delay]: 44 → 44 rows
+[00:34:32][bridge][INFO]   After joining [planned]: 44 → 119 rows
+[00:34:32][bridge][INFO]   After joining [anomaly]: 119 → 119 rows
+[00:34:32][bridge][INFO]   After joining [als]: 119 → 321 rows
+[00:34:32][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:32][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:32][bridge][INFO]   Cycle 57 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:32][bridge][INFO] === load_cycle(58) | folder=/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs ===
+[00:34:32][bridge][INFO]   [off] Loaded 69 rows  ← observed_forwarding_fractions_58.csv
+[00:34:32][bridge][INFO]   [hop_delay] Loaded 86 rows  ← vanet_hop_delay_58.csv
+[00:34:32][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_58.csv
+[00:34:32][bridge][INFO]   [planned] Loaded 215 rows  ← verified_planned_inbound_cycle_58.csv
+[00:34:32][bridge][INFO]   [anomaly] Loaded 56 rows  ← ff_node_anomaly_scores_58.csv
+[00:34:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_58.csv
+[00:34:32][bridge][INFO]   [als] Loaded 321 rows  ← spoof_58.csv (using spoof_dev alternative)
+[00:34:32][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_58.csv
+[00:34:32][bridge][INFO]   [off] Aggregated 69 → 54 rows (per node)
+[00:34:32][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:34:32][bridge][INFO]   [hop_delay] Aggregated 86 → 52 rows (per node)
+[00:34:32][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:34:32][bridge][INFO]   [planned] Aggregated 215 → 183 rows (per node)
+[00:34:32][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   [anomaly] Aggregated 56 → 56 rows (per node)
+[00:34:32][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:34:32][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:34:32][bridge][INFO] [hopcount] cycle=58: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:34:32][bridge][INFO]   [flow_metrics] Broadcast to 54 (cycle, flow, node) rows from 54 flow-node pairs
+[00:34:32][bridge][INFO]   [flow_metrics] Aggregated 54 → 54 rows (per node)
+[00:34:32][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:34:32][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:34:32][bridge][INFO]   After joining [hop_delay]: 54 → 54 rows
+[00:34:32][bridge][INFO]   After joining [planned]: 54 → 183 rows
+[00:34:32][bridge][INFO]   After joining [anomaly]: 183 → 183 rows
+[00:34:32][bridge][INFO]   After joining [als]: 183 → 321 rows
+[00:34:32][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:34:32][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:34:32][bridge][INFO]   Cycle 58 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:34:32][bridge][INFO] load_all_cycles done | cycles=58, total_rows=18618, columns=33
+[00:34:32][bridge][INFO] === add_percycle_features | rows=18618 ===
+[00:34:32][bridge][ERROR] Failed to load d_ref from /Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv, using fallback 4.8767: [Errno 2] No such file or directory: '/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv'
+[00:34:32][bridge][INFO] d_bar calculation: 15640 values set to NaN (due to zero/missing hop_delay_count)
+[00:34:32][bridge][INFO] lambda_t missing values: 16935 before -> 0 after (16935 filled using cycle median)
+[00:34:32][bridge][INFO] Feature 'FFc' -> min: 0.0000, max: 1.0000, mean: 0.7866
+[00:34:32][bridge][INFO] Feature 'rho_recv' -> min: 0.0000, max: 1.0000, mean: 0.9423
+[00:34:32][bridge][INFO] Feature 'dFF' -> min: 0.0000, max: 1.0000, mean: 0.0673
+[00:34:32][bridge][INFO] Feature 'd_bar' -> min: 1.1370, max: 14.2940, mean: 2.1025
+[00:34:32][bridge][INFO] Feature 'DelayInfl' -> min: 0.2331, max: 2.9311, mean: 0.4311
+[00:34:32][bridge][INFO] Feature 'lambda_t' -> min: 0.0000, max: 4264.0000, mean: 98.9655
+[00:34:32][bridge][INFO] Feature 'lambda_t_norm' -> min: 0.0000, max: 0.8528, mean: 0.0198
+[00:34:32][bridge][INFO] Feature 'tau' -> min: 1.0000, max: 1.0000, mean: 1.0000
+[00:34:32][bridge][INFO] Feature 'SpoofDev_raw' -> min: 0.0000, max: 19.2424, mean: 0.8316
+[00:34:32][bridge][INFO] === add_windowed_features | rows=18618 ===
+[00:34:32][bridge][INFO]   Cycle 1 | lambda_t_norm_median=0.8528 → W*=10, nodes=321
+[00:34:32][bridge][INFO]   Cycle 1 | full_window=0, partial_window=321
+[00:34:32][bridge][INFO]   Cycle 2 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:34:32][bridge][INFO]   Cycle 2 | full_window=0, partial_window=321
+[00:34:32][bridge][INFO]   Cycle 3 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:34:32][bridge][INFO]   Cycle 3 | full_window=0, partial_window=321
+[00:34:32][bridge][INFO]   Cycle 4 | lambda_t_norm_median=0.0000 → W*=20, nodes=321
+[00:34:33][bridge][INFO]   Cycle 4 | full_window=0, partial_window=321
+[00:34:33][bridge][INFO]   Cycle 5 | lambda_t_norm_median=0.0040 → W*=20, nodes=321
+[00:34:34][bridge][INFO]   Cycle 5 | full_window=0, partial_window=321
+[00:34:34][bridge][INFO]   Cycle 6 | lambda_t_norm_median=0.0080 → W*=20, nodes=321
+[00:34:35][bridge][INFO]   Cycle 6 | full_window=0, partial_window=321
+[00:34:35][bridge][INFO]   Cycle 7 | lambda_t_norm_median=0.0020 → W*=20, nodes=321
+[00:34:36][bridge][INFO]   Cycle 7 | full_window=0, partial_window=321
+[00:34:36][bridge][INFO]   Cycle 8 | lambda_t_norm_median=0.0048 → W*=20, nodes=321
+[00:34:37][bridge][INFO]   Cycle 8 | full_window=0, partial_window=321
+[00:34:37][bridge][INFO]   Cycle 9 | lambda_t_norm_median=0.0028 → W*=20, nodes=321
+[00:34:39][bridge][INFO]   Cycle 9 | full_window=0, partial_window=321
+[00:34:39][bridge][INFO]   Cycle 10 | lambda_t_norm_median=0.0048 → W*=20, nodes=321
+[00:34:41][bridge][INFO]   Cycle 10 | full_window=0, partial_window=321
+[00:34:41][bridge][INFO]   Cycle 11 | lambda_t_norm_median=0.0044 → W*=20, nodes=321
+[00:34:43][bridge][INFO]   Cycle 11 | full_window=0, partial_window=321
+[00:34:43][bridge][INFO]   Cycle 12 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:34:46][bridge][INFO]   Cycle 12 | full_window=0, partial_window=321
+[00:34:46][bridge][INFO]   Cycle 13 | lambda_t_norm_median=0.0044 → W*=20, nodes=321
+[00:34:48][bridge][INFO]   Cycle 13 | full_window=0, partial_window=321
+[00:34:48][bridge][INFO]   Cycle 14 | lambda_t_norm_median=0.0040 → W*=20, nodes=321
+[00:34:51][bridge][INFO]   Cycle 14 | full_window=0, partial_window=321
+[00:34:51][bridge][INFO]   Cycle 15 | lambda_t_norm_median=0.0000 → W*=20, nodes=321
+[00:34:54][bridge][INFO]   Cycle 15 | full_window=0, partial_window=321
+[00:34:54][bridge][INFO]   Cycle 16 | lambda_t_norm_median=0.0076 → W*=20, nodes=321
+[00:34:58][bridge][INFO]   Cycle 16 | full_window=0, partial_window=321
+[00:34:58][bridge][INFO]   Cycle 17 | lambda_t_norm_median=0.0044 → W*=20, nodes=321
+[00:35:02][bridge][INFO]   Cycle 17 | full_window=0, partial_window=321
+[00:35:02][bridge][INFO]   Cycle 18 | lambda_t_norm_median=0.0016 → W*=20, nodes=321
+[00:35:06][bridge][INFO]   Cycle 18 | full_window=0, partial_window=321
+[00:35:06][bridge][INFO]   Cycle 19 | lambda_t_norm_median=0.0076 → W*=20, nodes=321
+[00:35:10][bridge][INFO]   Cycle 19 | full_window=0, partial_window=321
+[00:35:10][bridge][INFO]   Cycle 20 | lambda_t_norm_median=0.0024 → W*=20, nodes=321
+[00:35:15][bridge][INFO]   Cycle 20 | full_window=321, partial_window=0
+[00:35:15][bridge][INFO]   Cycle 21 | lambda_t_norm_median=0.0044 → W*=20, nodes=321
+[00:35:20][bridge][INFO]   Cycle 21 | full_window=321, partial_window=0
+[00:35:20][bridge][INFO]   Cycle 22 | lambda_t_norm_median=0.0060 → W*=20, nodes=321
+[00:35:25][bridge][INFO]   Cycle 22 | full_window=321, partial_window=0
+[00:35:25][bridge][INFO]   Cycle 23 | lambda_t_norm_median=0.0012 → W*=20, nodes=321
+[00:35:30][bridge][INFO]   Cycle 23 | full_window=321, partial_window=0
+[00:35:30][bridge][INFO]   Cycle 24 | lambda_t_norm_median=0.0056 → W*=20, nodes=321
+[00:35:35][bridge][INFO]   Cycle 24 | full_window=321, partial_window=0
+[00:35:35][bridge][INFO]   Cycle 25 | lambda_t_norm_median=0.0040 → W*=20, nodes=321
+[00:35:39][bridge][INFO]   Cycle 25 | full_window=321, partial_window=0
+[00:35:39][bridge][INFO]   Cycle 26 | lambda_t_norm_median=0.0108 → W*=20, nodes=321
+[00:35:44][bridge][INFO]   Cycle 26 | full_window=321, partial_window=0
+[00:35:44][bridge][INFO]   Cycle 27 | lambda_t_norm_median=0.0048 → W*=20, nodes=321
+[00:35:49][bridge][INFO]   Cycle 27 | full_window=321, partial_window=0
+[00:35:49][bridge][INFO]   Cycle 28 | lambda_t_norm_median=0.0032 → W*=20, nodes=321
+[00:35:55][bridge][INFO]   Cycle 28 | full_window=321, partial_window=0
+[00:35:55][bridge][INFO]   Cycle 29 | lambda_t_norm_median=0.0100 → W*=20, nodes=321
+[00:36:00][bridge][INFO]   Cycle 29 | full_window=321, partial_window=0
+[00:36:00][bridge][INFO]   Cycle 30 | lambda_t_norm_median=0.0048 → W*=20, nodes=321
+[00:36:05][bridge][INFO]   Cycle 30 | full_window=321, partial_window=0
+[00:36:05][bridge][INFO]   Cycle 31 | lambda_t_norm_median=0.0016 → W*=20, nodes=321
+[00:36:10][bridge][INFO]   Cycle 31 | full_window=321, partial_window=0
+[00:36:10][bridge][INFO]   Cycle 32 | lambda_t_norm_median=0.0008 → W*=20, nodes=321
+[00:36:15][bridge][INFO]   Cycle 32 | full_window=321, partial_window=0
+[00:36:15][bridge][INFO]   Cycle 33 | lambda_t_norm_median=0.0056 → W*=20, nodes=321
+[00:36:21][bridge][INFO]   Cycle 33 | full_window=321, partial_window=0
+[00:36:21][bridge][INFO]   Cycle 34 | lambda_t_norm_median=0.0076 → W*=20, nodes=321
+[00:36:26][bridge][INFO]   Cycle 34 | full_window=321, partial_window=0
+[00:36:26][bridge][INFO]   Cycle 35 | lambda_t_norm_median=0.0048 → W*=20, nodes=321
+[00:36:31][bridge][INFO]   Cycle 35 | full_window=321, partial_window=0
+[00:36:31][bridge][INFO]   Cycle 36 | lambda_t_norm_median=0.0104 → W*=20, nodes=321
+[00:36:36][bridge][INFO]   Cycle 36 | full_window=321, partial_window=0
+[00:36:36][bridge][INFO]   Cycle 37 | lambda_t_norm_median=0.0052 → W*=20, nodes=321
+[00:36:41][bridge][INFO]   Cycle 37 | full_window=321, partial_window=0
+[00:36:41][bridge][INFO]   Cycle 38 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:36:46][bridge][INFO]   Cycle 38 | full_window=321, partial_window=0
+[00:36:46][bridge][INFO]   Cycle 39 | lambda_t_norm_median=0.0076 → W*=20, nodes=321
+[00:36:51][bridge][INFO]   Cycle 39 | full_window=321, partial_window=0
+[00:36:51][bridge][INFO]   Cycle 40 | lambda_t_norm_median=0.0044 → W*=20, nodes=321
+[00:36:56][bridge][INFO]   Cycle 40 | full_window=321, partial_window=0
+[00:36:56][bridge][INFO]   Cycle 41 | lambda_t_norm_median=0.0100 → W*=20, nodes=321
+[00:37:01][bridge][INFO]   Cycle 41 | full_window=321, partial_window=0
+[00:37:01][bridge][INFO]   Cycle 42 | lambda_t_norm_median=0.0092 → W*=20, nodes=321
+[00:37:06][bridge][INFO]   Cycle 42 | full_window=321, partial_window=0
+[00:37:06][bridge][INFO]   Cycle 43 | lambda_t_norm_median=0.0024 → W*=20, nodes=321
+[00:37:11][bridge][INFO]   Cycle 43 | full_window=321, partial_window=0
+[00:37:11][bridge][INFO]   Cycle 44 | lambda_t_norm_median=0.0000 → W*=20, nodes=321
+[00:37:16][bridge][INFO]   Cycle 44 | full_window=321, partial_window=0
+[00:37:16][bridge][INFO]   Cycle 45 | lambda_t_norm_median=0.0096 → W*=20, nodes=321
+[00:37:21][bridge][INFO]   Cycle 45 | full_window=321, partial_window=0
+[00:37:21][bridge][INFO]   Cycle 46 | lambda_t_norm_median=0.0044 → W*=20, nodes=321
+[00:37:26][bridge][INFO]   Cycle 46 | full_window=321, partial_window=0
+[00:37:26][bridge][INFO]   Cycle 47 | lambda_t_norm_median=0.0048 → W*=20, nodes=321
+[00:37:31][bridge][INFO]   Cycle 47 | full_window=321, partial_window=0
+[00:37:31][bridge][INFO]   Cycle 48 | lambda_t_norm_median=0.0096 → W*=20, nodes=321
+[00:37:35][bridge][INFO]   Cycle 48 | full_window=321, partial_window=0
+[00:37:35][bridge][INFO]   Cycle 49 | lambda_t_norm_median=0.0084 → W*=20, nodes=321
+[00:37:40][bridge][INFO]   Cycle 49 | full_window=321, partial_window=0
+[00:37:40][bridge][INFO]   Cycle 50 | lambda_t_norm_median=0.0088 → W*=20, nodes=321
+[00:37:44][bridge][INFO]   Cycle 50 | full_window=321, partial_window=0
+[00:37:44][bridge][INFO]   Cycle 51 | lambda_t_norm_median=0.0020 → W*=20, nodes=321
+[00:37:49][bridge][INFO]   Cycle 51 | full_window=321, partial_window=0
+[00:37:49][bridge][INFO]   Cycle 52 | lambda_t_norm_median=0.0128 → W*=20, nodes=321
+[00:37:54][bridge][INFO]   Cycle 52 | full_window=321, partial_window=0
+[00:37:54][bridge][INFO]   Cycle 53 | lambda_t_norm_median=0.0132 → W*=20, nodes=321
+[00:37:58][bridge][INFO]   Cycle 53 | full_window=321, partial_window=0
+[00:37:58][bridge][INFO]   Cycle 54 | lambda_t_norm_median=0.0124 → W*=20, nodes=321
+[00:38:03][bridge][INFO]   Cycle 54 | full_window=321, partial_window=0
+[00:38:03][bridge][INFO]   Cycle 55 | lambda_t_norm_median=0.0116 → W*=20, nodes=321
+[00:38:08][bridge][INFO]   Cycle 55 | full_window=321, partial_window=0
+[00:38:08][bridge][INFO]   Cycle 56 | lambda_t_norm_median=0.0000 → W*=20, nodes=321
+[00:38:12][bridge][INFO]   Cycle 56 | full_window=321, partial_window=0
+[00:38:12][bridge][INFO]   Cycle 57 | lambda_t_norm_median=0.0056 → W*=20, nodes=321
+[00:38:17][bridge][INFO]   Cycle 57 | full_window=321, partial_window=0
+[00:38:17][bridge][INFO]   Cycle 58 | lambda_t_norm_median=0.0032 → W*=20, nodes=321
+[00:38:21][bridge][INFO]   Cycle 58 | full_window=321, partial_window=0
+[00:38:21][bridge][INFO] Window totals: full=12519, partial=6099
+[00:38:21][bridge][INFO] Feature 'PDRVar' → min=0.000000, max=0.250000, mean=0.021519
+[00:38:21][bridge][INFO] Feature 'CoordScore' → min=0.000000, max=1.000000, mean=0.128566
+[00:38:21][bridge][INFO] Feature 'SpoofDev' → min=0.000090, max=18.786744, mean=0.804496
+[00:38:21][bridge][INFO] === assemble_agent_tables | input rows=18618 ===
+[00:38:21][bridge][INFO] Step 1: Dropped 0 unlabeled rows (is_attacker=NaN). Remaining: 18618 rows.
+[00:38:21][bridge][INFO]   [SP] 3793 rows | dropped 14825 NaN-state rows | attackers=1335, innocents=2458 | features=['FFc', 'dFF', 'rho_recv', 'tau', 'lambda_t_norm']
+[00:38:21][bridge][INFO]   [ALS] 18618 rows | dropped 0 NaN-state rows | attackers=5939, innocents=12679 | features=['SpoofDev', 'dFF', 'tau', 'lambda_t_norm']
+[00:38:21][bridge][INFO]   [FS] 2978 rows | dropped 15640 NaN-state rows | attackers=593, innocents=2385 | features=['FFc', 'dFF', 'DelayInfl', 'tau', 'lambda_t_norm']
+[00:38:21][bridge][INFO]   [IGH] 2978 rows | dropped 15640 NaN-state rows | attackers=593, innocents=2385 | features=['FFc', 'dFF', 'rho_recv', 'd_bar', 'tau', 'PDRVar', 'CoordScore', 'lambda_t_norm']
+[00:38:21][bridge][INFO]   Written sp_state.csv (3793 rows, 8 cols)
+[00:38:21][bridge][INFO]   Written als_state.csv (18618 rows, 7 cols)
+[00:38:21][bridge][INFO]   Written fs_state.csv (2978 rows, 11 cols)
+[00:38:21][bridge][INFO]   Written igh_state.csv (2978 rows, 11 cols)
+[10:40:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_1.csv
+[10:40:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_2.csv
+[10:40:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_3.csv
+[10:40:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_4.csv
+[10:40:38][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_5.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_6.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_7.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_8.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_9.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_10.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_11.csv
+[10:40:39][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_12.csv
+[10:40:45][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_13.csv
+[10:40:45][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_14.csv
+[10:40:46][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_15.csv
+[10:41:21][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_16.csv
+[10:41:22][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_17.csv
+[10:41:22][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_18.csv
+[10:41:22][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_19.csv
+[10:41:22][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_20.csv
+[10:41:22][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_21.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_22.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_23.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_24.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_25.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_26.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_27.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_28.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_29.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_30.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_31.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_32.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_33.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_34.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_35.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_36.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_37.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_38.csv
+[10:41:26][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_39.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_40.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_41.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_42.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_43.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_44.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_45.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_46.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_47.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_48.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_49.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_50.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_51.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_52.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_53.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_54.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_55.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_56.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_57.csv
+[10:41:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_58.csv
+[10:41:32][bridge][ERROR] Failed to load d_ref from /Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv, using fallback 4.8767: [Errno 2] No such file or directory: '/Users/binurasenevirathna/Projects/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv'

@@ -130,7 +130,7 @@ AGENT_CONFIGS = {
         "features":  ["FFc", "dFF", "rho_recv", "d_bar", "tau",
                       "PDRVar", "CoordScore", "lambda_t"],
         "input_dim": 8,
-        "deltas":    [0.0, 0.05, 0.15, 0.30, 0.50],  # Eq. 3.45 placeholders
+        "deltas":    [0.0, 0.05, 0.10, 0.20, 0.40],  # grid-searched by grid_search_deltas.py (Issue 2 fix)
         "reward_fn": "igh",
         "w1": 0.4,   # weight for r_sec
         "w2": 0.3,   # weight for r_fp
@@ -157,7 +157,7 @@ AGENT_CONFIGS = {
         "name":      "sp",
         "features":  ["FFc", "dFF", "rho_recv", "tau", "lambda_t"],
         "input_dim": 5,
-        "deltas":    [0.0, 0.05, 0.15, 0.30, 0.50],
+        "deltas":    [0.0, 0.05, 0.15, 0.30, 0.50],  # grid-searched by grid_search_deltas.py (Issue 2 fix)
         "reward_fn": "sp",
         "w1": 0.4,
         "w2": 0.3,
@@ -178,7 +178,7 @@ AGENT_CONFIGS = {
         "name":      "als",
         "features":  ["SpoofDev", "dFF", "tau", "lambda_t"],
         "input_dim": 4,
-        "deltas":    [0.0, 0.05, 0.15, 0.30, 0.50],
+        "deltas":    [0.0, 0.05, 0.10, 0.20, 0.40],  # grid-searched by grid_search_deltas.py (Issue 2 fix)
         "reward_fn": "als",
         "w1": 0.4,
         "w2": 0.3,
@@ -199,7 +199,7 @@ AGENT_CONFIGS = {
         "name":      "fs",
         "features":  ["FFc", "dFF", "DelayInfl", "tau", "lambda_t"],
         "input_dim": 5,
-        "deltas":    [0.0, 0.05, 0.15, 0.30, 0.50],
+        "deltas":    [0.0, 0.05, 0.10, 0.20, 0.35],  # grid-searched by grid_search_deltas.py (Issue 2 fix)
         "reward_fn": "fs",
         "w1": 0.4,
         "w2": 0.3,
@@ -209,7 +209,7 @@ AGENT_CONFIGS = {
         # E^FS = mean of normalised dFF excess and DelayInfl excess.
         "eta_dFF":   0.20,  # dFF detection threshold (calibrated by grid search)
         "eta_delay": 1.50,  # DelayInfl detection threshold (spec: attackers > 1.3)
-        "eta_dff_norm": 0.1, # normalized absolute forwarding plan deviation threshold (gate threshold)
+        "eta_dff_norm": 0.3, # normalized absolute forwarding plan deviation threshold (gate threshold)
         "delay_max": 2.00,  # upper clamp for DelayInfl normalisation
         "e1": 0.35, "e2": 0.50, "e3": 0.65,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
         # ---- MCC difference-reward weight (supervisor r_mcc patch) --------
