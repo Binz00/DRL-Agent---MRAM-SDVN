@@ -117,15 +117,17 @@ _max_cycles: Optional[int] = None
 _agents:     Optional[Dict] = None
 
 # Output file paths (resolved in _init_outputs)
-_penalties_csv:   Optional[Path] = None
-_blacklist_csv:   Optional[Path] = None
-_trust_csv:       Optional[Path] = None
-_penalties_written: bool = False   # tracks whether header needs to be written
+_penalties_csv:       Optional[Path] = None
+_blacklist_csv:       Optional[Path] = None
+_trust_csv:           Optional[Path] = None
+_trust_history_csv:   Optional[Path] = None
+_penalties_written:     bool = False   # tracks whether header needs to be written
+_trust_history_written: bool = False   # tracks whether header needs to be written
 
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
-    global _penalties_written
+    global _penalties_written, _trust_history_written
     _cycle_buffer.clear()
     _trust.clear()
     _blacklisted.clear()
@@ -133,6 +135,7 @@ def reset_state() -> None:
     _mid_ready.clear()
     _processed.clear()
     _penalties_written = False
+    _trust_history_written = False
 
 
 # ---------------------------------------------------------------------------
@@ -145,18 +148,51 @@ def _update_trust(results: List[dict], cycle_no: int) -> None:
 
     trust NEVER resets between cycles — accumulates across the entire run.
     Blacklisted nodes continue to be processed each cycle (min-trust semantics).
+    Writes non-zero delta nodes to live_trust_history.csv.
     """
+    global _trust_history_written
+    history_rows = []
+
     for r in results:
         nid = r["node_id"]
+        final_delta = r["final_delta"]
+
         if nid not in _trust:
             _trust[nid] = 1.0       # lazy init: first-seen node starts at 1.0
-        _trust[nid] = max(0.0, _trust[nid] - r["final_delta"])
-        if _trust[nid] < _tau_min and nid not in _blacklisted:
+
+        trust_before = _trust[nid]
+        trust_after  = max(0.0, trust_before - final_delta)
+        _trust[nid]  = trust_after
+
+        if trust_after < _tau_min and nid not in _blacklisted:
             _blacklisted[nid] = cycle_no
             logger.info(
                 "[BLACKLIST] node=%d blacklisted at cycle=%d trust=%.4f",
-                nid, cycle_no, _trust[nid],
+                nid, cycle_no, trust_after,
             )
+
+        if final_delta > 0:
+            history_rows.append({
+                "cycle_id":      cycle_no,
+                "node_id":       nid,
+                "trust_before":  trust_before,
+                "delta_applied": final_delta,
+                "trust_after":   trust_after,
+                "blacklisted":   trust_after < _tau_min,
+            })
+
+    if history_rows and _trust_history_csv is not None:
+        write_header = not _trust_history_written or not _trust_history_csv.exists()
+        with open(_trust_history_csv, "a", newline="") as f:
+            writer = csv.DictWriter(
+                f,
+                fieldnames=["cycle_id", "node_id", "trust_before", "delta_applied",
+                            "trust_after", "blacklisted"],
+            )
+            if write_header:
+                writer.writeheader()
+            writer.writerows(history_rows)
+        _trust_history_written = True
 
 
 # ---------------------------------------------------------------------------
@@ -165,11 +201,12 @@ def _update_trust(results: List[dict], cycle_no: int) -> None:
 
 def _init_outputs(output_dir: Path) -> None:
     """Create output directory and initialise file paths."""
-    global _penalties_csv, _blacklist_csv, _trust_csv
+    global _penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv
     output_dir.mkdir(parents=True, exist_ok=True)
-    _penalties_csv = output_dir / "pipeline_penalties.csv"
-    _blacklist_csv = output_dir / "live_blacklist.csv"
-    _trust_csv     = output_dir / "live_trust_scores.csv"
+    _penalties_csv       = output_dir / "pipeline_penalties.csv"
+    _blacklist_csv       = output_dir / "live_blacklist.csv"
+    _trust_csv           = output_dir / "live_trust_scores.csv"
+    _trust_history_csv   = output_dir / "live_trust_history.csv"
 
 
 def _append_penalties(results: List[dict], cycle_no: int) -> None:
@@ -321,21 +358,11 @@ def process_cycle_streaming(cycle_no: int) -> None:
         logger.warning("[STREAM] cycle %d: no rows after windowing — skipping", cycle_no)
         return
 
-    # Update tau column with live accumulated trust score
-    if "tau" in df_current.columns and _trust:
-        df_current["tau"] = df_current["node_id"].map(lambda nid: _trust.get(nid, 1.0))
-
     # Step 7: Build agent state tables
     tables = assemble_agent_tables(df_current)
 
-    # Step 8: Active agents — IGH dormant until W_MIN cycles of history
-    history_len    = len(_cycle_buffer)
-    active_agents  = ALL_AGENTS if history_len >= W_MIN else EARLY_AGENTS
-    if history_len < W_MIN:
-        logger.info(
-            "[STREAM] cycle %d | history=%d < W_MIN=%d → IGH dormant",
-            cycle_no, history_len, W_MIN,
-        )
+    # Step 8: Active agents — all four agents active
+    active_agents = ALL_AGENTS
 
     # Step 9: Run agent inference
     results = trigger_process_cycle(cycle_no, tables, _agents, active=active_agents)
