@@ -17,7 +17,7 @@ Outputs (written to --output-dir):
 Usage:
     # Live mode — watch /tmp/ for sentinel files from NS-3 + middleware
     python3 bridge/stream_pipeline.py \\
-        --watch-dir /tmp \\
+        --watch-dir /tmp/drl_agent \\
         --output-dir fm_dad/data \\
         --tau 0.4 \\
         --max-cycles 58 \\
@@ -110,12 +110,18 @@ _mid_ready:  Set[int] = set()
 _processed:  Set[int] = set()
 
 # Runtime config (set by run_streaming / run_replay)
-_watch_dir:  str = "/tmp"
+_watch_dir:  str = "/tmp/drl_agent"
 _output_dir: Path = _FM_DAD_DIR / "data"
 _tau_min:    float = 0.4
 _max_cycles: Optional[int] = None
 _agents:     Optional[Dict] = None
 _is_replay:  bool = False
+
+# Ground truth state (loaded at startup, IGH refreshed per-cycle)
+# _gt_static  : dict node_id -> {is_attacker, attack_type} for SP/ALS/FS + honest nodes
+# _all_igh_nodes : union of IGH attacker node_ids across ALL cycles
+_gt_static:    Dict[int, dict] = {}
+_all_igh_nodes: Set[int] = set()
 
 # Output file paths (resolved in _init_outputs)
 _penalties_csv:       Optional[Path] = None
@@ -135,22 +141,112 @@ def reset_state() -> None:
     _ns3_ready.clear()
     _mid_ready.clear()
     _processed.clear()
+    _gt_static.clear()
+    _all_igh_nodes.clear()
     _penalties_written = False
     _trust_history_written = False
     _is_replay = False
 
 
 # ---------------------------------------------------------------------------
+# Ground truth helpers
+# ---------------------------------------------------------------------------
+
+def _load_static_gt(watch_dir: str) -> None:
+    """
+    Scan all node_attack_ground_truth_*.csv files in watch_dir at startup.
+    Populates:
+        _gt_static — SP/ALS/FS attackers + honest nodes (IGH nodes excluded).
+    Note: _all_igh_nodes is populated incrementally by _load_cycle_igh() on
+    each cycle — no full startup scan needed.
+    """
+    folder = Path(watch_dir)
+    gt_re  = re.compile(r"node_attack_ground_truth_(\d+)\.csv$")
+    files  = sorted(f for f in folder.iterdir() if gt_re.match(f.name))
+
+    if not files:
+        logger.warning("[GT] No ground truth files found in %s — GT labels unavailable.", watch_dir)
+        return
+
+    # Build static GT from first file (SP/ALS/FS don't rotate — any cycle file works).
+    # IGH nodes are excluded here; they are handled per-cycle by _load_cycle_igh().
+    # We identify which nodes are EVER IGH by scanning all files once, cheaply.
+    all_igh: Set[int] = set()
+    for f in files:
+        try:
+            df = pd.read_csv(f)
+            df.columns = df.columns.str.strip()
+            mask = (df["is_attacker"] == 1) & (df["attack_type"] == "IGH")
+            all_igh.update(df.loc[mask, "node_id"].tolist())
+        except Exception as exc:
+            logger.warning("[GT] Could not read %s: %s", f.name, exc)
+
+    try:
+        df_ref = pd.read_csv(files[0])
+        df_ref.columns = df_ref.columns.str.strip()
+        non_igh = df_ref[~df_ref["node_id"].isin(all_igh)]
+        for r in non_igh.to_dict("records"):
+            nid = int(r["node_id"])
+            _gt_static[nid] = {
+                "is_attacker": int(r["is_attacker"]),
+                "attack_type": str(r["attack_type"]),
+            }
+    except Exception as exc:
+        logger.warning("[GT] Could not build static GT from %s: %s", files[0].name, exc)
+
+    logger.info(
+        "[GT] Static GT loaded: %d non-IGH nodes from %d GT files",
+        len(_gt_static), len(files),
+    )
+
+
+def _load_cycle_igh(cycle_no: int, watch_dir: str) -> Set[int]:
+    """
+    Returns set of node_ids that are ACTIVE IGH attackers in cycle_no.
+    Reads node_attack_ground_truth_{cycle_no}.csv from watch_dir.
+    Also incrementally updates _all_igh_nodes with any new IGH nodes seen.
+    Returns empty set if file not found (logs warning).
+    """
+    global _all_igh_nodes
+    path = Path(watch_dir) / f"node_attack_ground_truth_{cycle_no}.csv"
+    if not path.exists():
+        logger.warning("[GT] node_attack_ground_truth_%d.csv not found", cycle_no)
+        return set()
+    try:
+        df = pd.read_csv(path)
+        df.columns = df.columns.str.strip()
+        active_igh = set(
+            df[(df["is_attacker"] == 1) & (df["attack_type"] == "IGH")]["node_id"].tolist()
+        )
+        _all_igh_nodes.update(active_igh)   # incremental accumulation
+        return active_igh
+    except Exception as exc:
+        logger.warning("[GT] Could not read GT for cycle %d: %s", cycle_no, exc)
+        return set()
+
+
+# ---------------------------------------------------------------------------
 # Trust update (mirrors validate_pipeline.py exactly)
 # ---------------------------------------------------------------------------
 
-def _update_trust(results: List[dict], cycle_no: int) -> None:
+def _update_trust(
+    results: List[dict],
+    cycle_no: int,
+    cycle_gt: Optional[Dict[int, dict]] = None,
+) -> None:
     """
     Apply trust deltas from agent results.
 
     trust NEVER resets between cycles — accumulates across the entire run.
     Blacklisted nodes continue to be processed each cycle (min-trust semantics).
     Writes non-zero delta nodes to live_trust_history.csv.
+
+    Args:
+        results   : per-node agent results from trigger_process_cycle.
+        cycle_no  : current cycle number.
+        cycle_gt  : per-cycle ground truth dict (node_id -> {is_attacker, attack_type}).
+                    Used to label each penalized node in live_trust_history.csv.
+                    If None, gt_label is written as 'UNKNOWN'.
     """
     global _trust_history_written
     history_rows = []
@@ -174,6 +270,13 @@ def _update_trust(results: List[dict], cycle_no: int) -> None:
             )
 
         if final_delta > 0:
+            # Determine ground truth label for this specific cycle
+            if cycle_gt is not None:
+                info = cycle_gt.get(nid, {})
+                gt_label = "ATTACKER" if info.get("is_attacker", 0) else "HONEST"
+            else:
+                gt_label = "UNKNOWN"
+
             history_rows.append({
                 "cycle_id":      cycle_no,
                 "node_id":       nid,
@@ -181,6 +284,7 @@ def _update_trust(results: List[dict], cycle_no: int) -> None:
                 "delta_applied": final_delta,
                 "trust_after":   trust_after,
                 "blacklisted":   trust_after < _tau_min,
+                "gt_label":      gt_label,
             })
 
     if history_rows and _trust_history_csv is not None:
@@ -189,7 +293,7 @@ def _update_trust(results: List[dict], cycle_no: int) -> None:
             writer = csv.DictWriter(
                 f,
                 fieldnames=["cycle_id", "node_id", "trust_before", "delta_applied",
-                            "trust_after", "blacklisted"],
+                            "trust_after", "blacklisted", "gt_label"],
             )
             if write_header:
                 writer.writeheader()
@@ -323,14 +427,15 @@ def process_cycle_streaming(cycle_no: int) -> None:
       5. add_windowed_features(df_window)
       6. Extract current cycle rows: df_current = df_windowed[cycle_id == cycle_no]
       7. assemble_agent_tables(df_current)
-      8. Determine active agents: IGH dormant before W_MIN
-      9. trigger_process_cycle(cycle_no, tables, agents, active=active_agents)
-     10. _update_trust(results, cycle_no)
-     11. _append_penalties(results, cycle_no)
-     12. _write_live_blacklist(cycle_no)
-     13. _write_live_trust(cycle_no)
-     14. _log_cycle_summary(cycle_no, results, active_agents)
-     15. Delete both sentinel files after successful processing (live mode only).
+      8. Build per-cycle GT: merge _gt_static with active IGH set for this cycle
+      9. Determine active agents: all four active
+     10. trigger_process_cycle(cycle_no, tables, agents, active=active_agents)
+     11. _update_trust(results, cycle_no, cycle_gt)
+     12. _append_penalties(results, cycle_no)
+     13. _write_live_blacklist(cycle_no)
+     14. _write_live_trust(cycle_no)
+     15. _log_cycle_summary(cycle_no, results, active_agents)
+     16. Delete both sentinel files after successful processing (live mode only).
     """
     logger.info("[STREAM] === Starting cycle %d ===", cycle_no)
 
@@ -352,7 +457,7 @@ def process_cycle_streaming(cycle_no: int) -> None:
     _cycle_buffer.append(df)
 
     # Step 4-5: Windowed features need the full history window
-    df_window  = pd.concat(list(_cycle_buffer), ignore_index=True)
+    df_window   = pd.concat(list(_cycle_buffer), ignore_index=True)
     df_windowed = add_windowed_features(df_window)
 
     # Step 6: Extract only the current cycle's rows
@@ -364,24 +469,40 @@ def process_cycle_streaming(cycle_no: int) -> None:
     # Step 7: Build agent state tables
     tables = assemble_agent_tables(df_current)
 
-    # Step 8: Active agents — all four agents active
+    # Step 8: Build per-cycle ground truth.
+    # Start from the static dict (SP/ALS/FS + honest nodes), then overlay
+    # the active/inactive IGH status for THIS specific cycle.
+    active_igh = _load_cycle_igh(cycle_no, _watch_dir)
+    cycle_gt: Dict[int, dict] = dict(_gt_static)  # copy static entries
+    for nid in _all_igh_nodes:
+        if nid in active_igh:
+            cycle_gt[nid] = {"is_attacker": 1, "attack_type": "IGH"}
+        else:
+            # IGH node inactive this cycle — treat as honest
+            cycle_gt[nid] = {"is_attacker": 0, "attack_type": "NONE"}
+    logger.info(
+        "[GT] cycle %d: %d IGH active / %d total IGH nodes",
+        cycle_no, len(active_igh), len(_all_igh_nodes),
+    )
+
+    # Step 9: Active agents — all four agents active
     active_agents = ALL_AGENTS
 
-    # Step 9: Run agent inference
+    # Step 10: Run agent inference
     results = trigger_process_cycle(cycle_no, tables, _agents, active=active_agents)
 
-    # Step 10: Update trust state
-    _update_trust(results, cycle_no)
+    # Step 11: Update trust state, passing per-cycle GT for history labeling
+    _update_trust(results, cycle_no, cycle_gt=cycle_gt)
 
-    # Steps 11-13: Write outputs
+    # Steps 12-14: Write outputs
     _append_penalties(results, cycle_no)
     _write_live_blacklist(cycle_no)
     _write_live_trust(cycle_no)
 
-    # Step 14: Summary log
+    # Step 15: Summary log
     _log_cycle_summary(cycle_no, results, active_agents)
 
-    # Step 15: Delete both sentinel files after successful processing (live mode only).
+    # Step 16: Delete both sentinel files after successful processing (live mode only).
     if not _is_replay:
         for suffix in ["ns3", "mid"]:
             sentinel = Path(_watch_dir) / f"drl_cycle_{cycle_no}_ready_{suffix}"
@@ -507,6 +628,9 @@ def run_streaming(
     _agents = load_frozen_agents()
     logger.info("[STREAM] Agents loaded. Watching %s ...", watch_dir)
 
+    logger.info("[STREAM] Loading static ground truth from %s ...", watch_dir)
+    _load_static_gt(watch_dir)
+
     handler = _make_handler()
     if handler is not None:
         try:
@@ -576,6 +700,9 @@ def run_replay(
     _agents = load_frozen_agents()
     logger.info("[REPLAY] Agents loaded. Scanning %s ...", replay_dir)
 
+    logger.info("[REPLAY] Loading static ground truth from %s ...", replay_dir)
+    _load_static_gt(replay_dir)
+
     # Discover all cycles via ground-truth file pattern (same as load_all_cycles)
     folder_path = Path(replay_dir)
     pattern_re  = re.compile(CYCLE_DETECTION_REGEX)
@@ -611,7 +738,7 @@ def _build_parser() -> argparse.ArgumentParser:
     # Mode selection
     mode = p.add_mutually_exclusive_group()
     mode.add_argument(
-        "--watch-dir", default="/tmp", metavar="DIR",
+        "--watch-dir", default="/tmp/drl_agent", metavar="DIR",
         help="Directory to watch for sentinel files (live mode).",
     )
     mode.add_argument(
