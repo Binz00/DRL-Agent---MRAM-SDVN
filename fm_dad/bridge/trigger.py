@@ -296,6 +296,7 @@ def process_cycle(
     cycle_id: int,
     tables: Dict[str, "pd.DataFrame"],
     agents: Dict[str, DQNAgent],
+    active: list = None,
 ) -> List[dict]:
     """
     Run process_node for every node present in the given cycle.
@@ -307,12 +308,18 @@ def process_cycle(
         cycle_id : Which cycle to process.
         tables   : agent_name → DataFrame (from assemble_agent_tables).
         agents   : Loaded DQNAgent instances.
+        active   : Optional list of agent names to run (e.g. ["sp","als","fs"]).
+                   None means all four agents run (default, backward compatible).
+                   Agents not in this list are marked "dormant" with delta=0.0.
 
     Returns:
         List of result dicts, one per node.
     """
     import pandas as pd
     from bridge.assemble import AGENT_STATE_FEATURES, EXTRA_COLS
+
+    if active is None:
+        active = ["sp", "als", "fs", "igh"]
 
     all_nodes: set = set()
     cycle_data: Dict[str, "pd.DataFrame"] = {}
@@ -322,8 +329,9 @@ def process_cycle(
         all_nodes.update(cycle_df["node_id"].unique())
 
     logger.info(
-        "[CYCLE] Processing cycle %d | %d unique nodes across %d agents",
+        "[CYCLE] Processing cycle %d | %d unique nodes across %d agents (active: %s)",
         cycle_id, len(all_nodes), len(tables),
+        [a.upper() for a in active],
     )
 
     results = []
@@ -332,6 +340,12 @@ def process_cycle(
         feat_dicts_by_agent:    Dict[str, Optional[dict]]       = {}
 
         for name in ["sp", "als", "fs", "igh"]:
+            # Dormant agents: skip state extraction entirely
+            if name not in active:
+                states_by_agent[name]     = None
+                feat_dicts_by_agent[name] = None
+                continue
+
             cdf = cycle_data.get(name)
             if cdf is None or cdf.empty:
                 states_by_agent[name]     = None
