@@ -115,6 +115,7 @@ _output_dir: Path = _FM_DAD_DIR / "data"
 _tau_min:    float = 0.4
 _max_cycles: Optional[int] = None
 _agents:     Optional[Dict] = None
+_is_replay:  bool = False
 
 # Output file paths (resolved in _init_outputs)
 _penalties_csv:       Optional[Path] = None
@@ -127,7 +128,7 @@ _trust_history_written: bool = False   # tracks whether header needs to be writt
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
-    global _penalties_written, _trust_history_written
+    global _penalties_written, _trust_history_written, _is_replay
     _cycle_buffer.clear()
     _trust.clear()
     _blacklisted.clear()
@@ -136,6 +137,7 @@ def reset_state() -> None:
     _processed.clear()
     _penalties_written = False
     _trust_history_written = False
+    _is_replay = False
 
 
 # ---------------------------------------------------------------------------
@@ -328,6 +330,7 @@ def process_cycle_streaming(cycle_no: int) -> None:
      12. _write_live_blacklist(cycle_no)
      13. _write_live_trust(cycle_no)
      14. _log_cycle_summary(cycle_no, results, active_agents)
+     15. Delete both sentinel files after successful processing (live mode only).
     """
     logger.info("[STREAM] === Starting cycle %d ===", cycle_no)
 
@@ -378,6 +381,17 @@ def process_cycle_streaming(cycle_no: int) -> None:
     # Step 14: Summary log
     _log_cycle_summary(cycle_no, results, active_agents)
 
+    # Step 15: Delete both sentinel files after successful processing (live mode only).
+    if not _is_replay:
+        for suffix in ["ns3", "mid"]:
+            sentinel = Path(_watch_dir) / f"drl_cycle_{cycle_no}_ready_{suffix}"
+            try:
+                sentinel.unlink(missing_ok=True)
+                logger.info("[STREAM] Deleted sentinel: %s", sentinel.name)
+            except Exception as e:
+                logger.warning("[STREAM] Could not delete sentinel %s: %s",
+                               sentinel.name, e)
+
     logger.info("[STREAM] === Cycle %d complete ===", cycle_no)
 
 
@@ -398,11 +412,15 @@ def _make_handler():
 
                 m = re.match(r"drl_cycle_(\d+)_ready_ns3$", filename)
                 if m:
-                    _ns3_ready.add(int(m.group(1)))
+                    c = int(m.group(1))
+                    if c not in _processed:
+                        _ns3_ready.add(c)
 
                 m = re.match(r"drl_cycle_(\d+)_ready_mid$", filename)
                 if m:
-                    _mid_ready.add(int(m.group(1)))
+                    c = int(m.group(1))
+                    if c not in _processed:
+                        _mid_ready.add(c)
 
                 # Fire when BOTH sentinels present for the same cycle
                 ready = (_ns3_ready & _mid_ready) - _processed
@@ -434,10 +452,14 @@ def _poll_for_sentinels(watch_dir: str, timeout: Optional[int]) -> None:
         for f in watch_path.iterdir():
             m = ns3_re.match(f.name)
             if m:
-                _ns3_ready.add(int(m.group(1)))
+                c = int(m.group(1))
+                if c not in _processed:
+                    _ns3_ready.add(c)
             m = mid_re.match(f.name)
             if m:
-                _mid_ready.add(int(m.group(1)))
+                c = int(m.group(1))
+                if c not in _processed:
+                    _mid_ready.add(c)
 
         ready = (_ns3_ready & _mid_ready) - _processed
         if ready:
@@ -471,9 +493,10 @@ def run_streaming(
     timeout: Optional[int],
 ) -> None:
     """Start the watchdog/polling sentinel watcher in live mode."""
-    global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents
+    global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents, _is_replay
 
     reset_state()
+    _is_replay  = False
     _watch_dir  = watch_dir
     _output_dir = output_dir
     _tau_min    = tau
@@ -539,9 +562,10 @@ def run_replay(
 
     Streaming output must be identical to batch output on the same data.
     """
-    global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents
+    global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents, _is_replay
 
     reset_state()
+    _is_replay  = True
     _watch_dir  = replay_dir
     _output_dir = output_dir
     _tau_min    = tau
