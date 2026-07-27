@@ -78,10 +78,12 @@ from bridge.trust_client import reduce_rsu_trust, reduce_vehicle_trust
 
 def node_type(node_id: int) -> str:
     """Return 'rsu' or 'vehicle' for a node_id.
-    IMPLEMENT THIS from your NS-3 / ground-truth metadata. RSU IDs (0–99) and
-    vehicle IDs (0–199) overlap, so a bare node_id cannot disambiguate on its own."""
-    raise NotImplementedError("map node_id -> 'rsu' | 'vehicle'")
-
+    NS-3 numbering: 0–199 = vehicles, 200–320 = RSUs (disjoint ranges)."""
+    if 0 <= node_id <= 199:
+        return "vehicle"
+    if 200 <= node_id <= 320:
+        return "rsu"
+    raise ValueError(f"node_id {node_id} outside known ranges (0–199 veh, 200–320 rsu)")
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
@@ -89,6 +91,10 @@ logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s][stream][%(levelname)s] %(message)s",
     datefmt="%H:%M:%S",
+    handlers=[
+        logging.StreamHandler(),                       # console (as before)
+        logging.FileHandler("drl_agent.log", mode="a"),  # full run log on disk
+    ],
 )
 logger = logging.getLogger("stream")
 
@@ -99,6 +105,8 @@ logger = logging.getLogger("stream")
 W_MIN = 10          # minimum cycle history before IGH gate can fire
 ALL_AGENTS  = ["sp", "als", "fs", "igh"]
 EARLY_AGENTS = ["sp", "als", "fs"]   # IGH dormant before W_MIN
+
+REVOKE_THRESHOLD = 0.40   # on-chain trust below this → request ns-3 revocation
 
 
 # ---------------------------------------------------------------------------
@@ -137,8 +145,10 @@ _penalties_csv:       Optional[Path] = None
 _blacklist_csv:       Optional[Path] = None
 _trust_csv:           Optional[Path] = None
 _trust_history_csv:   Optional[Path] = None
+_revoked_csv:         Optional[Path] = None
 _penalties_written:     bool = False   # tracks whether header needs to be written
 _trust_history_written: bool = False   # tracks whether header needs to be written
+_revoked_written:       bool = False   # tracks whether header needs to be written
 
 
 def reset_state() -> None:
@@ -259,6 +269,8 @@ def _update_trust(
     """
     global _trust_history_written
     history_rows = []
+    bc_ok = bc_fail = 0   # per-cycle blockchain update tally
+    to_revoke: List[int] = []   # nodes whose on-chain score fell below REVOKE_THRESHOLD
 
     for r in results:
         nid = r["node_id"]
@@ -281,10 +293,32 @@ def _update_trust(
         if final_delta > 0:
             # Send the reduction amount to the blockchain (the source of truth).
             # The chaincode subtracts it from the current on-chain score.
-            if node_type(nid) == "rsu":
-                reduce_rsu_trust(nid, final_delta)
+            ntype = node_type(nid)
+            fn_name = "ReduceTrustScore" if ntype == "rsu" else "ReduceVehicleTrustScore"
+            logger.info(
+                "[BC] cycle=%d %-7s node=%d reduce=-%.4f → %s",
+                cycle_no, ntype.upper(), nid, final_delta, fn_name,
+            )
+
+            if ntype == "rsu":
+                new_score = reduce_rsu_trust(nid, final_delta)
             else:
-                reduce_vehicle_trust(nid, final_delta)
+                new_score = reduce_vehicle_trust(nid, final_delta)
+
+            if new_score is None:
+                bc_fail += 1
+                logger.warning(
+                    "[BC] cycle=%d %-7s node=%d reduce=-%.4f FAILED — ledger unchanged",
+                    cycle_no, ntype.upper(), nid, final_delta,
+                )
+            else:
+                bc_ok += 1
+                logger.info(
+                    "[BC] cycle=%d %-7s node=%d reduce=-%.4f OK  on-chain now=%.4f",
+                    cycle_no, ntype.upper(), nid, final_delta, new_score,
+                )
+                if new_score < REVOKE_THRESHOLD:
+                    to_revoke.append(nid)
 
             # Determine ground truth label for this specific cycle
             if cycle_gt is not None:
@@ -315,6 +349,59 @@ def _update_trust(
                 writer.writeheader()
             writer.writerows(history_rows)
         _trust_history_written = True
+    if bc_ok or bc_fail:
+        logger.info(
+            "[BC] cycle=%d blockchain summary: %d committed, %d failed",
+            cycle_no, bc_ok, bc_fail,
+        )
+
+    return to_revoke
+        
+
+
+def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
+    """Request ns-3 revocation for each node whose on-chain trust fell below threshold."""
+    if not node_ids:
+        return
+    global _revoked_written
+    from bridge.ns3_client import request_ns3_revocation
+    ok = fail = 0
+    revoked_rows = []
+    for nid in sorted(set(node_ids)):   # dedupe, stable order
+        try:
+            status = request_ns3_revocation(nid)
+            ok += 1
+            logger.warning(
+                "[NS3] cycle=%d node=%d trust<%.2f → REVOKE_NODE; ns-3: %s",
+                cycle_no, nid, REVOKE_THRESHOLD, status,
+            )
+        except Exception as exc:
+            status = f"FAILED: {exc}"
+            fail += 1
+            logger.error("[NS3] cycle=%d node=%d revocation failed: %s",
+                         cycle_no, nid, exc)
+
+        revoked_rows.append({
+            "cycle_id":   cycle_no,
+            "node_id":    nid,
+            "node_type":  node_type(nid),
+            "ns3_status": status,
+        })
+
+    # Append this cycle's revoked nodes to blacklisted_nodes.csv
+    if revoked_rows and _revoked_csv is not None:
+        write_header = not _revoked_written or not _revoked_csv.exists()
+        with open(_revoked_csv, "a", newline="") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["cycle_id", "node_id", "node_type", "ns3_status"],
+            )
+            if write_header:
+                writer.writeheader()
+            writer.writerows(revoked_rows)
+        _revoked_written = True
+
+    logger.info("[NS3] cycle=%d revocations complete — ok=%d failed=%d",
+                cycle_no, ok, fail)
 
 
 # ---------------------------------------------------------------------------
@@ -323,12 +410,13 @@ def _update_trust(
 
 def _init_outputs(output_dir: Path) -> None:
     """Create output directory and initialise file paths."""
-    global _penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv
+    global _penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv, _revoked_csv
     output_dir.mkdir(parents=True, exist_ok=True)
     _penalties_csv       = output_dir / "pipeline_penalties.csv"
     _blacklist_csv       = output_dir / "live_blacklist.csv"
     _trust_csv           = output_dir / "live_trust_scores.csv"
     _trust_history_csv   = output_dir / "live_trust_history.csv"
+    _revoked_csv         = output_dir / "blacklisted_nodes.csv"
 
 
 def _append_penalties(results: List[dict], cycle_no: int) -> None:
@@ -507,13 +595,16 @@ def process_cycle_streaming(cycle_no: int) -> None:
     # Step 10: Run agent inference
     results = trigger_process_cycle(cycle_no, tables, _agents, active=active_agents)
 
-    # Step 11: Update trust state, passing per-cycle GT for history labeling
-    _update_trust(results, cycle_no, cycle_gt=cycle_gt)
+    # Step 11: Update trust; returns nodes whose on-chain trust fell below threshold
+    to_revoke = _update_trust(results, cycle_no, cycle_gt=cycle_gt)
 
     # Steps 12-14: Write outputs
     _append_penalties(results, cycle_no)
     _write_live_blacklist(cycle_no)
     _write_live_trust(cycle_no)
+
+    # Step 14b: End-of-cycle ns-3 revocation for nodes below trust threshold
+    _revoke_low_trust(cycle_no, to_revoke)
 
     # Step 15: Summary log
     _log_cycle_summary(cycle_no, results, active_agents)
