@@ -73,6 +73,15 @@ from bridge.config_bridge import RAW_CSV_FOLDER, CYCLE_DETECTION_REGEX
 from config import AGENT_CONFIGS
 from episode_eval import load_frozen_agents
 
+from bridge.trust_client import reduce_rsu_trust, reduce_vehicle_trust
+
+
+def node_type(node_id: int) -> str:
+    """Return 'rsu' or 'vehicle' for a node_id.
+    IMPLEMENT THIS from your NS-3 / ground-truth metadata. RSU IDs (0–99) and
+    vehicle IDs (0–199) overlap, so a bare node_id cannot disambiguate on its own."""
+    raise NotImplementedError("map node_id -> 'rsu' | 'vehicle'")
+
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
@@ -270,6 +279,13 @@ def _update_trust(
             )
 
         if final_delta > 0:
+            # Send the reduction amount to the blockchain (the source of truth).
+            # The chaincode subtracts it from the current on-chain score.
+            if node_type(nid) == "rsu":
+                reduce_rsu_trust(nid, final_delta)
+            else:
+                reduce_vehicle_trust(nid, final_delta)
+
             # Determine ground truth label for this specific cycle
             if cycle_gt is not None:
                 info = cycle_gt.get(nid, {})
