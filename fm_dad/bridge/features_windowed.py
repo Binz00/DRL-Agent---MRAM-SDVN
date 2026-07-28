@@ -121,8 +121,8 @@ def _compute_coord_score(
 
         ffc_j = np.array([j_hist.get(c, np.nan) for c in window_cycles])
 
-        # Scan all lags τ ∈ [1, W-1]  (W-1 because at τ=W overlap is 0)
-        for tau in range(1, W):
+        # Scan all lags τ ∈ [1, W]  (Eq. 3.22 — inclusive upper bound)
+        for tau in range(1, W + 1):
             x = ffc_i[tau:]       # length W - tau
             y = ffc_j[: W - tau]  # length W - tau
 
@@ -251,24 +251,38 @@ def add_windowed_features(df: pd.DataFrame) -> pd.DataFrame:
             else:
                 partial_window_cycle += 1
 
-            # -- PDRVar: variance of FFc over the window --
-            ffc_vals = [h[1] for h in window if not np.isnan(h[1])]
-            if len(ffc_vals) >= 2:
-                df.at[idx, "PDRVar"] = float(np.var(ffc_vals, ddof=0))
+            # Minimum full-window gate: PDRVar and CoordScore require a
+            # complete W* window before evaluation. A partial window is
+            # statistically unreliable. Nodes in their first W* cycles are
+            # not evaluated on these two features (both stay 0.0). This
+            # trades a detection delay equal to W* for reduced false
+            # positives/negatives from premature evaluation.
+            #
+            # SpoofDev is NOT gated this way — it's a simple mean, not a
+            # variance/correlation statistic, and stays reliable on a
+            # partial window.
+            if w_len < W_star:
+                df.at[idx, "PDRVar"]     = 0.0
+                df.at[idx, "CoordScore"] = 0.0
             else:
-                df.at[idx, "PDRVar"] = 0.0
+                # -- PDRVar: variance of FFc over the FULL window --
+                ffc_vals = [h[1] for h in window if not np.isnan(h[1])]
+                if len(ffc_vals) >= 2:
+                    df.at[idx, "PDRVar"] = float(np.var(ffc_vals, ddof=0))
+                else:
+                    df.at[idx, "PDRVar"] = 0.0
 
-            # -- SpoofDev: mean of SpoofDev_raw over the window --
+                # -- CoordScore: Eq. 3.22 double maximum, FULL window only --
+                window_cycles = [h[0] for h in window]
+                df.at[idx, "CoordScore"] = _compute_coord_score(
+                    nid, window_cycles, ffc_history, active_nodes,
+                )
+
+            # -- SpoofDev: mean of SpoofDev_raw over the window (unchanged) --
             sp_vals = [h[2] for h in window if not np.isnan(h[2])]
             if sp_vals:
                 df.at[idx, "SpoofDev"] = float(np.mean(sp_vals))
             # else: stays NaN (ALS columns missing)
-
-            # -- CoordScore: Eq. 3.22 double maximum --
-            window_cycles = [h[0] for h in window]
-            df.at[idx, "CoordScore"] = _compute_coord_score(
-                nid, window_cycles, ffc_history, active_nodes,
-            )
 
         full_window_total   += full_window_cycle
         partial_window_total += partial_window_cycle

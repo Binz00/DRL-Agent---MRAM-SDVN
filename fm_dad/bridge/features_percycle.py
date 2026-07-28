@@ -122,8 +122,18 @@ def add_percycle_features(df: pd.DataFrame) -> pd.DataFrame:
     else:
         df['SpoofDev_raw'] = 0.0
 
+    # 9. is_stretched_flag — FS flow-stretch proxy (aggregator-computed).
+    # 1.0 = stretched or untestable (does not block gate — defer to dFF alone)
+    # 0.0 = confirmed NOT stretched (blocks the AND condition in trigger.py)
+    # fillna(1.0): anomaly file absent for this cycle — treat as untestable,
+    # so the FS gate degrades gracefully to the dFF-only condition.
+    if 'is_stretched_numeric' in df.columns:
+        df['is_stretched_flag'] = df['is_stretched_numeric'].fillna(1.0)
+    else:
+        df['is_stretched_flag'] = 1.0
+
     # Log summary statistics of each new feature
-    new_features = ['FFc', 'rho_recv', 'dFF', 'd_bar', 'DelayInfl', 'lambda_t', 'lambda_t_norm', 'tau', 'SpoofDev_raw']
+    new_features = ['FFc', 'rho_recv', 'dFF', 'd_bar', 'DelayInfl', 'lambda_t', 'lambda_t_norm', 'tau', 'SpoofDev_raw', 'is_stretched_flag']
     for feat in new_features:
         feat_min = df[feat].min()
         feat_max = df[feat].max()

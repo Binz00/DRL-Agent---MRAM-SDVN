@@ -10,9 +10,10 @@ Sentinels:
     Cycle N is processed ONLY when BOTH sentinels are present.
 
 Outputs (written to --output-dir):
-    pipeline_penalties.csv   — appended after every cycle (same format as batch)
-    live_blacklist.csv       — overwritten after every cycle (current trust snapshot)
-    live_trust_scores.csv    — overwritten after every cycle (simple node→trust dump)
+    pipeline_penalties_<ablation>_<run_id>.csv   — appended after every cycle
+    live_blacklist_<ablation>_<run_id>.csv        — overwritten after every cycle
+    live_trust_scores_<ablation>_<run_id>.csv     — overwritten after every cycle
+    live_trust_history_<ablation>_<run_id>.csv    — appended after every cycle
 
 Usage:
     # Live mode — watch /tmp/ for sentinel files from NS-3 + middleware
@@ -27,7 +28,15 @@ Usage:
     python3 bridge/stream_pipeline.py \\
         --replay fm_dad/data/raw_csvs \\
         --output-dir fm_dad/data/stream_test \\
-        --tau 0.4
+        --tau 0.3 \\
+        --ablation graded
+
+    # C2 ablation replay
+    python3 bridge/stream_pipeline.py \\
+        --replay fm_dad/data/raw_csvs \\
+        --output-dir fm_dad/data/stream_test \\
+        --tau 0.3 \\
+        --ablation binary
 
 Architecture:
     - Imports bridge/join.py, features_percycle.py, features_windowed.py,
@@ -130,12 +139,14 @@ _mid_ready:  Set[int] = set()
 _processed:  Set[int] = set()
 
 # Runtime config (set by run_streaming / run_replay)
-_watch_dir:  str = "/tmp/drl_agent"
-_output_dir: Path = _FM_DAD_DIR / "data"
-_tau_min:    float = 0.4
-_max_cycles: Optional[int] = None
-_agents:     Optional[Dict] = None
-_is_replay:  bool = False
+_watch_dir:    str = "/tmp/drl_agent"
+_output_dir:   Path = _FM_DAD_DIR / "data"
+_tau_min:      float = 0.4
+_max_cycles:   Optional[int] = None
+_agents:       Optional[Dict] = None
+_is_replay:    bool = False
+_ablation_mode: str = "graded"   # "graded" (production) or "binary" (C2)
+_run_id:       str = ""           # set at startup; used in output filenames
 
 # Ground truth state (loaded at startup, IGH refreshed per-cycle)
 # _gt_static  : dict node_id -> {is_attacker, attack_type} for SP/ALS/FS + honest nodes
@@ -157,7 +168,7 @@ _revoked_written:       bool = False   # tracks whether header needs to be writt
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
-    global _penalties_written, _trust_history_written, _is_replay
+    global _penalties_written, _trust_history_written, _is_replay, _ablation_mode, _run_id
     _cycle_buffer.clear()
     _trust.clear()
     _blacklisted.clear()
@@ -166,10 +177,12 @@ def reset_state() -> None:
     _processed.clear()
     _gt_static.clear()
     _all_igh_nodes.clear()
-    _ns3_revoked.clear()              # ← ADD THIS LINE
+    _ns3_revoked.clear()
     _penalties_written = False
     _trust_history_written = False
     _is_replay = False
+    _ablation_mode = "graded"
+    _run_id = ""
 
 
 # ---------------------------------------------------------------------------
@@ -316,14 +329,15 @@ def _update_trust(
                 gt_label = "UNKNOWN"
 
             history_rows.append({
-                "cycle_id":      cycle_no,
-                "node_id":       nid,
-                "trust_before":  trust_before,
-                "delta_applied": final_delta,
-                "trust_after":   trust_after,
-                "blacklisted":   trust_after < _tau_min,
-                "gt_label":      gt_label,
-            })
+                    "cycle_id":      cycle_no,
+                    "node_id":       nid,
+                    "trust_before":  trust_before,
+                    "delta_applied": final_delta,
+                    "trust_after":   trust_after,
+                    "blacklisted":   trust_after < _tau_min,
+                    "gt_label":      gt_label,
+                    "ablation_mode": _ablation_mode,
+                })
 
     # ── Pass 2: one batch Fabric transaction per node type ────────────────────
     bc_ok = bc_fail = 0
@@ -381,7 +395,7 @@ def _update_trust(
             writer = csv.DictWriter(
                 f,
                 fieldnames=["cycle_id", "node_id", "trust_before", "delta_applied",
-                            "trust_after", "blacklisted", "gt_label"],
+                            "trust_after", "blacklisted", "gt_label", "ablation_mode"],
             )
             if write_header:
                 writer.writeheader()
@@ -459,14 +473,35 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
 # ---------------------------------------------------------------------------
 
 def _init_outputs(output_dir: Path) -> None:
-    """Create output directory and initialise file paths."""
+    """Create output directory and initialise file paths.
+
+    When ablation_mode != 'graded' or run_id is set, output filenames include
+    the ablation condition and run_id so baseline and C2 runs never collide.
+    """
     global _penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv, _revoked_csv
     output_dir.mkdir(parents=True, exist_ok=True)
-    _penalties_csv       = output_dir / "pipeline_penalties.csv"
-    _blacklist_csv       = output_dir / "live_blacklist.csv"
-    _trust_csv           = output_dir / "live_trust_scores.csv"
-    _trust_history_csv   = output_dir / "live_trust_history.csv"
-    _revoked_csv         = output_dir / "blacklisted_nodes.csv"
+
+    # Build a suffix so ablation runs are clearly named:
+    #   graded → no suffix (backward compatible with existing tooling)
+    #   binary → _c2_<run_id>  (or _binary_<run_id> if run_id is explicit)
+    if _ablation_mode == "graded":
+        suffix = f"_baseline_{_run_id}" if _run_id else ""
+    else:
+        suffix = f"_{_ablation_mode}_{_run_id}" if _run_id else f"_{_ablation_mode}"
+
+    _penalties_csv      = output_dir / f"pipeline_penalties{suffix}.csv"
+    _blacklist_csv      = output_dir / f"live_blacklist{suffix}.csv"
+    _trust_csv          = output_dir / f"live_trust_scores{suffix}.csv"
+    _trust_history_csv  = output_dir / f"live_trust_history{suffix}.csv"
+    _revoked_csv        = output_dir / "blacklisted_nodes.csv"   # single shared revocation log
+
+    logger.info(
+        "[INIT] ablation=%s run_id=%s | outputs: %s",
+        _ablation_mode, _run_id or "(none)", output_dir,
+    )
+    logger.info("[INIT]   penalties      → %s", _penalties_csv.name)
+    logger.info("[INIT]   trust_history  → %s", _trust_history_csv.name)
+    logger.info("[INIT]   live_blacklist → %s", _blacklist_csv.name)
 
 
 def _append_penalties(results: List[dict], cycle_no: int) -> None:
@@ -664,7 +699,11 @@ def process_cycle_streaming(cycle_no: int) -> None:
         )
 
     # Step 10: Run agent inference
-    results = trigger_process_cycle(cycle_no, tables, _agents, active=active_agents)
+    results = trigger_process_cycle(
+        cycle_no, tables, _agents,
+        active=active_agents,
+        ablation_mode=_ablation_mode,
+    )
 
     # Step 11: Update trust; returns nodes whose on-chain trust fell below threshold
     to_revoke = _update_trust(results, cycle_no, cycle_gt=cycle_gt)
@@ -820,16 +859,21 @@ def run_streaming(
     tau: float,
     max_cycles: Optional[int],
     timeout: Optional[int],
+    ablation: str = "graded",
+    run_id: str = "",
 ) -> None:
     """Start the watchdog/polling sentinel watcher in live mode."""
     global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents, _is_replay
+    global _ablation_mode, _run_id
 
     reset_state()
-    _is_replay  = False
-    _watch_dir  = watch_dir
-    _output_dir = output_dir
-    _tau_min    = tau
-    _max_cycles = max_cycles
+    _is_replay     = False
+    _watch_dir     = watch_dir
+    _output_dir    = output_dir
+    _tau_min       = tau
+    _max_cycles    = max_cycles
+    _ablation_mode = ablation
+    _run_id        = run_id
     _init_outputs(output_dir)
 
     logger.info("[STREAM] Loading DRL agents...")
@@ -889,22 +933,31 @@ def run_replay(
     replay_dir: str,
     output_dir: Path,
     tau: float,
+    ablation: str = "graded",
+    run_id: str = "",
 ) -> None:
     """
     Replay mode: process existing CSVs in cycle order, simulating sentinel arrival.
     Used for correctness verification before NS-3 integration.
 
     Streaming output must be identical to batch output on the same data.
+    Both graded and binary runs use the exact same cycle ordering (deterministic).
     """
     global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents, _is_replay
+    global _ablation_mode, _run_id
 
     reset_state()
-    _is_replay  = True
-    _watch_dir  = replay_dir
-    _output_dir = output_dir
-    _tau_min    = tau
-    _max_cycles = None
+    _is_replay     = True
+    _watch_dir     = replay_dir
+    _output_dir    = output_dir
+    _tau_min       = tau
+    _max_cycles    = None
+    _ablation_mode = ablation
+    _run_id        = run_id
     _init_outputs(output_dir)
+
+    logger.info("[REPLAY] ablation=%s  tau_min=%.2f  run_id=%s",
+                ablation, tau, run_id or "(none)")
 
     logger.info("[REPLAY] Loading DRL agents...")
     _agents = load_frozen_agents()
@@ -962,8 +1015,18 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Directory for output CSVs (pipeline_penalties, live_blacklist, live_trust).",
     )
     p.add_argument(
-        "--tau", type=float, default=0.4, metavar="FLOAT",
+        "--tau", type=float, default=0.3, metavar="FLOAT",
         help="Blacklisting trust threshold (tau_min).",
+    )
+    p.add_argument(
+        "--ablation", choices=["graded", "binary"], default="graded", metavar="MODE",
+        help="C2 ablation mode: 'graded' (production default, DQN inference active) or "
+             "'binary' (DQN skipped, delta=1.0 on any gate fire).",
+    )
+    p.add_argument(
+        "--run-id", default="", metavar="ID",
+        help="Optional run identifier appended to output filenames (e.g. '20260803_170026'). "
+             "Defaults to a timestamp generated at startup if left empty.",
     )
     p.add_argument(
         "--max-cycles", type=int, default=None, metavar="N",
@@ -979,19 +1042,27 @@ def _build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = _build_parser().parse_args()
 
+    # Auto-generate run_id from timestamp if not supplied — ensures distinct output
+    # filenames every run without user needing to remember to set --run-id.
+    run_id = args.run_id or time.strftime("%Y%m%d_%H%M%S")
+
     if args.replay:
         run_replay(
-            replay_dir  = args.replay,
-            output_dir  = Path(args.output_dir),
-            tau         = args.tau,
+            replay_dir = args.replay,
+            output_dir = Path(args.output_dir),
+            tau        = args.tau,
+            ablation   = args.ablation,
+            run_id     = run_id,
         )
     else:
         run_streaming(
-            watch_dir   = args.watch_dir,
-            output_dir  = Path(args.output_dir),
-            tau         = args.tau,
-            max_cycles  = args.max_cycles,
-            timeout     = args.timeout,
+            watch_dir  = args.watch_dir,
+            output_dir = Path(args.output_dir),
+            tau        = args.tau,
+            max_cycles = args.max_cycles,
+            timeout    = args.timeout,
+            ablation   = args.ablation,
+            run_id     = run_id,
         )
 
 

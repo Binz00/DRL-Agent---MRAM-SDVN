@@ -131,6 +131,12 @@ AGG_MAX = frozenset([
     # The Python bridge computes its own gate in trigger.py using:
     #   dFF = abs_ff_deviation > eta_dFF  (correct per-plan deviation, Eq. 3.99)
     # The NS-3 pre-flag is therefore both wrong and unused — drop it.
+    #
+    # is_stretched_numeric: aggregator-computed FS hop-stretch proxy.
+    # MAX across a node's flows gives the worst-case stretch signal.
+    # 1.0 = stretched or untestable (does not block gate).
+    # 0.0 = confirmed not stretched (blocks AND condition).
+    "is_stretched_numeric",
 ])
 
 # Columns that are join/routing artifacts — dropped after aggregation
@@ -152,6 +158,10 @@ DROP_POST_AGG = frozenset([
     # Bridge gate in trigger.py uses dFF = abs(ff_deviation) > eta_dFF instead.
     "detected",
     "threshold",
+    # is_stretched: raw string column from ff_node_anomaly_scores
+    # ("True", "False", or blank). Converted to is_stretched_numeric in
+    # join.py before aggregation. Drop the string version post-agg.
+    "is_stretched",
 ])
 
 

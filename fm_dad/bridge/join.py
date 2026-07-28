@@ -270,6 +270,30 @@ def load_cycle(cycle_no: int, folder: str = RAW_CSV_FOLDER) -> pd.DataFrame:
                 # the MAXIMUM absolute per-flow deviation — correctly capturing the
                 # worst-case departure from the committed forwarding plan.
                 df["abs_ff_deviation"] = df["ff_deviation"].abs()
+            if key == "anomaly" and "is_stretched" in df.columns:
+                # Convert FS flow-stretch proxy to numeric PER FLOW ROW, before
+                # aggregation, so it can be MAX-aggregated the same way as
+                # abs_ff_deviation (worst-case across a node's flows).
+                # "False" = confirmed not stretched (0.0 — blocks AND condition).
+                # Any other value ("True", blank/NaN) = stretched or untestable (1.0).
+                df["is_stretched_numeric"] = df["is_stretched"].apply(
+                    lambda v: 0.0 if str(v).strip() == "False" else 1.0
+                )
+            if key == "anomaly":
+                # Drop columns from the anomaly file that duplicate columns from other
+                # authoritative sources. In newer NS-3 runs, ff_node_anomaly_scores
+                # includes a spoof_dev column (also present in spoof_{N}.csv / als key).
+                # Keeping both causes pandas to suffix them _x/_y during the outer join,
+                # breaking features_percycle.py's exact-name lookup for 'spoof_dev'
+                # → SpoofDev_raw = 0.0 → ALS gate never fires.
+                # The als key (spoof_{N}.csv) is the authoritative spoof_dev source.
+                _anomaly_drop = [c for c in ("spoof_dev",) if c in df.columns]
+                if _anomaly_drop:
+                    df = df.drop(columns=_anomaly_drop)
+                    logger.info(
+                        "  [anomaly] Dropped duplicate column(s) %s "
+                        "(authoritative source: als key)", _anomaly_drop,
+                    )
             raw[key] = df
 
     if not raw:

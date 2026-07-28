@@ -138,9 +138,9 @@ AGENT_CONFIGS = {
         "w4": 0.1,   # weight for r_end
         # ---- E^IGH severity thresholds (graded r_sec, supervisor Issue 1) ----
         # E^IGH = mean of normalised PDRVar, CoordScore, rho_recv excesses.
-        "eta_pdrvar": 0.01,  # PDRVar detection threshold (calibrated by grid search)
-        "eta_coord":  0.30,  # CoordScore detection threshold
-        "eta_rho":    0.30,  # rho_recv lower bound (= rho_recv_low)
+        "eta_pdrvar": 0.03,  # PDRVar detection threshold (calibrated by grid search)
+        "eta_coord":  0.40,  # CoordScore detection threshold (calibrated by grid search)
+        "eta_rho":    0.40,  # rho_recv lower bound (calibrated by grid search)
         # a*(E^IGH) mapping thresholds: E<e1→a1, e1≤E<e2→a2, e2≤E<e3→a3, E≥e3→a4
         "e1": 0.76, "e2": 0.78, "e3": 0.80,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
         # ---- MCC difference-reward weight (supervisor r_mcc patch) --------
@@ -165,7 +165,7 @@ AGENT_CONFIGS = {
         "w4": 0.1,
         # ---- E^SP severity threshold (graded r_sec, supervisor Issue 1) ----
         # E^SP = normalised dFF excess above eta_dFF.
-        "eta_dFF": 0.8,  # dFF detection gate threshold (calibrated by grid search)
+        "eta_dFF": 0.65,  # dFF detection gate threshold (calibrated by grid search)
         "e1": 0.37, "e2": 0.58, "e3": 0.78,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
         # ---- MCC difference-reward weight (supervisor r_mcc patch) --------
         "w5": 0.2,  # grid {0.0, 0.1, 0.2, 0.3}; w1..w4 rescaled by (1-w5) in train.py
@@ -209,7 +209,7 @@ AGENT_CONFIGS = {
         # E^FS = mean of normalised dFF excess and DelayInfl excess.
         "eta_dFF":   0.20,  # dFF detection threshold (calibrated by grid search)
         "eta_delay": 1.50,  # DelayInfl detection threshold (spec: attackers > 1.3)
-        "eta_dff_norm": 0.3, # normalized absolute forwarding plan deviation threshold (gate threshold)
+        "eta_dff_norm": 0.10, # normalized absolute forwarding plan deviation threshold (gate threshold calibrated by grid search)
         "delay_max": 2.00,  # upper clamp for DelayInfl normalisation
         "e1": 0.35, "e2": 0.50, "e3": 0.65,  # calibrated from attacker severity distribution (25/50/75 percentiles), not from action-count tuning.
         # ---- MCC difference-reward weight (supervisor r_mcc patch) --------
