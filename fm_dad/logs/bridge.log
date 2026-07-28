@@ -308,3 +308,213 @@
 [00:50:09][bridge][INFO]   [ALS] 321 rows | dropped 0 NaN-state rows | attackers=72, innocents=249 | features=['SpoofDev', 'dFF', 'tau', 'lambda_t_norm']
 [00:50:09][bridge][INFO]   [FS] 52 rows | dropped 269 NaN-state rows | attackers=5, innocents=47 | features=['FFc', 'dFF', 'DelayInfl', 'tau', 'lambda_t_norm']
 [00:50:09][bridge][INFO]   [IGH] 52 rows | dropped 269 NaN-state rows | attackers=5, innocents=47 | features=['FFc', 'dFF', 'rho_recv', 'd_bar', 'tau', 'PDRVar', 'CoordScore', 'lambda_t_norm']
+[00:55:24][bridge][INFO] === load_cycle(6) | folder=/tmp/drl_agent ===
+[00:55:24][bridge][INFO]   [off] Loaded 93 rows  ← observed_forwarding_fractions_6.csv
+[00:55:24][bridge][INFO]   [hop_delay] Loaded 81 rows  ← vanet_hop_delay_6.csv
+[00:55:24][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_6.csv
+[00:55:24][bridge][INFO]   [planned] Loaded 119 rows  ← verified_planned_inbound_cycle_6.csv
+[00:55:24][bridge][INFO]   [anomaly] Loaded 53 rows  ← ff_node_anomaly_scores_6.csv
+[00:55:24][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_6.csv
+[00:55:24][bridge][INFO]   [als] Loaded 321 rows  ← spoof_6.csv (using spoof_dev alternative)
+[00:55:24][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_6.csv
+[00:55:24][bridge][INFO]   [off] Aggregated 93 → 44 rows (per node)
+[00:55:24][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:55:24][bridge][INFO]   [hop_delay] Aggregated 81 → 44 rows (per node)
+[00:55:24][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:55:24][bridge][INFO]   [planned] Aggregated 119 → 87 rows (per node)
+[00:55:24][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:55:24][bridge][INFO]   [anomaly] Aggregated 53 → 49 rows (per node)
+[00:55:24][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:55:24][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:55:24][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:55:25][bridge][INFO] [hopcount] cycle=6: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:55:25][bridge][INFO]   [flow_metrics] Broadcast to 48 (cycle, flow, node) rows from 48 flow-node pairs
+[00:55:25][bridge][INFO]   [flow_metrics] Aggregated 48 → 44 rows (per node)
+[00:55:25][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:55:25][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:55:25][bridge][INFO]   After joining [hop_delay]: 44 → 44 rows
+[00:55:25][bridge][INFO]   After joining [planned]: 44 → 87 rows
+[00:55:25][bridge][INFO]   After joining [anomaly]: 87 → 87 rows
+[00:55:25][bridge][INFO]   After joining [als]: 87 → 321 rows
+[00:55:25][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:55:25][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:55:25][bridge][INFO]   Cycle 6 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:55:25][bridge][INFO] === add_percycle_features | rows=321 ===
+[00:55:25][bridge][ERROR] Failed to load d_ref from /home/chamod/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv, using fallback 4.8767: [Errno 2] No such file or directory: '/home/chamod/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv'
+[00:55:25][bridge][INFO] d_bar calculation: 277 values set to NaN (due to zero/missing hop_delay_count)
+[00:55:25][bridge][INFO] lambda_t missing values: 290 before -> 0 after (290 filled using cycle median)
+[00:55:25][bridge][INFO] Feature 'FFc' -> min: 0.0000, max: 1.0000, mean: 0.8972
+[00:55:25][bridge][INFO] Feature 'rho_recv' -> min: 0.8000, max: 1.0000, mean: 0.9814
+[00:55:25][bridge][INFO] Feature 'dFF' -> min: 0.0000, max: 1.0000, mean: 0.0315
+[00:55:25][bridge][INFO] Feature 'd_bar' -> min: 1.3450, max: 7.9683, mean: 2.9132
+[00:55:25][bridge][INFO] Feature 'DelayInfl' -> min: 0.2758, max: 1.6340, mean: 0.5974
+[00:55:25][bridge][INFO] Feature 'lambda_t' -> min: 30.0000, max: 30.0000, mean: 30.0000
+[00:55:25][bridge][INFO] Feature 'lambda_t_norm' -> min: 0.0060, max: 0.0060, mean: 0.0060
+[00:55:25][bridge][INFO] Feature 'tau' -> min: 1.0000, max: 1.0000, mean: 1.0000
+[00:55:25][bridge][INFO] Feature 'SpoofDev_raw' -> min: 0.0000, max: 0.0096, mean: 0.0009
+[00:55:25][bridge][INFO] === add_windowed_features | rows=1926 ===
+[00:55:25][bridge][WARNING] WINDOW WARNING: Only 6 cycle(s) available, smallest W* = 10.  ALL windows will be partial — windowed features (PDRVar, CoordScore, SpoofDev) are statistically weak.  Collect more cycles for reliable detection.
+[00:55:25][bridge][INFO]   Cycle 1 | lambda_t_norm_median=0.8528 → W*=10, nodes=321
+[00:55:25][bridge][INFO]   Cycle 1 | full_window=0, partial_window=321
+[00:55:25][bridge][INFO]   Cycle 2 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:55:25][bridge][INFO]   Cycle 2 | full_window=0, partial_window=321
+[00:55:25][bridge][INFO]   Cycle 3 | lambda_t_norm_median=0.0672 → W*=20, nodes=321
+[00:55:26][bridge][INFO]   Cycle 3 | full_window=0, partial_window=321
+[00:55:26][bridge][INFO]   Cycle 4 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:55:29][bridge][INFO]   Cycle 4 | full_window=0, partial_window=321
+[00:55:29][bridge][INFO]   Cycle 5 | lambda_t_norm_median=0.0568 → W*=20, nodes=321
+[00:55:31][bridge][INFO]   Cycle 5 | full_window=0, partial_window=321
+[00:55:31][bridge][INFO]   Cycle 6 | lambda_t_norm_median=0.0060 → W*=20, nodes=321
+[00:55:34][bridge][INFO]   Cycle 6 | full_window=0, partial_window=321
+[00:55:34][bridge][INFO] Window totals: full=0, partial=1926
+[00:55:34][bridge][INFO] Feature 'PDRVar' → min=0.000000, max=0.250000, mean=0.005820
+[00:55:34][bridge][INFO] Feature 'CoordScore' → min=0.000000, max=1.000000, mean=0.023364
+[00:55:34][bridge][INFO] Feature 'SpoofDev' → min=0.000100, max=0.005698, mean=0.000773
+[00:55:34][bridge][INFO] === assemble_agent_tables | input rows=321 ===
+[00:55:34][bridge][INFO] Step 1: Dropped 0 unlabeled rows (is_attacker=NaN). Remaining: 321 rows.
+[00:55:34][bridge][INFO]   [SP] 49 rows | dropped 272 NaN-state rows | attackers=10, innocents=39 | features=['FFc', 'dFF', 'rho_recv', 'tau', 'lambda_t_norm']
+[00:55:34][bridge][INFO]   [ALS] 321 rows | dropped 0 NaN-state rows | attackers=69, innocents=252 | features=['SpoofDev', 'dFF', 'tau', 'lambda_t_norm']
+[00:55:34][bridge][INFO]   [FS] 44 rows | dropped 277 NaN-state rows | attackers=5, innocents=39 | features=['FFc', 'dFF', 'DelayInfl', 'tau', 'lambda_t_norm']
+[00:55:34][bridge][INFO]   [IGH] 44 rows | dropped 277 NaN-state rows | attackers=5, innocents=39 | features=['FFc', 'dFF', 'rho_recv', 'd_bar', 'tau', 'PDRVar', 'CoordScore', 'lambda_t_norm']
+[00:59:32][bridge][INFO] === load_cycle(7) | folder=/tmp/drl_agent ===
+[00:59:32][bridge][INFO]   [off] Loaded 82 rows  ← observed_forwarding_fractions_7.csv
+[00:59:32][bridge][INFO]   [hop_delay] Loaded 80 rows  ← vanet_hop_delay_7.csv
+[00:59:32][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_7.csv
+[00:59:32][bridge][INFO]   [planned] Loaded 194 rows  ← verified_planned_inbound_cycle_7.csv
+[00:59:32][bridge][INFO]   [anomaly] Loaded 64 rows  ← ff_node_anomaly_scores_7.csv
+[00:59:32][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_7.csv
+[00:59:32][bridge][INFO]   [als] Loaded 321 rows  ← spoof_7.csv (using spoof_dev alternative)
+[00:59:32][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_7.csv
+[00:59:32][bridge][INFO]   [off] Aggregated 82 → 44 rows (per node)
+[00:59:32][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[00:59:32][bridge][INFO]   [hop_delay] Aggregated 80 → 41 rows (per node)
+[00:59:32][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[00:59:32][bridge][INFO]   [planned] Aggregated 194 → 142 rows (per node)
+[00:59:32][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[00:59:32][bridge][INFO]   [anomaly] Aggregated 64 → 51 rows (per node)
+[00:59:32][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[00:59:32][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[00:59:32][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[00:59:35][bridge][INFO] [hopcount] cycle=7: 0/2 flows matched, hop_excess computed for 0 nodes
+[00:59:35][bridge][INFO]   [flow_metrics] Broadcast to 57 (cycle, flow, node) rows from 57 flow-node pairs
+[00:59:35][bridge][INFO]   [flow_metrics] Aggregated 57 → 44 rows (per node)
+[00:59:35][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[00:59:35][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[00:59:35][bridge][INFO]   After joining [hop_delay]: 44 → 44 rows
+[00:59:35][bridge][INFO]   After joining [planned]: 44 → 142 rows
+[00:59:35][bridge][INFO]   After joining [anomaly]: 142 → 142 rows
+[00:59:35][bridge][INFO]   After joining [als]: 142 → 321 rows
+[00:59:35][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[00:59:35][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[00:59:35][bridge][INFO]   Cycle 7 complete | 321 unique nodes, 321 total rows, 0 null keys
+[00:59:35][bridge][INFO] === add_percycle_features | rows=321 ===
+[00:59:35][bridge][ERROR] Failed to load d_ref from /home/chamod/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv, using fallback 4.8767: [Errno 2] No such file or directory: '/home/chamod/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv'
+[00:59:35][bridge][INFO] d_bar calculation: 280 values set to NaN (due to zero/missing hop_delay_count)
+[00:59:35][bridge][INFO] lambda_t missing values: 290 before -> 0 after (290 filled using cycle median)
+[00:59:35][bridge][INFO] Feature 'FFc' -> min: 0.0000, max: 1.0000, mean: 0.8489
+[00:59:35][bridge][INFO] Feature 'rho_recv' -> min: 0.4211, max: 1.0000, mean: 0.9502
+[00:59:35][bridge][INFO] Feature 'dFF' -> min: 0.0000, max: 1.0000, mean: 0.0456
+[00:59:35][bridge][INFO] Feature 'd_bar' -> min: 1.3820, max: 8.0940, mean: 2.8053
+[00:59:35][bridge][INFO] Feature 'DelayInfl' -> min: 0.2834, max: 1.6597, mean: 0.5752
+[00:59:35][bridge][INFO] Feature 'lambda_t' -> min: 64.0000, max: 64.0000, mean: 64.0000
+[00:59:35][bridge][INFO] Feature 'lambda_t_norm' -> min: 0.0128, max: 0.0128, mean: 0.0128
+[00:59:35][bridge][INFO] Feature 'tau' -> min: 1.0000, max: 1.0000, mean: 1.0000
+[00:59:35][bridge][INFO] Feature 'SpoofDev_raw' -> min: 0.0000, max: 0.0102, mean: 0.0008
+[00:59:35][bridge][INFO] === add_windowed_features | rows=2247 ===
+[00:59:35][bridge][WARNING] WINDOW WARNING: Only 7 cycle(s) available, smallest W* = 10.  ALL windows will be partial — windowed features (PDRVar, CoordScore, SpoofDev) are statistically weak.  Collect more cycles for reliable detection.
+[00:59:35][bridge][INFO]   Cycle 1 | lambda_t_norm_median=0.8528 → W*=10, nodes=321
+[00:59:35][bridge][INFO]   Cycle 1 | full_window=0, partial_window=321
+[00:59:35][bridge][INFO]   Cycle 2 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:59:35][bridge][INFO]   Cycle 2 | full_window=0, partial_window=321
+[00:59:35][bridge][INFO]   Cycle 3 | lambda_t_norm_median=0.0672 → W*=20, nodes=321
+[00:59:36][bridge][INFO]   Cycle 3 | full_window=0, partial_window=321
+[00:59:36][bridge][INFO]   Cycle 4 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[00:59:37][bridge][INFO]   Cycle 4 | full_window=0, partial_window=321
+[00:59:37][bridge][INFO]   Cycle 5 | lambda_t_norm_median=0.0568 → W*=20, nodes=321
+[00:59:39][bridge][INFO]   Cycle 5 | full_window=0, partial_window=321
+[00:59:40][bridge][INFO]   Cycle 6 | lambda_t_norm_median=0.0060 → W*=20, nodes=321
+[00:59:42][bridge][INFO]   Cycle 6 | full_window=0, partial_window=321
+[00:59:42][bridge][INFO]   Cycle 7 | lambda_t_norm_median=0.0128 → W*=20, nodes=321
+[00:59:45][bridge][INFO]   Cycle 7 | full_window=0, partial_window=321
+[00:59:45][bridge][INFO] Window totals: full=0, partial=2247
+[00:59:45][bridge][INFO] Feature 'PDRVar' → min=0.000000, max=0.250000, mean=0.006417
+[00:59:45][bridge][INFO] Feature 'CoordScore' → min=0.000000, max=1.000000, mean=0.028482
+[00:59:45][bridge][INFO] Feature 'SpoofDev' → min=0.000100, max=0.005698, mean=0.000809
+[00:59:45][bridge][INFO] === assemble_agent_tables | input rows=321 ===
+[00:59:45][bridge][INFO] Step 1: Dropped 0 unlabeled rows (is_attacker=NaN). Remaining: 321 rows.
+[00:59:45][bridge][INFO]   [SP] 51 rows | dropped 270 NaN-state rows | attackers=9, innocents=42 | features=['FFc', 'dFF', 'rho_recv', 'tau', 'lambda_t_norm']
+[00:59:45][bridge][INFO]   [ALS] 321 rows | dropped 0 NaN-state rows | attackers=71, innocents=250 | features=['SpoofDev', 'dFF', 'tau', 'lambda_t_norm']
+[00:59:45][bridge][INFO]   [FS] 41 rows | dropped 280 NaN-state rows | attackers=2, innocents=39 | features=['FFc', 'dFF', 'DelayInfl', 'tau', 'lambda_t_norm']
+[00:59:45][bridge][INFO]   [IGH] 41 rows | dropped 280 NaN-state rows | attackers=2, innocents=39 | features=['FFc', 'dFF', 'rho_recv', 'd_bar', 'tau', 'PDRVar', 'CoordScore', 'lambda_t_norm']
+[01:05:54][bridge][INFO] === load_cycle(8) | folder=/tmp/drl_agent ===
+[01:05:54][bridge][INFO]   [off] Loaded 155 rows  ← observed_forwarding_fractions_8.csv
+[01:05:54][bridge][INFO]   [hop_delay] Loaded 152 rows  ← vanet_hop_delay_8.csv
+[01:05:54][bridge][INFO]   [flow_metrics] Loaded 2 rows  ← per_flow_metrics_8.csv
+[01:05:54][bridge][INFO]   [planned] Loaded 247 rows  ← verified_planned_inbound_cycle_8.csv
+[01:05:54][bridge][INFO]   [anomaly] Loaded 84 rows  ← ff_node_anomaly_scores_8.csv
+[01:05:54][bridge][WARNING]   [trust] NOT FOUND: node_trust_scores_8.csv
+[01:05:54][bridge][INFO]   [als] Loaded 321 rows  ← spoof_8.csv (using spoof_dev alternative)
+[01:05:54][bridge][INFO]   [ground_truth] Loaded 321 rows  ← node_attack_ground_truth_8.csv
+[01:05:54][bridge][INFO]   [off] Aggregated 155 → 59 rows (per node)
+[01:05:54][bridge][INFO]   [off] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'forwarding_node_type', 'next_hop_id', 'next_hop_type']
+[01:05:54][bridge][INFO]   [hop_delay] Aggregated 152 → 59 rows (per node)
+[01:05:54][bridge][INFO]   [hop_delay] Dropped artifact columns: ['flow_id', 'prev_hop_id']
+[01:05:54][bridge][INFO]   [planned] Aggregated 247 → 172 rows (per node)
+[01:05:54][bridge][INFO]   [planned] Dropped artifact columns: ['flow_id']
+[01:05:54][bridge][INFO]   [anomaly] Aggregated 84 → 64 rows (per node)
+[01:05:54][bridge][INFO]   [anomaly] Dropped artifact columns: ['sim_time_s', 'flow_id', 'flow_source', 'flow_destination', 'node_type', 'threshold', 'detected', 'mean_pdr_flow', 'pdr_deviation']
+[01:05:54][bridge][INFO]   [als] 321 rows (already per-node, no aggregation needed)
+[01:05:54][bridge][INFO]   [ground_truth] 321 rows (already per-node, no aggregation needed)
+[01:06:01][bridge][INFO] [hopcount] cycle=8: 0/2 flows matched, hop_excess computed for 0 nodes
+[01:06:01][bridge][INFO]   [flow_metrics] Broadcast to 79 (cycle, flow, node) rows from 79 flow-node pairs
+[01:06:01][bridge][INFO]   [flow_metrics] Aggregated 79 → 59 rows (per node)
+[01:06:01][bridge][INFO]   [flow_metrics] Dropped artifact columns: ['flow_id']
+[01:06:01][bridge][INFO]   Joining 7 source(s) on (cycle_id, node_id) …
+[01:06:01][bridge][INFO]   After joining [hop_delay]: 59 → 59 rows
+[01:06:01][bridge][INFO]   After joining [planned]: 59 → 172 rows
+[01:06:01][bridge][INFO]   After joining [anomaly]: 172 → 172 rows
+[01:06:01][bridge][INFO]   After joining [als]: 172 → 321 rows
+[01:06:01][bridge][INFO]   After joining [ground_truth]: 321 → 321 rows
+[01:06:01][bridge][INFO]   After joining [flow_metrics]: 321 → 321 rows
+[01:06:01][bridge][INFO]   Cycle 8 complete | 321 unique nodes, 321 total rows, 0 null keys
+[01:06:01][bridge][INFO] === add_percycle_features | rows=321 ===
+[01:06:01][bridge][ERROR] Failed to load d_ref from /home/chamod/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv, using fallback 4.8767: [Errno 2] No such file or directory: '/home/chamod/DRL-Agent---MRAM-SDVN/fm_dad/data/raw_csvs/delay_reference.csv'
+[01:06:01][bridge][INFO] d_bar calculation: 262 values set to NaN (due to zero/missing hop_delay_count)
+[01:06:01][bridge][INFO] lambda_t missing values: 286 before -> 0 after (286 filled using cycle median)
+[01:06:01][bridge][INFO] Feature 'FFc' -> min: 0.0000, max: 1.0000, mean: 0.9085
+[01:06:01][bridge][INFO] Feature 'rho_recv' -> min: 0.1429, max: 1.0000, mean: 0.8116
+[01:06:01][bridge][INFO] Feature 'dFF' -> min: 0.0000, max: 1.0000, mean: 0.0396
+[01:06:01][bridge][INFO] Feature 'd_bar' -> min: 1.4300, max: 3.4180, mean: 2.0990
+[01:06:01][bridge][INFO] Feature 'DelayInfl' -> min: 0.2932, max: 0.7009, mean: 0.4304
+[01:06:01][bridge][INFO] Feature 'lambda_t' -> min: 118.0000, max: 118.0000, mean: 118.0000
+[01:06:01][bridge][INFO] Feature 'lambda_t_norm' -> min: 0.0236, max: 0.0236, mean: 0.0236
+[01:06:01][bridge][INFO] Feature 'tau' -> min: 1.0000, max: 1.0000, mean: 1.0000
+[01:06:01][bridge][INFO] Feature 'SpoofDev_raw' -> min: 0.0000, max: 0.0144, mean: 0.0008
+[01:06:01][bridge][INFO] === add_windowed_features | rows=2568 ===
+[01:06:01][bridge][WARNING] WINDOW WARNING: Only 8 cycle(s) available, smallest W* = 10.  ALL windows will be partial — windowed features (PDRVar, CoordScore, SpoofDev) are statistically weak.  Collect more cycles for reliable detection.
+[01:06:01][bridge][INFO]   Cycle 1 | lambda_t_norm_median=0.8528 → W*=10, nodes=321
+[01:06:01][bridge][INFO]   Cycle 1 | full_window=0, partial_window=321
+[01:06:01][bridge][INFO]   Cycle 2 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[01:06:01][bridge][INFO]   Cycle 2 | full_window=0, partial_window=321
+[01:06:01][bridge][INFO]   Cycle 3 | lambda_t_norm_median=0.0672 → W*=20, nodes=321
+[01:06:03][bridge][INFO]   Cycle 3 | full_window=0, partial_window=321
+[01:06:03][bridge][INFO]   Cycle 4 | lambda_t_norm_median=0.0004 → W*=20, nodes=321
+[01:06:05][bridge][INFO]   Cycle 4 | full_window=0, partial_window=321
+[01:06:05][bridge][INFO]   Cycle 5 | lambda_t_norm_median=0.0568 → W*=20, nodes=321
+[01:06:07][bridge][INFO]   Cycle 5 | full_window=0, partial_window=321
+[01:06:07][bridge][INFO]   Cycle 6 | lambda_t_norm_median=0.0060 → W*=20, nodes=321
+[01:06:09][bridge][INFO]   Cycle 6 | full_window=0, partial_window=321
+[01:06:09][bridge][INFO]   Cycle 7 | lambda_t_norm_median=0.0128 → W*=20, nodes=321
+[01:06:12][bridge][INFO]   Cycle 7 | full_window=0, partial_window=321
+[01:06:12][bridge][INFO]   Cycle 8 | lambda_t_norm_median=0.0236 → W*=20, nodes=321
+[01:06:15][bridge][INFO]   Cycle 8 | full_window=0, partial_window=321
+[01:06:15][bridge][INFO] Window totals: full=0, partial=2568
+[01:06:15][bridge][INFO] Feature 'PDRVar' → min=0.000000, max=0.250000, mean=0.006849
+[01:06:15][bridge][INFO] Feature 'CoordScore' → min=0.000000, max=1.000000, mean=0.032321
+[01:06:15][bridge][INFO] Feature 'SpoofDev' → min=0.000100, max=0.005698, mean=0.000833
+[01:06:15][bridge][INFO] === assemble_agent_tables | input rows=321 ===
+[01:06:15][bridge][INFO] Step 1: Dropped 0 unlabeled rows (is_attacker=NaN). Remaining: 321 rows.
+[01:06:15][bridge][INFO]   [SP] 64 rows | dropped 257 NaN-state rows | attackers=10, innocents=54 | features=['FFc', 'dFF', 'rho_recv', 'tau', 'lambda_t_norm']
+[01:06:15][bridge][INFO]   [ALS] 321 rows | dropped 0 NaN-state rows | attackers=75, innocents=246 | features=['SpoofDev', 'dFF', 'tau', 'lambda_t_norm']
+[01:06:15][bridge][INFO]   [FS] 59 rows | dropped 262 NaN-state rows | attackers=5, innocents=54 | features=['FFc', 'dFF', 'DelayInfl', 'tau', 'lambda_t_norm']
+[01:06:15][bridge][INFO]   [IGH] 59 rows | dropped 262 NaN-state rows | attackers=5, innocents=54 | features=['FFc', 'dFF', 'rho_recv', 'd_bar', 'tau', 'PDRVar', 'CoordScore', 'lambda_t_norm']

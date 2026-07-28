@@ -73,7 +73,10 @@ from bridge.config_bridge import RAW_CSV_FOLDER, CYCLE_DETECTION_REGEX
 from config import AGENT_CONFIGS
 from episode_eval import load_frozen_agents
 
-from bridge.trust_client import reduce_rsu_trust, reduce_vehicle_trust
+from bridge.trust_client import (
+    reduce_rsu_trust, reduce_vehicle_trust,
+    batch_reduce_rsu_trust, batch_reduce_vehicle_trust,
+)
 
 
 def node_type(node_id: int) -> str:
@@ -146,6 +149,7 @@ _blacklist_csv:       Optional[Path] = None
 _trust_csv:           Optional[Path] = None
 _trust_history_csv:   Optional[Path] = None
 _revoked_csv:         Optional[Path] = None
+_ns3_revoked:         Set[int] = set()          # nodes already sent to NS-3; never re-sent
 _penalties_written:     bool = False   # tracks whether header needs to be written
 _trust_history_written: bool = False   # tracks whether header needs to be written
 _revoked_written:       bool = False   # tracks whether header needs to be written
@@ -162,6 +166,7 @@ def reset_state() -> None:
     _processed.clear()
     _gt_static.clear()
     _all_igh_nodes.clear()
+    _ns3_revoked.clear()              # ← ADD THIS LINE
     _penalties_written = False
     _trust_history_written = False
     _is_replay = False
@@ -252,28 +257,33 @@ def _update_trust(
     results: List[dict],
     cycle_no: int,
     cycle_gt: Optional[Dict[int, dict]] = None,
-) -> None:
+) -> List[int]:
     """
-    Apply trust deltas from agent results.
+    Apply trust deltas from agent results and commit all reductions to Fabric
+    in exactly TWO batch transactions per cycle (one for RSUs, one for vehicles).
 
-    trust NEVER resets between cycles — accumulates across the entire run.
-    Blacklisted nodes continue to be processed each cycle (min-trust semantics).
-    Writes non-zero delta nodes to live_trust_history.csv.
+    Pass 1 — local state update:
+        Iterate results, update _trust in memory, record blacklisting, build
+        history_rows and two batch dicts (rsu_batch, vehicle_batch).
 
-    Args:
-        results   : per-node agent results from trigger_process_cycle.
-        cycle_no  : current cycle number.
-        cycle_gt  : per-cycle ground truth dict (node_id -> {is_attacker, attack_type}).
-                    Used to label each penalized node in live_trust_history.csv.
-                    If None, gt_label is written as 'UNKNOWN'.
+    Pass 2 — single batch call per node type:
+        batch_reduce_rsu_trust(rsu_batch)     → 1 Fabric tx for all RSUs
+        batch_reduce_vehicle_trust(vehicle_batch) → 1 Fabric tx for all vehicles
+
+    Returns list of node_ids whose on-chain score fell below REVOKE_THRESHOLD.
+    Never raises.
     """
     global _trust_history_written
     history_rows = []
-    bc_ok = bc_fail = 0   # per-cycle blockchain update tally
-    to_revoke: List[int] = []   # nodes whose on-chain score fell below REVOKE_THRESHOLD
+    to_revoke: List[int] = []
 
+    # These accumulate {node_id: delta} for nodes that need blockchain updates
+    rsu_batch:     Dict[int, float] = {}
+    vehicle_batch: Dict[int, float] = {}
+
+    # ── Pass 1: update local trust state, build history rows and batch dicts ──
     for r in results:
-        nid = r["node_id"]
+        nid         = r["node_id"]
         final_delta = r["final_delta"]
 
         if nid not in _trust:
@@ -291,38 +301,16 @@ def _update_trust(
             )
 
         if final_delta > 0:
-            # Send the reduction amount to the blockchain (the source of truth).
-            # The chaincode subtracts it from the current on-chain score.
+            # Route to the right batch dict based on node type
             ntype = node_type(nid)
-            fn_name = "ReduceTrustScore" if ntype == "rsu" else "ReduceVehicleTrustScore"
-            logger.info(
-                "[BC] cycle=%d %-7s node=%d reduce=-%.4f → %s",
-                cycle_no, ntype.upper(), nid, final_delta, fn_name,
-            )
-
             if ntype == "rsu":
-                new_score = reduce_rsu_trust(nid, final_delta)
+                rsu_batch[nid] = final_delta
             else:
-                new_score = reduce_vehicle_trust(nid, final_delta)
+                vehicle_batch[nid] = final_delta
 
-            if new_score is None:
-                bc_fail += 1
-                logger.warning(
-                    "[BC] cycle=%d %-7s node=%d reduce=-%.4f FAILED — ledger unchanged",
-                    cycle_no, ntype.upper(), nid, final_delta,
-                )
-            else:
-                bc_ok += 1
-                logger.info(
-                    "[BC] cycle=%d %-7s node=%d reduce=-%.4f OK  on-chain now=%.4f",
-                    cycle_no, ntype.upper(), nid, final_delta, new_score,
-                )
-                if new_score < REVOKE_THRESHOLD:
-                    to_revoke.append(nid)
-
-            # Determine ground truth label for this specific cycle
+            # Ground truth label for history CSV
             if cycle_gt is not None:
-                info = cycle_gt.get(nid, {})
+                info     = cycle_gt.get(nid, {})
                 gt_label = "ATTACKER" if info.get("is_attacker", 0) else "HONEST"
             else:
                 gt_label = "UNKNOWN"
@@ -337,6 +325,56 @@ def _update_trust(
                 "gt_label":      gt_label,
             })
 
+    # ── Pass 2: one batch Fabric transaction per node type ────────────────────
+    bc_ok = bc_fail = 0
+
+    if rsu_batch:
+        logger.info(
+            "[BC] cycle=%d RSU batch: %d nodes → BatchReduceTrustScores",
+            cycle_no, len(rsu_batch),
+        )
+        rsu_results = batch_reduce_rsu_trust(rsu_batch)
+        if rsu_results is None:
+            bc_fail += len(rsu_batch)
+            logger.warning(
+                "[BC] cycle=%d RSU batch FAILED — %d nodes ledger unchanged",
+                cycle_no, len(rsu_batch),
+            )
+        else:
+            bc_ok += len(rsu_results)
+            bc_fail += len(rsu_batch) - len(rsu_results)
+            for nid, new_score in rsu_results.items():
+                logger.info(
+                    "[BC] cycle=%d RSU    node=%d reduce=-%.4f OK  on-chain now=%.4f",
+                    cycle_no, nid, rsu_batch[nid], new_score,
+                )
+                if new_score < REVOKE_THRESHOLD:
+                    to_revoke.append(nid)
+
+    if vehicle_batch:
+        logger.info(
+            "[BC] cycle=%d VEH batch: %d nodes → BatchReduceVehicleTrustScores",
+            cycle_no, len(vehicle_batch),
+        )
+        veh_results = batch_reduce_vehicle_trust(vehicle_batch)
+        if veh_results is None:
+            bc_fail += len(vehicle_batch)
+            logger.warning(
+                "[BC] cycle=%d VEH batch FAILED — %d nodes ledger unchanged",
+                cycle_no, len(vehicle_batch),
+            )
+        else:
+            bc_ok += len(veh_results)
+            bc_fail += len(vehicle_batch) - len(veh_results)
+            for nid, new_score in veh_results.items():
+                logger.info(
+                    "[BC] cycle=%d VEH    node=%d reduce=-%.4f OK  on-chain now=%.4f",
+                    cycle_no, nid, vehicle_batch[nid], new_score,
+                )
+                if new_score < REVOKE_THRESHOLD:
+                    to_revoke.append(nid)
+
+    # ── Write trust history CSV ───────────────────────────────────────────────
     if history_rows and _trust_history_csv is not None:
         write_header = not _trust_history_written or not _trust_history_csv.exists()
         with open(_trust_history_csv, "a", newline="") as f:
@@ -349,9 +387,10 @@ def _update_trust(
                 writer.writeheader()
             writer.writerows(history_rows)
         _trust_history_written = True
+
     if bc_ok or bc_fail:
         logger.info(
-            "[BC] cycle=%d blockchain summary: %d committed, %d failed",
+            "[BC] cycle=%d batch summary: %d committed, %d failed",
             cycle_no, bc_ok, bc_fail,
         )
 
@@ -360,17 +399,28 @@ def _update_trust(
 
 
 def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
-    """Request ns-3 revocation for each node whose on-chain trust fell below threshold."""
+    """Request ns-3 revocation for each node whose on-chain trust fell below threshold.
+    Nodes already sent to NS-3 in a previous cycle are skipped (dedup via _ns3_revoked)."""
     if not node_ids:
         return
-    global _revoked_written
+    global _revoked_written, _ns3_revoked    # ← added _ns3_revoked here
     from bridge.ns3_client import request_ns3_revocation
-    ok = fail = 0
+    ok = fail = skip = 0                     # ← added skip counter
     revoked_rows = []
-    for nid in sorted(set(node_ids)):   # dedupe, stable order
+    for nid in sorted(set(node_ids)):   # dedupe within this cycle's list
+        # ── Dedup guard: never send REVOKE_NODE for the same node twice ──────
+        if nid in _ns3_revoked:
+            logger.info(
+                "[NS3] cycle=%d node=%d already revoked in a previous cycle — skipping",
+                cycle_no, nid,
+            )
+            skip += 1
+            continue
+        # ─────────────────────────────────────────────────────────────────────
         try:
             status = request_ns3_revocation(nid)
             ok += 1
+            _ns3_revoked.add(nid)            # ← record successful revocation
             logger.warning(
                 "[NS3] cycle=%d node=%d trust<%.2f → REVOKE_NODE; ns-3: %s",
                 cycle_no, nid, REVOKE_THRESHOLD, status,
@@ -400,8 +450,8 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
             writer.writerows(revoked_rows)
         _revoked_written = True
 
-    logger.info("[NS3] cycle=%d revocations complete — ok=%d failed=%d",
-                cycle_no, ok, fail)
+    logger.info("[NS3] cycle=%d revocations complete — ok=%d failed=%d skipped=%d",
+                cycle_no, ok, fail, skip)
 
 
 # ---------------------------------------------------------------------------
@@ -708,6 +758,36 @@ def _poll_for_sentinels(watch_dir: str, timeout: Optional[int]) -> None:
 
         time.sleep(1.0)
 
+# ---------------------------------------------------------------------------
+# NS-3 shutdown signal
+# ---------------------------------------------------------------------------
+
+def _send_ns3_shutdown() -> None:
+    """
+    Signal NS-3 that Python has finished all revocations.
+    NS-3's main thread is spin-waiting on g_python_done after Simulator::Run()
+    returns. Sending SHUTDOWN unblocks it so it can call Simulator::Destroy().
+    Only sent in live (non-replay) mode — in replay mode NS-3 is not running.
+    """
+    if _is_replay:
+        logger.info("[NS3] Replay mode — skipping SHUTDOWN signal")
+        return
+    import socket as _socket
+    sock_path = "/tmp/vanet_verify.sock"
+    try:
+        s = _socket.socket(_socket.AF_UNIX, _socket.SOCK_STREAM)
+        s.settimeout(5.0)
+        s.connect(sock_path)
+        s.sendall(b"SHUTDOWN\n")
+        resp = s.recv(64)
+        logger.info("[NS3] SHUTDOWN sent — NS-3 ack: %s", resp.decode().strip())
+        s.close()
+    except FileNotFoundError:
+        logger.warning("[NS3] SHUTDOWN: socket %s not found — NS-3 may have already exited", sock_path)
+    except Exception as exc:
+        logger.warning("[NS3] SHUTDOWN send failed: %s", exc)
+
+
 
 # ---------------------------------------------------------------------------
 # Live mode entry point
@@ -776,6 +856,7 @@ def run_streaming(
 
     logger.info("[STREAM] Done. Processed %d cycles. Blacklisted: %d nodes.",
                 len(_processed), len(_blacklisted))
+    _send_ns3_shutdown()    # ← unblock NS-3's post-sim spin-wait
 
 
 # ---------------------------------------------------------------------------
@@ -831,6 +912,7 @@ def run_replay(
 
     logger.info("[REPLAY] Done. Processed %d cycles. Blacklisted: %d nodes.",
                 len(_processed), len(_blacklisted))
+    _send_ns3_shutdown()    # ← no-op in replay mode; kept for symmetry
 
 
 # ---------------------------------------------------------------------------

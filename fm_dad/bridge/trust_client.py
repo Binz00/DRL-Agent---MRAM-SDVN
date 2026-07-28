@@ -1,11 +1,14 @@
 """
 trust_client.py — real trust chaincode client (Reduce design).
 
-reduce_rsu_trust(node_id, amount)     → new score (float) or None
-reduce_vehicle_trust(node_id, amount) → new score (float) or None
+reduce_rsu_trust(node_id, amount)           → new score (float) or None
+reduce_vehicle_trust(node_id, amount)       → new score (float) or None
+batch_reduce_rsu_trust(updates: dict)       → dict[int, float] or None
+batch_reduce_vehicle_trust(updates: dict)   → dict[int, float] or None
 
-Sends a POSITIVE reduction amount to ReduceTrustScore / ReduceVehicleTrustScore,
-which subtract it from the current on-chain score (the source of truth).
+Single-node functions: send one POSITIVE reduction amount per call.
+Batch functions: send {node_id: amount, ...} for an entire cycle in one Fabric
+transaction — dramatically faster when multiple nodes are penalized per cycle.
 Never raises — a Fabric hiccup logs and returns None so the cycle loop survives.
 """
 
@@ -70,7 +73,66 @@ def _reduce_trust(chaincode: str, function: str, node_id: int, amount: float):
     except Exception as e:
         logger.error("%s.%s(%d) exception: %s", chaincode, function, node_id, e)
         return None
+def _batch_reduce_trust(chaincode: str, function: str, updates: dict) -> dict | None:
+    """
+    Call a batch chaincode function with {node_id: amount, ...} in one transaction.
 
+    `updates` is a dict of int node_id → float reduction_amount (positive values).
+    The chaincode receives this as a single JSON string argument and applies all
+    reductions atomically in one Fabric transaction.
+
+    Returns a dict of int node_id → float new_score on success.
+    Returns None if the Fabric call fails entirely.
+    Nodes the chaincode rejected (returned score -1) are excluded from the result.
+    Never raises.
+    """
+    if not updates:
+        return {}
+
+    # Fabric chaincode Args are always strings — serialize the whole dict as JSON.
+    # Keys must be strings for JSON; values are float reduction amounts.
+    updates_json = json.dumps({str(k): float(v) for k, v in updates.items()})
+    ctor = {"function": function, "Args": [updates_json]}
+
+    cmd = [
+        "peer", "chaincode", "invoke",
+        "-o", ORDERER,
+        "--ordererTLSHostnameOverride", ORDERER_HOSTNAME,
+        "--tls", "--cafile", ORDERER_CA,
+        "-C", CHANNEL_NAME, "-n", chaincode,
+        "--peerAddresses", PEER_ORG1, "--tlsRootCertFiles", TLS_CERT_ORG1,
+        "--peerAddresses", PEER_ORG2, "--tlsRootCertFiles", TLS_CERT_ORG2,
+        "-c", json.dumps(ctor),
+        "--waitForEvent",
+    ]
+    try:
+        r = subprocess.run(cmd, env=_env(), capture_output=True, text=True, timeout=60)
+        out = r.stderr + r.stdout
+        if r.returncode != 0:
+            logger.error("%s.%s BATCH(%d nodes) FAILED rc=%d | %s",
+                         chaincode, function, len(updates), r.returncode, out)
+            return None
+
+        # The chaincode payload is a JSON string: {"205": 0.88, "211": 0.76, ...}
+        m = re.search(r'payload:"(\{.*?\})"', out)
+        if not m:
+            logger.warning("%s.%s BATCH: could not parse payload from: %s", chaincode, function, out)
+            return None
+
+        raw = json.loads(m.group(1))
+        # Convert string keys back to int, drop any -1 sentinel values (rejected IDs)
+        result = {int(k): v for k, v in raw.items() if v >= 0}
+        logger.info("%s.%s BATCH(%d nodes) OK — %d succeeded, %d rejected",
+                    chaincode, function, len(updates), len(result),
+                    len(updates) - len(result))
+        return result
+
+    except subprocess.TimeoutExpired:
+        logger.error("%s.%s BATCH(%d nodes) timeout", chaincode, function, len(updates))
+        return None
+    except Exception as e:
+        logger.error("%s.%s BATCH exception: %s", chaincode, function, e)
+        return None
 
 def reduce_rsu_trust(node_id: int, amount: float):
     return _reduce_trust(RSU_CC, "ReduceTrustScore", node_id, amount)
@@ -78,3 +140,17 @@ def reduce_rsu_trust(node_id: int, amount: float):
 
 def reduce_vehicle_trust(node_id: int, amount: float):
     return _reduce_trust(VEHICLE_CC, "ReduceVehicleTrustScore", node_id, amount)
+
+
+def batch_reduce_rsu_trust(updates: dict) -> dict | None:
+    """Reduce multiple RSU trust scores in one Fabric transaction.
+    updates: {node_id (int): reduction_amount (float), ...}
+    Returns {node_id (int): new_score (float)} or None on total failure."""
+    return _batch_reduce_trust(RSU_CC, "BatchReduceTrustScores", updates)
+
+
+def batch_reduce_vehicle_trust(updates: dict) -> dict | None:
+    """Reduce multiple vehicle trust scores in one Fabric transaction.
+    updates: {node_id (int): reduction_amount (float), ...}
+    Returns {node_id (int): new_score (float)} or None on total failure."""
+    return _batch_reduce_trust(VEHICLE_CC, "BatchReduceVehicleTrustScores", updates)

@@ -22,3 +22,12 @@ cycle_id,node_id,node_type,ns3_status
 5,6,vehicle,QUEUED:routing_node_id=6:global_id=8
 5,84,vehicle,QUEUED:routing_node_id=84:global_id=86
 5,251,rsu,QUEUED:routing_node_id=251:global_id=253
+6,27,vehicle,QUEUED:routing_node_id=27:global_id=29
+6,195,vehicle,QUEUED:routing_node_id=195:global_id=197
+6,197,vehicle,QUEUED:routing_node_id=197:global_id=199
+7,152,vehicle,QUEUED:routing_node_id=152:global_id=154
+7,188,vehicle,QUEUED:routing_node_id=188:global_id=190
+7,198,vehicle,QUEUED:routing_node_id=198:global_id=200
+7,228,rsu,QUEUED:routing_node_id=228:global_id=230
+7,259,rsu,QUEUED:routing_node_id=259:global_id=261
+7,262,rsu,QUEUED:routing_node_id=262:global_id=264
