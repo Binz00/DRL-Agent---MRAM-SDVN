@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 trust_client.py — real trust chaincode client (Reduce design).
 
@@ -113,13 +115,15 @@ def _batch_reduce_trust(chaincode: str, function: str, updates: dict) -> dict | 
                          chaincode, function, len(updates), r.returncode, out)
             return None
 
-        # The chaincode payload is a JSON string: {"205": 0.88, "211": 0.76, ...}
-        m = re.search(r'payload:"(\{.*?\})"', out)
+        # The chaincode payload is an escaped JSON string in the peer CLI output.
+        # peer prints it as:  payload:"{\"205\":0.88,\"211\":0.76}"
+        # The regex captures the inner content; unescape before parsing.
+        m = re.search(r'payload:"(.*?)"(?:\s|$)', out)
         if not m:
             logger.warning("%s.%s BATCH: could not parse payload from: %s", chaincode, function, out)
             return None
 
-        raw = json.loads(m.group(1))
+        raw = json.loads(m.group(1).replace('\\"', '"'))
         # Convert string keys back to int, drop any -1 sentinel values (rejected IDs)
         result = {int(k): v for k, v in raw.items() if v >= 0}
         logger.info("%s.%s BATCH(%d nodes) OK — %d succeeded, %d rejected",
