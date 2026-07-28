@@ -575,6 +575,8 @@ def process_cycle_streaming(cycle_no: int) -> None:
 
     Steps:
       1. load_cycle(cycle_no, folder=_watch_dir)
+      1b. [FIX 2] inject live _trust as trust_score (live mode only)
+      1c. [FIX 1] lazily populate _gt_static on first successful cycle (live mode only)
       2. add_percycle_features(df)
       3. Append to _cycle_buffer
       4. df_window = pd.concat(list(_cycle_buffer))
@@ -582,12 +584,13 @@ def process_cycle_streaming(cycle_no: int) -> None:
       6. Extract current cycle rows: df_current = df_windowed[cycle_id == cycle_no]
       7. assemble_agent_tables(df_current)
       8. Build per-cycle GT: merge _gt_static with active IGH set for this cycle
-      9. Determine active agents: all four active
+      9. [FIX 3] Determine active agents: IGH dormant until W_MIN cycles of history
      10. trigger_process_cycle(cycle_no, tables, agents, active=active_agents)
      11. _update_trust(results, cycle_no, cycle_gt)
      12. _append_penalties(results, cycle_no)
      13. _write_live_blacklist(cycle_no)
      14. _write_live_trust(cycle_no)
+     14b. _revoke_low_trust(cycle_no, to_revoke)
      15. _log_cycle_summary(cycle_no, results, active_agents)
      16. Delete both sentinel files after successful processing (live mode only).
     """
@@ -603,6 +606,19 @@ def process_cycle_streaming(cycle_no: int) -> None:
     if df.empty:
         logger.warning("[STREAM] cycle %d produced empty DataFrame — skipping", cycle_no)
         return
+
+    # Fix 2: inject live trust state as trust_score since node_trust_scores_{N}.csv
+    # no longer exists post-blockchain-integration (Fabric ledger is now the
+    # source of truth, and _trust mirrors it via _update_trust's batch writes).
+    # Replay mode is untouched to preserve the batch-vs-stream oracle.
+    if not _is_replay and _trust:
+        df['trust_score'] = df['node_id'].map(lambda nid: _trust.get(nid, 1.0))
+
+    # Fix 1: populate static GT lazily on first successful cycle, not at process
+    # startup — in live mode, NS-3 hasn't written any files yet at that point.
+    # Retries every cycle until _gt_static is non-empty, then never runs again.
+    if not _gt_static and not _is_replay:
+        _load_static_gt(_watch_dir)
 
     # Step 2: Per-cycle features
     df = add_percycle_features(df)
@@ -639,8 +655,13 @@ def process_cycle_streaming(cycle_no: int) -> None:
         cycle_no, len(active_igh), len(_all_igh_nodes),
     )
 
-    # Step 9: Active agents — all four agents active
-    active_agents = ALL_AGENTS
+    # Fix 3: Active agents — IGH dormant until W_MIN cycles of history exist
+    active_agents = ALL_AGENTS if len(_cycle_buffer) >= W_MIN else EARLY_AGENTS
+    if len(_cycle_buffer) < W_MIN:
+        logger.info(
+            "[STREAM] cycle %d | history=%d < W_MIN=%d → IGH dormant",
+            cycle_no, len(_cycle_buffer), W_MIN,
+        )
 
     # Step 10: Run agent inference
     results = trigger_process_cycle(cycle_no, tables, _agents, active=active_agents)
@@ -815,8 +836,9 @@ def run_streaming(
     _agents = load_frozen_agents()
     logger.info("[STREAM] Agents loaded. Watching %s ...", watch_dir)
 
-    logger.info("[STREAM] Loading static ground truth from %s ...", watch_dir)
-    _load_static_gt(watch_dir)
+    # _load_static_gt() removed from here (Fix 1) — now called lazily inside
+    # process_cycle_streaming() on the first successful cycle, so NS-3 has had
+    # time to write its ground-truth files before the pipeline tries to read them.
 
     handler = _make_handler()
     if handler is not None:
