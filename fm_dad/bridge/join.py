@@ -270,6 +270,15 @@ def load_cycle(cycle_no: int, folder: str = RAW_CSV_FOLDER) -> pd.DataFrame:
                 # the MAXIMUM absolute per-flow deviation — correctly capturing the
                 # worst-case departure from the committed forwarding plan.
                 df["abs_ff_deviation"] = df["ff_deviation"].abs()
+            if key == "anomaly" and "is_stretched" in df.columns:
+                # Convert FS flow-stretch proxy to numeric PER FLOW ROW, before
+                # aggregation, so it can be MAX-aggregated the same way as
+                # abs_ff_deviation (worst-case across a node's flows).
+                # "False" = confirmed not stretched (0.0 — blocks AND condition).
+                # Any other value ("True", blank/NaN) = stretched or untestable (1.0).
+                df["is_stretched_numeric"] = df["is_stretched"].apply(
+                    lambda v: 0.0 if str(v).strip() == "False" else 1.0
+                )
             raw[key] = df
 
     if not raw:

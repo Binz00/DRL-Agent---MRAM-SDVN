@@ -66,10 +66,20 @@ GATE_CONDITIONS: Dict[str, List[Condition]] = {
         ("SpoofDev", ">", AGENT_CONFIGS["als"]["eta_spoof"]),
     ],
 
-    # FS — Flow Stretching gate
-    # Evaluates to True if sum_abs_ff_deviation_normalized > eta_dff_norm
+    # FS — Flow Stretching gate (single AND clause, expressed as a nested list so
+    # _check_gate's OR-of-ANDs evaluation path handles it uniformly with IGH).
+    # Condition 1: sum_abs_ff_deviation_normalized > eta_dff_norm
+    #   The node's normalized total forwarding deviation exceeds the threshold.
+    # Condition 2: is_stretched_flag > 0.5
+    #   Aggregator-computed hop-stretch proxy:
+    #     1.0 = stretched or untestable (does not block gate)
+    #     0.0 = confirmed NOT stretched  (blocks gate — high dFF but no path inflation)
+    #   Missing anomaly file or blank is_stretched → flag=1.0 → gate defers to dFF only.
     "fs": [
-        ("sum_abs_ff_deviation_normalized", ">", AGENT_CONFIGS["fs"]["eta_dff_norm"]),
+        [
+            ("sum_abs_ff_deviation_normalized", ">", AGENT_CONFIGS["fs"]["eta_dff_norm"]),
+            ("is_stretched_flag",               ">", 0.5),
+        ],
     ],
 
     # IGH — Inter-flow Greedy Hoarding gate (Algorithm 4 line 9, Definition 3)
