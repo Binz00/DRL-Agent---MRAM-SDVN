@@ -29,6 +29,10 @@ from bridge.fabric_config import (
 logger = logging.getLogger("pipeline")
 
 
+# ---------------------------------------------------------------------------
+# Real Fabric trust client (blockchain integration)
+# ---------------------------------------------------------------------------
+
 def _env() -> dict:
     env = os.environ.copy()
     env.update({
@@ -158,3 +162,59 @@ def batch_reduce_vehicle_trust(updates: dict) -> dict | None:
     updates: {node_id (int): reduction_amount (float), ...}
     Returns {node_id (int): new_score (float)} or None on total failure."""
     return _batch_reduce_trust(VEHICLE_CC, "BatchReduceVehicleTrustScores", updates)
+
+
+# ---------------------------------------------------------------------------
+# Mock trust API — used by run_pipeline.py (batch mode, no Fabric required)
+# ---------------------------------------------------------------------------
+
+_mock_trust_store: dict = {}  # node_id → current trust score (in-memory, per-run)
+
+
+def _get_mock_trust(node_id: int, default: float = 1.0) -> float:
+    """Return the current mock trust score for a node (default 1.0 for unseen nodes)."""
+    return _mock_trust_store.get(node_id, default)
+
+
+def _set_mock_trust(node_id: int, new_trust: float) -> None:
+    """Set the mock trust score for a node, clamped to [0.0, 1.0]."""
+    _mock_trust_store[node_id] = max(0.0, min(1.0, new_trust))
+
+
+def reset_mock_store() -> None:
+    """Clear the mock trust store — call between independent batch runs."""
+    _mock_trust_store.clear()
+
+
+def apply_trust_delta(
+    node_id: int,
+    delta: float,
+    is_rsu: bool = False,
+    current_trust: float = None,
+) -> float:
+    """
+    Apply a trust penalty delta to a node using the in-memory mock store.
+
+    Used exclusively by run_pipeline.py (batch mode).  Does NOT touch the
+    Hyperledger Fabric ledger — the real blockchain calls are made by
+    stream_pipeline._update_trust() via reduce_rsu_trust / reduce_vehicle_trust.
+
+    Args:
+        node_id       : Node being penalized.
+        delta         : Penalty amount (positive = reduce trust).
+        is_rsu        : Unused — kept for API compatibility with run_pipeline.py.
+        current_trust : If provided, used as the starting value; otherwise the
+                        mock store is queried (defaults to 1.0 for first-seen nodes).
+
+    Returns:
+        new_trust (float) — updated trust score clamped to [0.0, 1.0].
+    """
+    if current_trust is None:
+        current_trust = _get_mock_trust(node_id)
+    new_trust = max(0.0, current_trust - delta)
+    _set_mock_trust(node_id, new_trust)
+    logger.info(
+        "apply_trust_delta: node=%d delta=%.4f %.4f → %.4f",
+        node_id, delta, current_trust, new_trust,
+    )
+    return new_trust

@@ -22,20 +22,25 @@ from bridge.config_bridge import RAW_CSV_FOLDER
 
 GATE_SEARCH_SPACE = {
     "sp": {
-        "eta_dFF":  [0.20, 0.35, 0.50, 0.65, 0.80],
+        "eta_dFF":  [0.20, 0.35, 0.50, 0.65],           # 4 values
     },
     "als": {
-        "eta_spoof": [0.001, 0.003, 0.005, 0.010, 0.050],
+        "eta_spoof": [0.001, 0.003, 0.005, 0.010],      # 4 values
     },
     "fs": {
-        "eta_dff_norm": [0.10, 0.30, 0.50, 0.70, 0.90],
+        "eta_dff_norm":      [0.10, 0.20, 0.30, 0.40],  # 4 values
+        "eta_is_stretched": [0.3, 0.5],                  # 2 values — binary signal anyway
     },
     "igh": {
-        "eta_pdrvar": [0.01, 0.03, 0.05, 0.10, 0.15],
-        "eta_coord":  [0.30, 0.40, 0.50, 0.60, 0.70],
-        "eta_rho":    [0.30, 0.40, 0.50],
-    },
+        "eta_pdrvar": [0.03, 0.05, 0.10],               # 3 values
+        "eta_coord":  [0.40, 0.50, 0.60],               # 3 values
+        "eta_rho":    [0.40, 0.50],                      # 2 values
+    },  # IGH total: 3×3×2 = 18 combos (was 75)
 }
+# Total combos: SP=4, ALS=4, FS=8, IGH=18 → 34 total (was 100)
+
+TAU_MIN_CANDIDATES = [0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
+
 
 def compute_mcc(tp, fp, fn, tn):
     numerator   = tp * tn - fp * fn
@@ -84,29 +89,38 @@ def evaluate_thresholds(agents, tables, gt, tau_min=0.30) -> dict:
             if nid in trust:
                 trust[nid] = max(0.0, trust[nid] - r["final_delta"])
 
-    # Build detected set
-    detected = {nid for nid, tau in trust.items() if tau < tau_min}
+    # Build detected set for every tau_min candidate and return best
+    best_macro = -float("inf")
+    best_result = None
+    for tm in TAU_MIN_CANDIDATES:
+        detected = {nid for nid, t in trust.items() if t < tm}
+        result = _compute_mcc_result(gt, detected, tm)
+        if result["macro"] > best_macro:
+            best_macro = result["macro"]
+            best_result = result
+    return best_result
 
-    # Compute MCC^X per attack type
-    honest_mask = gt["is_attacker"] == 0
+
+def _compute_mcc_result(gt, detected, tau_min):
+    honest_mask  = gt["is_attacker"] == 0
     attack_types = sorted(gt.loc[gt["is_attacker"]==1, "attack_type"].unique())
-    mcc_results = {}
+    mcc_results  = {}
     for atype in attack_types:
-        is_target  = (gt["is_attacker"]==1) & (gt["attack_type"]==atype)
-        relevant   = is_target | honest_mask
-        rel_gt     = gt[relevant].copy()
+        is_target = (gt["is_attacker"]==1) & (gt["attack_type"]==atype)
+        relevant  = is_target | honest_mask
+        rel_gt    = gt[relevant].copy()
         rel_gt["detected_flag"] = rel_gt["node_id"].isin(detected)
-        rel_tgt    = is_target[relevant]
-        rel_det    = rel_gt["detected_flag"]
+        rel_tgt   = is_target[relevant]
+        rel_det   = rel_gt["detected_flag"]
         tp = int(( rel_tgt &  rel_det).sum())
         fp = int((~rel_tgt &  rel_det).sum())
         fn = int(( rel_tgt & ~rel_det).sum())
         tn = int((~rel_tgt & ~rel_det).sum())
         mcc_results[atype] = {"tp":tp,"fp":fp,"fn":fn,"tn":tn,
                                "mcc": compute_mcc(tp,fp,fn,tn)}
-    macro = sum(v["mcc"] for v in mcc_results.values()) / len(mcc_results)
-    fp_total = list(mcc_results.values())[0]["fp"]  # shared across agents
-    return {"per_attack": mcc_results, "macro": macro, "fp": fp_total}
+    macro   = sum(v["mcc"] for v in mcc_results.values()) / len(mcc_results)
+    fp_total = list(mcc_results.values())[0]["fp"]
+    return {"per_attack": mcc_results, "macro": macro, "fp": fp_total, "tau_min": tau_min}
 
 def _patch_gate_conditions(agent_name: str, threshold_overrides: dict):
     """
@@ -228,25 +242,60 @@ def write_outputs(best_per_agent, results_log, logger):
 if __name__ == "__main__":
     logger = get_logger("grid_search_gate")
     logger.setLevel(logging.INFO)
-    
-    # Optional: disable noisy pipeline logs during grid search
+
+    # Suppress noisy pipeline logs during grid search
     logging.getLogger("pipeline").setLevel(logging.WARNING)
     logging.getLogger("bridge").setLevel(logging.WARNING)
 
-    logger.info("Loading ground truth...")
-    GT_FILE = Path("data/raw_csvs/node_attack_ground_truth_1.csv")
-    gt = pd.read_csv(GT_FILE)
-    gt.columns = gt.columns.str.strip()
+    logger.info("Loading ground truth from all cycles...")
+    import glob, re
+    gt_parts = []
+    for f in sorted(
+        glob.glob(str(Path("data/raw_csvs/node_attack_ground_truth_*.csv"))),
+        key=lambda x: int(re.search(r"(\d+)", Path(x).stem).group())
+    ):
+        gt_parts.append(pd.read_csv(f))
+    gt_all   = pd.concat(gt_parts, ignore_index=True)
+    gt_all.columns = gt_all.columns.str.strip()
+    # Resolve per-node label: a node is an attacker if it's ever labelled as one
+    gt = (
+        gt_all.groupby("node_id", as_index=False)
+              .agg(is_attacker=("is_attacker", "max"),
+                   attack_type=("attack_type", lambda s: s[s!="NONE"].iloc[0] if (s!="NONE").any() else "NONE"))
+    )
+    logger.info("GT loaded: %d nodes (%d attackers)",
+                len(gt), (gt["is_attacker"]==1).sum())
 
     logger.info("Loading bridge data...")
     df_joined   = load_all_cycles(RAW_CSV_FOLDER)
     df_features = add_percycle_features(df_joined)
     df_windowed = add_windowed_features(df_features)
     BASE_TABLES = assemble_agent_tables(df_windowed)
-    
+
     logger.info("Loading agents...")
     agents = load_best_agents(logger)
-    
-    logger.info("Running gate threshold grid search...")
+
+    logger.info("Running gate threshold grid search (tau_min also searched)...")
     best, log = run_grid_search(agents, BASE_TABLES, gt, tau_min=0.30, logger=logger)
     write_outputs(best, log, logger)
+
+    # --- Apply all best thresholds simultaneously and re-evaluate ---
+    print("\n" + "="*60)
+    print("COMBINED EVALUATION — all best thresholds applied together")
+    print("="*60)
+    # Patch all agents simultaneously
+    originals = {}
+    for agent_name, result in best.items():
+        originals[agent_name] = _patch_gate_conditions(agent_name, result["thresholds"])
+    try:
+        combined = evaluate_thresholds(agents, BASE_TABLES, gt)
+        print(f"  tau_min selected : {combined['tau_min']}")
+        print(f"  Macro MCC        : {combined['macro']:+.4f}")
+        print(f"  FP count         : {combined['fp']}")
+        for atype, r in combined["per_attack"].items():
+            print(f"  {atype:<6} MCC={r['mcc']:+.4f}  TP={r['tp']}  FP={r['fp']}  FN={r['fn']}")
+    finally:
+        for agent_name, orig in originals.items():
+            _restore_gate_conditions(agent_name, orig)
+    print("="*60)
+

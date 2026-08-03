@@ -962,7 +962,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Directory for output CSVs (pipeline_penalties, live_blacklist, live_trust).",
     )
     p.add_argument(
-        "--tau", type=float, default=0.4, metavar="FLOAT",
+        "--tau", type=float, default=0.3, metavar="FLOAT",
         help="Blacklisting trust threshold (tau_min).",
     )
     p.add_argument(
