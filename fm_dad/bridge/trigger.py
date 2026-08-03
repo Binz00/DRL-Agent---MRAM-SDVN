@@ -202,6 +202,8 @@ def process_node(
     states_by_agent: Dict[str, Optional[np.ndarray]],
     feature_dicts_by_agent: Dict[str, Optional[dict]],
     agents: Dict[str, DQNAgent],
+    ablation_mode: str = "graded",
+    ablation_binary_agents: Optional[set] = None,
 ) -> dict:
     """
     Run the full pipeline for one node: gate → agent → max-combine.
@@ -211,11 +213,19 @@ def process_node(
     The final Δτ is the MAX across all agents whose gate fired (Eq. 3.38).
 
     Args:
-        node_id               : The node being evaluated.
-        cycle_id              : The current cycle.
-        states_by_agent       : agent_name → state vector (np array) or None.
-        feature_dicts_by_agent: agent_name → {feature: value} dict for gate checks.
-        agents                : Loaded DQNAgent instances.
+        node_id                  : The node being evaluated.
+        cycle_id                 : The current cycle.
+        states_by_agent          : agent_name → state vector (np array) or None.
+        feature_dicts_by_agent   : agent_name → {feature: value} dict for gate checks.
+        agents                   : Loaded DQNAgent instances.
+        ablation_mode            : "graded" (default, production) or "binary" (C2/C3).
+                                   In "binary" mode, DQN inference is skipped for the
+                                   targeted agents and delta is fixed at 1.0, forcing
+                                   trust below any tau_min in {0.3, 0.4, 0.5} in one step.
+        ablation_binary_agents   : Set of agent names to apply binary mode to.
+                                   None (default) means ALL agents when mode=="binary" (C2).
+                                   A subset like {"sp","als","fs"} applies binary mode only
+                                   to those agents, leaving the rest graded (C3).
 
     Returns:
         dict with keys: node_id, cycle_id, gates_fired, actions, deltas,
@@ -231,7 +241,8 @@ def process_node(
         feat_dict = feature_dicts_by_agent.get(name)
 
         if state is None or feat_dict is None:
-            per_agent_details[name] = {"gate": "absent", "action": None, "delta": 0.0}
+            per_agent_details[name] = {"gate": "absent", "action": None, "delta": 0.0,
+                                       "ablation_mode": ablation_mode}
             logger.info(
                 "[GATE] node=%d, cycle=%d, agent=%s → ABSENT (no state vector)",
                 node_id, cycle_id, name.upper(),
@@ -242,20 +253,43 @@ def process_node(
 
         if gate_open:
             gates_fired.append(name)
-            action = agents[name].act(state, epsilon=0.0)
-            delta  = agents[name].deltas[action]
-            actions[name] = action
-            deltas[name]  = delta
-            per_agent_details[name] = {
-                "gate": "OPEN", "action": ACTION_NAMES[action], "delta": delta,
-            }
-            logger.info(
-                "[AGENT] node=%d, cycle=%d, agent=%s → gate=OPEN, action=%s, Δτ=%.3f",
-                node_id, cycle_id, name.upper(), ACTION_NAMES[action], delta,
+
+            # --- C2/C3 ablation: binary mode skips DQN inference entirely ---
+            apply_binary = (
+                ablation_mode == "binary"
+                and (ablation_binary_agents is None or name in ablation_binary_agents)
             )
+            if apply_binary:
+                action = None     # DQN inference SKIPPED — intentional for ablation
+                delta  = 1.0      # forces tau below any tau_min in one step
+                actions[name] = None
+                deltas[name]  = delta
+                per_agent_details[name] = {
+                    "gate": "OPEN", "action": "N/A", "delta": delta,
+                    "ablation_mode": "binary",
+                }
+                logger.info(
+                    "[TRACE] Cycle %d | Node %d | Gates: ['%s'] | Mode: BINARY "
+                    "| Action: N/A (skipped) | Delta-tau: %.3f",
+                    cycle_id, node_id, name.upper(), delta,
+                )
+            else:
+                action = agents[name].act(state, epsilon=0.0)
+                delta  = agents[name].deltas[action]
+                actions[name] = action
+                deltas[name]  = delta
+                per_agent_details[name] = {
+                    "gate": "OPEN", "action": ACTION_NAMES[action], "delta": delta,
+                    "ablation_mode": ablation_mode,
+                }
+                logger.info(
+                    "[AGENT] node=%d, cycle=%d, agent=%s → gate=OPEN, action=%s, Δτ=%.3f",
+                    node_id, cycle_id, name.upper(), ACTION_NAMES[action], delta,
+                )
         else:
             deltas[name] = 0.0
-            per_agent_details[name] = {"gate": "closed", "action": None, "delta": 0.0}
+            per_agent_details[name] = {"gate": "closed", "action": None, "delta": 0.0,
+                                       "ablation_mode": ablation_mode}
             logger.info(
                 "[GATE] node=%d, cycle=%d, agent=%s → gate=CLOSED (condition(s) not met)",
                 node_id, cycle_id, name.upper(),
@@ -279,7 +313,7 @@ def process_node(
                         status,
                     )
 
-    # Max-combine (Eq. 3.38)
+    # Max-combine (Eq. 3.38) — unchanged regardless of ablation mode
     final_delta = max(deltas.values()) if deltas else 0.0
     logger.info(
         "[COMBINE] node=%d, cycle=%d → final Δτ=%.3f (gates fired: %s)",
@@ -288,12 +322,12 @@ def process_node(
     )
 
     return {
-        "node_id":          node_id,
-        "cycle_id":         cycle_id,
-        "gates_fired":      gates_fired,
-        "actions":          actions,
-        "deltas":           deltas,
-        "final_delta":      final_delta,
+        "node_id":           node_id,
+        "cycle_id":          cycle_id,
+        "gates_fired":       gates_fired,
+        "actions":           actions,
+        "deltas":            deltas,
+        "final_delta":       final_delta,
         "per_agent_details": per_agent_details,
     }
 
@@ -307,6 +341,8 @@ def process_cycle(
     tables: Dict[str, "pd.DataFrame"],
     agents: Dict[str, DQNAgent],
     active: list = None,
+    ablation_mode: str = "graded",
+    ablation_binary_agents: Optional[set] = None,
 ) -> List[dict]:
     """
     Run process_node for every node present in the given cycle.
@@ -315,12 +351,15 @@ def process_cycle(
     then processes each node.
 
     Args:
-        cycle_id : Which cycle to process.
-        tables   : agent_name → DataFrame (from assemble_agent_tables).
-        agents   : Loaded DQNAgent instances.
-        active   : Optional list of agent names to run (e.g. ["sp","als","fs"]).
-                   None means all four agents run (default, backward compatible).
-                   Agents not in this list are marked "dormant" with delta=0.0.
+        cycle_id                 : Which cycle to process.
+        tables                   : agent_name → DataFrame (from assemble_agent_tables).
+        agents                   : Loaded DQNAgent instances.
+        active                   : Optional list of agent names to run.
+                                   None means all four agents run (default, backward compatible).
+                                   Agents not in this list are marked "dormant" with delta=0.0.
+        ablation_mode            : "graded" (default, production) or "binary" (C2/C3).
+        ablation_binary_agents   : Set of agent names to apply binary mode to.
+                                   None (default) means ALL agents when mode=="binary" (C2).
 
     Returns:
         List of result dicts, one per node.
@@ -339,9 +378,9 @@ def process_cycle(
         all_nodes.update(cycle_df["node_id"].unique())
 
     logger.info(
-        "[CYCLE] Processing cycle %d | %d unique nodes across %d agents (active: %s)",
+        "[CYCLE] Processing cycle %d | %d unique nodes across %d agents (active: %s) | ablation=%s",
         cycle_id, len(all_nodes), len(tables),
-        [a.upper() for a in active],
+        [a.upper() for a in active], ablation_mode,
     )
 
     results = []
@@ -381,7 +420,12 @@ def process_cycle(
             states_by_agent[name]     = state_vec
             feat_dicts_by_agent[name] = feat_dict
 
-        result = process_node(nid, cycle_id, states_by_agent, feat_dicts_by_agent, agents)
+        result = process_node(
+            nid, cycle_id,
+            states_by_agent, feat_dicts_by_agent, agents,
+            ablation_mode=ablation_mode,
+            ablation_binary_agents=ablation_binary_agents,
+        )
         results.append(result)
 
     return results
