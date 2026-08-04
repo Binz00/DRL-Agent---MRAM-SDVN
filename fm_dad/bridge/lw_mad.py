@@ -81,10 +81,17 @@ def check_als(feat_dict: dict) -> bool:
 
 def check_fs(feat_dict: dict) -> bool:
     """
-    LW-MAD Flow Stretching rule check: NOT EVALUABLE.
-    Returns False always. Algorithm 1 requires h_bc vs h_obs hop counts.
+    LW-MAD Flow Stretching rule check using forwarding-stretch proxy.
+    Evaluates sum_abs_ff_deviation_normalized > eta_dff_norm AND is_stretched_flag > 0.5.
     """
-    return False
+    dff_norm = feat_dict.get("sum_abs_ff_deviation_normalized", feat_dict.get("dFF", np.nan))
+    is_stretched = feat_dict.get("is_stretched_flag", 1.0)
+
+    if np.isnan(dff_norm):
+        return False
+
+    eta_dff_norm = AGENT_CONFIGS["fs"].get("eta_dff_norm", 0.10)
+    return bool(dff_norm > eta_dff_norm and is_stretched > 0.5)
 
 
 def evaluate_node_lw_mad(

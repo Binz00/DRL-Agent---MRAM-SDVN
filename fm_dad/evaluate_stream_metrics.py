@@ -199,15 +199,14 @@ def evaluate_stream(results_dir: Path, gt_dir: Path, tau_min: float, out_csv: Pa
 
         for at in sorted(b_mcc_dict.keys()):
             bv = b_mcc_dict[at]; cv = c1_mcc_dict.get(at, {"mcc": 0.0, "tp": 0, "fp": c1_fp, "fn": 0})
-            is_evaluable = (at != "FS")
             records.append({
                 "ablation_study": "C1_rule_based",
                 "metric_category": "mcc_score",
                 "item": f"{at}_mcc",
                 "baseline_value": round(bv["mcc"], 4),
-                "ablation_value": round(cv["mcc"], 4) if is_evaluable else "N/A",
+                "ablation_value": round(cv["mcc"], 4),
                 "match": False,
-                "notes": f"LW-MAD rule detection. FS is N/A (Section 1: missing h_bc/h_obs hop data)." if not is_evaluable else f"TP_b={bv['tp']} FP_b={bv['fp']} | TP_c1={cv['tp']} FP_c1={cv['fp']}"
+                "notes": f"TP_b={bv['tp']} FP_b={bv['fp']} | TP_c1={cv['tp']} FP_c1={cv['fp']}"
             })
         records.append({
             "ablation_study": "C1_rule_based",
@@ -239,12 +238,8 @@ def evaluate_stream(results_dir: Path, gt_dir: Path, tau_min: float, out_csv: Pa
         print(f"  {'Attack':<8} {'Baseline (DRL) MCC':>20} {'Rule-Based (LW-MAD) MCC':>25} {'Evaluability':>15}")
         print(f"  {'-'*74}")
         for at in sorted(b_mcc_dict.keys()):
-            bv = b_mcc_dict[at]
-            if at == "FS":
-                print(f"  {at:<8} {bv['mcc']:>+20.4f} {'N/A':>25} {'NOT EVALUABLE (missing h_bc/h_obs)':>35}")
-            else:
-                cv = c1_mcc_dict.get(at, {"mcc": 0.0})
-                print(f"  {at:<8} {bv['mcc']:>+20.4f} {cv['mcc']:>+25.4f} {'Evaluable ✅':>25}")
+            bv = b_mcc_dict[at]; cv = c1_mcc_dict.get(at, {"mcc": 0.0})
+            print(f"  {at:<8} {bv['mcc']:>+20.4f} {cv['mcc']:>+25.4f} {'Evaluable ✅':>25}")
         print(f"  {'-'*74}")
         print(f"  {'Macro':<8} {b_macro:>+20.4f} {c1_macro:>+25.4f}   FP: Baseline={b_fp}, Rule-Based={c1_fp}")
         print(f"  T_isolate : Baseline={b_t_mean:.2f} cycles mean | Rule-Based={c1_t_mean:.2f} cycles mean")
