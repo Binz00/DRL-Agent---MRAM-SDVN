@@ -164,6 +164,7 @@ _trust_csv:           Optional[Path] = None
 _trust_history_csv:   Optional[Path] = None
 _revoked_csv:         Optional[Path] = None
 _ns3_revoked:         Set[int] = set()          # nodes already sent to NS-3; never re-sent
+_node_gates:          Dict[int, Set[str]] = {}  # node_id -> set of agent names whose gate ever fired
 _penalties_written:     bool = False   # tracks whether header needs to be written
 _trust_history_written: bool = False   # tracks whether header needs to be written
 _revoked_written:       bool = False   # tracks whether header needs to be written
@@ -171,7 +172,7 @@ _revoked_written:       bool = False   # tracks whether header needs to be writt
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
-    global _penalties_written, _trust_history_written, _is_replay, _ablation_mode, _run_id
+    global _penalties_written, _trust_history_written, _revoked_written, _is_replay, _ablation_mode, _run_id
     _cycle_buffer.clear()
     _trust.clear()
     _blacklisted.clear()
@@ -181,8 +182,10 @@ def reset_state() -> None:
     _gt_static.clear()
     _all_igh_nodes.clear()
     _ns3_revoked.clear()
-    _penalties_written = False
+    _node_gates.clear()
+    _penalties_written     = False
     _trust_history_written = False
+    _revoked_written       = False
     _is_replay = False
     _ablation_mode = "graded"
     _run_id = ""
@@ -324,6 +327,12 @@ def _update_trust(
             else:
                 vehicle_batch[nid] = final_delta
 
+            # Track which agents' gates fired for this node (used in blacklisted_nodes.csv)
+            for agent_name in ALL_AGENTS:
+                details = r.get("per_agent_details", {}).get(agent_name, {})
+                if details.get("gate") == "OPEN":
+                    _node_gates.setdefault(nid, set()).add(agent_name.upper())
+
             # Ground truth label for history CSV
             if cycle_gt is not None:
                 info     = cycle_gt.get(nid, {})
@@ -450,11 +459,13 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
             logger.info("[NS3] cycle=%d node=%d offline/fallback revocation: %s", cycle_no, nid, status)
 
         ntype = node_type(nid)
+        gates = ",".join(sorted(_node_gates.get(nid, set()))) or "none"
         revoked_rows.append({
-            "cycle_id":   cycle_no,
-            "node_id":    nid,
-            "node_type":  ntype,
-            "ns3_status": status,
+            "cycle_id":    cycle_no,
+            "node_id":     nid,
+            "node_type":   ntype,
+            "gates_fired": gates,
+            "ns3_status":  status,
         })
 
     # Append this cycle's revoked nodes to blacklisted_nodes.csv
@@ -462,7 +473,7 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
         write_header = not _revoked_written or not _revoked_csv.exists()
         with open(_revoked_csv, "a", newline="") as f:
             writer = csv.DictWriter(
-                f, fieldnames=["cycle_id", "node_id", "node_type", "ns3_status"],
+                f, fieldnames=["cycle_id", "node_id", "node_type", "gates_fired", "ns3_status"],
             )
             if write_header:
                 writer.writeheader()
