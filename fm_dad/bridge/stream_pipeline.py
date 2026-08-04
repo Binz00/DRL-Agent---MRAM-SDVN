@@ -419,7 +419,6 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
         return
     global _revoked_written, _ns3_revoked
     from bridge.ns3_client import request_ns3_revocation
-    from bridge.join import is_rsu
 
     ok = fail = skip = 0
     revoked_rows = []
@@ -441,13 +440,14 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
             )
         except Exception as exc:
             # Fallback status format matching NS-3 response when running without live NS-3 socket
-            global_id = nid + 2 if not is_rsu(nid) else nid
+            ntype_for_id = node_type(nid)
+            global_id = nid + 2 if ntype_for_id == "vehicle" else nid
             status = f"QUEUED:routing_node_id={nid}:global_id={global_id}"
             ok += 1
             _ns3_revoked.add(nid)
             logger.info("[NS3] cycle=%d node=%d offline/fallback revocation: %s", cycle_no, nid, status)
 
-        ntype = "rsu" if is_rsu(nid) else "vehicle"
+        ntype = node_type(nid)
         revoked_rows.append({
             "cycle_id":   cycle_no,
             "node_id":    nid,
