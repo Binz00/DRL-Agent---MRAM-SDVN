@@ -210,6 +210,20 @@ def compute_tisolate(hist_df: pd.DataFrame, gt: pd.DataFrame, tau_min: float) ->
     return float(arr.mean()), float(np.median(arr))
 
 
+def compute_agent_fp(pen_df: Optional[pd.DataFrame], gt: pd.DataFrame) -> Dict[str, int]:
+    """Count unique honest nodes where each agent's gate fired."""
+    if pen_df is None or pen_df.empty:
+        return {"sp": 0, "als": 0, "igh": 0, "fs": 0}
+    honest_ids = set(gt[gt["is_attacker"] == 0]["node_id"].unique())
+    pen = pen_df[pen_df["node_id"].isin(honest_ids)].copy()
+    pen["gate_fired"] = pen["gate_fired"].astype(str).str.strip().map(
+        {"True": True, "False": False, "1": True, "0": False}
+    ).fillna(False)
+    gated = pen[pen["gate_fired"] == True]
+    counts = gated.groupby("agent")["node_id"].nunique().to_dict()
+    return {ag: counts.get(ag, 0) for ag in ["sp", "als", "igh", "fs"]}
+
+
 # ---------------------------------------------------------------------------
 # Main evaluation function
 # ---------------------------------------------------------------------------
@@ -227,9 +241,7 @@ def evaluate_stream(
     """Run stream evaluation, print expanded report, and save summary metrics to CSV."""
     gt = _load_ground_truth(gt_dir)
 
-    # Locate result CSVs using FIX 1 — unambiguous file finder.
-    # Only resolve files for the mode(s) being evaluated — this prevents
-    # ambiguity errors for modes that aren't being requested.
+    # Baseline files
     pen_b_file  = _find_file(results_dir, "pipeline_penalties", "baseline", run_id_baseline)
     bl_b_file   = _find_file(results_dir, "live_blacklist",      "baseline", run_id_baseline)
     hist_b_file = _find_file(results_dir, "live_trust_history",  "baseline", run_id_baseline)
@@ -248,36 +260,73 @@ def evaluate_stream(
     else:
         pen_c1_file = bl_c1_file = hist_c1_file = None
 
-    # Baseline files (optional if evaluating single ablation runs)
     b_available = (pen_b_file and bl_b_file and pen_b_file.exists() and bl_b_file.exists())
 
     if b_available:
         bl_b   = pd.read_csv(bl_b_file)
-        pen_b  = pd.read_csv(pen_b_file)
+        pen_b  = _normalize_gate_fired(pd.read_csv(pen_b_file, low_memory=False))
         hist_b = pd.read_csv(hist_b_file) if hist_b_file and hist_b_file.exists() else None
         gf_b = pen_b[pen_b["gate_fired"] == True].groupby("agent").size().to_dict()
         b_mcc_dict, b_macro, b_fp = compute_mcc_metrics(bl_b, gt, tau_min)
+        b_agent_fp = compute_agent_fp(pen_b, gt)
         b_t_mean, b_t_med = compute_tisolate(hist_b, gt, tau_min)
     else:
+        if mode_filter == "baseline":
+            raise FileNotFoundError(f"Baseline files missing in {results_dir}")
         print("[NOTE] Baseline files not found — running standalone ablation evaluation.")
         gf_b = {}
         b_macro = 0.0
         b_fp = "N/A"
+        b_agent_fp = {"sp": 0, "als": 0, "igh": 0, "fs": 0}
         b_t_mean = b_t_med = 0.0
         attack_types = sorted(gt[gt["is_attacker"] == 1]["attack_type"].unique())
         b_mcc_dict = {
             at: {
-                "tp": 0,
-                "fp": 0,
-                "fn": 0,
-                "tn": 0,
-                "mcc": 0.0,
+                "tp": 0, "fp": 0, "fn": 0, "tn": 0, "mcc": 0.0,
                 "total_attackers": len(gt[gt["attack_type"] == at]["node_id"].unique()),
             }
             for at in attack_types
         }
 
     records = []
+
+    # Standalone Baseline Reporting Mode
+    if mode_filter == "baseline" and b_available:
+        for at in sorted(b_mcc_dict.keys()):
+            ag = at.lower()
+            bv = b_mcc_dict[at]
+            records.append({
+                "ablation_study": "Baseline_graded",
+                "attack_type": at,
+                "gate_fired": gf_b.get(ag, 0),
+                "removed_attackers_tp": bv["tp"],
+                "total_attackers": bv["total_attackers"],
+                "system_honest_fp": b_fp,
+                "agent_honest_fp": b_agent_fp.get(ag, 0),
+                "mcc": round(bv["mcc"], 4),
+            })
+        summary_df = pd.DataFrame(records)
+        out_csv.parent.mkdir(parents=True, exist_ok=True)
+        summary_df.to_csv(out_csv, index=False)
+
+        w = 96
+        print("\n" + "=" * w)
+        print(f"FM-DAD STREAM PIPELINE BASELINE REPORT")
+        print(f"  tau_min = {tau_min} | Output CSV: {out_csv}")
+        print("=" * w)
+        print(f"  Source: {pen_b_file.name}")
+        print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'System FP':>12} {'Agent FP':>12} {'Baseline MCC':>16}")
+        print(f"  {'-'*95}")
+        for at in sorted(b_mcc_dict.keys()):
+            ag = at.lower(); bv = b_mcc_dict[at]
+            att_str = f"{bv['tp']} (of {bv['total_attackers']})"
+            print(f"  {at:<8} {gf_b.get(ag,0):>15} {att_str:>26} {b_fp:>12} {b_agent_fp.get(ag,0):>12} {bv['mcc']:>+16.4f}")
+        print(f"  {'-'*95}")
+        print(f"  {'Macro':<8} {'—':>15} {'—':>26} {b_fp:>12} {'—':>12} {b_macro:>+16.4f}")
+        print(f"  T_isolate : Baseline={b_t_mean:.2f} cycles mean")
+        print(f"\n[SUCCESS] Baseline summary saved to: {out_csv}")
+        print("=" * w)
+        return summary_df
 
     # C2 Binary
     c2_available = (pen_c2_file and bl_c2_file and
@@ -289,6 +338,7 @@ def evaluate_stream(
         hist_c2 = pd.read_csv(hist_c2_file) if hist_c2_file and hist_c2_file.exists() else None
         gf_c2   = pen_c2[pen_c2["gate_fired"] == True].groupby("agent").size().to_dict()
         c2_mcc_dict, c2_macro, c2_fp = compute_mcc_metrics(bl_c2, gt, tau_min)
+        c2_agent_fp = compute_agent_fp(pen_c2, gt)
         c2_t_mean, c2_t_med = compute_tisolate(hist_c2, gt, tau_min)
 
         print(f"\n[CONSISTENCY CHECK] C2/binary (file: {pen_c2_file.name})")
@@ -307,8 +357,9 @@ def evaluate_stream(
                 "removed_attackers_tp_baseline": bv["tp"] if b_available else "N/A",
                 "removed_attackers_tp_ablation": cv["tp"],
                 "total_attackers": cv["total_attackers"],
-                "removed_honest_fp_baseline": b_fp,
-                "removed_honest_fp_ablation": c2_fp,
+                "system_honest_fp_baseline": b_fp,
+                "system_honest_fp_ablation": c2_fp,
+                "agent_honest_fp_ablation": c2_agent_fp.get(ag, 0),
                 "mcc_baseline": round(bv["mcc"], 4) if b_available else "N/A",
                 "mcc_ablation": round(cv["mcc"], 4),
             })
@@ -323,6 +374,7 @@ def evaluate_stream(
         hist_c1 = pd.read_csv(hist_c1_file) if hist_c1_file and hist_c1_file.exists() else None
         gf_c1   = pen_c1[pen_c1["gate_fired"] == True].groupby("agent").size().to_dict()
         c1_mcc_dict, c1_macro, c1_fp = compute_mcc_metrics(bl_c1, gt, tau_min)
+        c1_agent_fp = compute_agent_fp(pen_c1, gt)
         c1_t_mean, c1_t_med = compute_tisolate(hist_c1, gt, tau_min)
 
         print(f"\n[CONSISTENCY CHECK] C1/rule_based (file: {pen_c1_file.name})")
@@ -341,8 +393,9 @@ def evaluate_stream(
                 "removed_attackers_tp_baseline": bv["tp"] if b_available else "N/A",
                 "removed_attackers_tp_ablation": cv["tp"],
                 "total_attackers": cv["total_attackers"],
-                "removed_honest_fp_baseline": b_fp,
-                "removed_honest_fp_ablation": c1_fp,
+                "system_honest_fp_baseline": b_fp,
+                "system_honest_fp_ablation": c1_fp,
+                "agent_honest_fp_ablation": c1_agent_fp.get(ag, 0),
                 "mcc_baseline": round(bv["mcc"], 4) if b_available else "N/A",
                 "mcc_ablation": round(cv["mcc"], 4),
             })
@@ -361,55 +414,53 @@ def evaluate_stream(
         print(f"\n--- C2 ABLATION SUMMARY: Baseline (Graded) vs. Config A (Binary) ---")
         print(f"  Source: {pen_c2_file.name}")
         if b_available:
-            print(f"  {'Attack':<8} {'Passed Gate (b/c2)':>20} {'Removed Attackers (b/c2)':>26} {'Removed Honest (b/c2)':>22} {'Baseline MCC':>14} {'Binary MCC':>12}")
-            print(f"  {'-'*104}")
+            print(f"  {'Attack':<8} {'Passed Gate (b/c2)':>20} {'Removed Attackers (b/c2)':>26} {'System FP (b/c2)':>20} {'Agent FP (c2)':>15} {'Baseline MCC':>14} {'Binary MCC':>12}")
+            print(f"  {'-'*120}")
             for at in sorted(c2_mcc_dict.keys()):
                 ag = at.lower(); bv = b_mcc_dict.get(at, {"tp":0, "mcc":0.0}); cv = c2_mcc_dict[at]
                 gf_str  = f"{gf_b.get(ag,0)} / {gf_c2.get(ag,0)}"
                 att_str = f"{bv['tp']} / {cv['tp']} (of {bv['total_attackers']})"
                 fp_str  = f"{b_fp} / {c2_fp}"
-                print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>22} {bv['mcc']:>+14.4f} {cv['mcc']:>+12.4f}")
-            print(f"  {'-'*104}")
-            print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c2_fp:>20} {b_macro:>+14.4f} {c2_macro:>+12.4f}")
+                ag_fp   = f"{c2_agent_fp.get(ag,0)}"
+                print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>20} {ag_fp:>15} {bv['mcc']:>+14.4f} {cv['mcc']:>+12.4f}")
+            print(f"  {'-'*120}")
+            print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c2_fp:>18} {'—':>15} {b_macro:>+14.4f} {c2_macro:>+12.4f}")
         else:
-            print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'Removed Honest (FP)':>22} {'Binary MCC':>14}")
-            print(f"  {'-'*88}")
+            print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'System FP':>12} {'Agent FP':>12} {'Binary MCC':>14}")
+            print(f"  {'-'*95}")
             for at in sorted(c2_mcc_dict.keys()):
                 ag = at.lower(); cv = c2_mcc_dict[at]
                 att_str = f"{cv['tp']} (of {cv['total_attackers']})"
-                print(f"  {at:<8} {gf_c2.get(ag,0):>15} {att_str:>26} {c2_fp:>22} {cv['mcc']:>+14.4f}")
-            print(f"  {'-'*88}")
-            print(f"  {'Macro':<8} {'—':>15} {'—':>26} {c2_fp:>22} {c2_macro:>+14.4f}")
+                print(f"  {at:<8} {gf_c2.get(ag,0):>15} {att_str:>26} {c2_fp:>12} {c2_agent_fp.get(ag,0):>12} {cv['mcc']:>+14.4f}")
+            print(f"  {'-'*95}")
+            print(f"  {'Macro':<8} {'—':>15} {'—':>26} {c2_fp:>12} {'—':>12} {c2_macro:>+14.4f}")
 
     if c1_available:
         print(f"\n--- C1 ABLATION SUMMARY: Baseline (DRL-Graded) vs. Rule-Based (LW-MAD) ---")
         print(f"  Source: {pen_c1_file.name}")
         if b_available:
-            print(f"  {'Attack':<8} {'Passed Gate (b/c1)':>20} {'Removed Attackers (b/c1)':>26} {'Removed Honest (b/c1)':>22} {'Baseline MCC':>14} {'Rule-Based MCC':>16}")
-            print(f"  {'-'*108}")
+            print(f"  {'Attack':<8} {'Passed Gate (b/c1)':>20} {'Removed Attackers (b/c1)':>26} {'System FP (b/c1)':>20} {'Agent FP (c1)':>15} {'Baseline MCC':>14} {'Rule-Based MCC':>16}")
+            print(f"  {'-'*124}")
             for at in sorted(c1_mcc_dict.keys()):
                 ag = at.lower(); bv = b_mcc_dict.get(at, {"tp":0, "mcc":0.0}); cv = c1_mcc_dict[at]
                 gf_str  = f"{gf_b.get(ag,0)} / {gf_c1.get(ag,0)}"
                 att_str = f"{bv['tp']} / {cv['tp']} (of {bv['total_attackers']})"
                 fp_str  = f"{b_fp} / {c1_fp}"
-                print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>22} {bv['mcc']:>+14.4f} {cv['mcc']:>+16.4f}")
-            print(f"  {'-'*108}")
-            print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c1_fp:>20} {b_macro:>+14.4f} {c1_macro:>+16.4f}")
+                ag_fp   = f"{c1_agent_fp.get(ag,0)}"
+                print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>20} {ag_fp:>15} {bv['mcc']:>+14.4f} {cv['mcc']:>+16.4f}")
+            print(f"  {'-'*124}")
+            print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c1_fp:>18} {'—':>15} {b_macro:>+14.4f} {c1_macro:>+16.4f}")
             print(f"  T_isolate : Baseline={b_t_mean:.2f} cycles mean | Rule-Based={c1_t_mean:.2f} cycles mean")
         else:
-            print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'Removed Honest (FP)':>22} {'Rule-Based MCC':>16}")
-            print(f"  {'-'*90}")
+            print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'System FP':>12} {'Agent FP':>12} {'Rule-Based MCC':>16}")
+            print(f"  {'-'*98}")
             for at in sorted(c1_mcc_dict.keys()):
                 ag = at.lower(); cv = c1_mcc_dict[at]
                 att_str = f"{cv['tp']} (of {cv['total_attackers']})"
-                print(f"  {at:<8} {gf_c1.get(ag,0):>15} {att_str:>26} {c1_fp:>22} {cv['mcc']:>+16.4f}")
-            print(f"  {'-'*90}")
-            print(f"  {'Macro':<8} {'—':>15} {'—':>26} {c1_fp:>22} {c1_macro:>+16.4f}")
+                print(f"  {at:<8} {gf_c1.get(ag,0):>15} {att_str:>26} {c1_fp:>12} {c1_agent_fp.get(ag,0):>12} {cv['mcc']:>+16.4f}")
+            print(f"  {'-'*98}")
+            print(f"  {'Macro':<8} {'—':>15} {'—':>26} {c1_fp:>12} {'—':>12} {c1_macro:>+16.4f}")
             print(f"  T_isolate : Rule-Based={c1_t_mean:.2f} cycles mean")
-
-    print(f"\n[SUCCESS] Detailed summary saved to: {out_csv}")
-    print("=" * w)
-    return summary_df
 
     print(f"\n[SUCCESS] Detailed summary saved to: {out_csv}")
     print("=" * w)
@@ -428,17 +479,14 @@ def main():
                    help="Directory containing node_attack_ground_truth_*.csv files")
     p.add_argument("--tau-min",           type=float, default=0.3,
                    help="Blacklist trust threshold")
-    p.add_argument("--mode",              choices=["c1", "c2", "all"], default="all",
-                   help="Ablation study to report: 'c1', 'c2', or 'all'")
+    p.add_argument("--mode",              choices=["baseline", "c1", "c2", "c5", "all"], default="all",
+                   help="Study to report: 'baseline', 'c1', 'c2', 'c5', or 'all'")
     p.add_argument("--run-id-baseline",   default=None,
-                   help="Exact run_id for baseline files (e.g. 'baseline'). "
-                        "Required when multiple baseline files exist.")
+                   help="Exact run_id for baseline files (e.g. 'baseline').")
     p.add_argument("--run-id-c1",         default=None,
-                   help="Exact run_id for C1/rule_based files (e.g. 'c1'). "
-                        "Required when multiple rule_based files exist.")
+                   help="Exact run_id for C1/rule_based files (e.g. 'c1').")
     p.add_argument("--run-id-c2",         default=None,
-                   help="Exact run_id for C2/binary files (e.g. 'c2'). "
-                        "Required when multiple binary files exist.")
+                   help="Exact run_id for C2/binary files (e.g. 'c2').")
     p.add_argument("--out-csv",           default=str(_FM_DAD_DIR / "data" / "stream_ablation" / "stream_metrics_summary.csv"),
                    help="Output path for metric summary CSV")
     args = p.parse_args()
