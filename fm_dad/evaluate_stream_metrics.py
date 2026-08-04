@@ -248,16 +248,34 @@ def evaluate_stream(
     else:
         pen_c1_file = bl_c1_file = hist_c1_file = None
 
-    if not pen_b_file or not bl_b_file:
-        raise FileNotFoundError(f"Baseline files missing in {results_dir}")
+    # Baseline files (optional if evaluating single ablation runs)
+    b_available = (pen_b_file and bl_b_file and pen_b_file.exists() and bl_b_file.exists())
 
-    bl_b   = pd.read_csv(bl_b_file)
-    pen_b  = pd.read_csv(pen_b_file)
-    hist_b = pd.read_csv(hist_b_file) if hist_b_file and hist_b_file.exists() else None
-
-    gf_b = pen_b[pen_b["gate_fired"] == True].groupby("agent").size().to_dict()
-    b_mcc_dict, b_macro, b_fp = compute_mcc_metrics(bl_b, gt, tau_min)
-    b_t_mean, b_t_med = compute_tisolate(hist_b, gt, tau_min)
+    if b_available:
+        bl_b   = pd.read_csv(bl_b_file)
+        pen_b  = pd.read_csv(pen_b_file)
+        hist_b = pd.read_csv(hist_b_file) if hist_b_file and hist_b_file.exists() else None
+        gf_b = pen_b[pen_b["gate_fired"] == True].groupby("agent").size().to_dict()
+        b_mcc_dict, b_macro, b_fp = compute_mcc_metrics(bl_b, gt, tau_min)
+        b_t_mean, b_t_med = compute_tisolate(hist_b, gt, tau_min)
+    else:
+        print("[NOTE] Baseline files not found — running standalone ablation evaluation.")
+        gf_b = {}
+        b_macro = 0.0
+        b_fp = "N/A"
+        b_t_mean = b_t_med = 0.0
+        attack_types = sorted(gt[gt["is_attacker"] == 1]["attack_type"].unique())
+        b_mcc_dict = {
+            at: {
+                "tp": 0,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+                "mcc": 0.0,
+                "total_attackers": len(gt[gt["attack_type"] == at]["node_id"].unique()),
+            }
+            for at in attack_types
+        }
 
     records = []
 
@@ -273,25 +291,25 @@ def evaluate_stream(
         c2_mcc_dict, c2_macro, c2_fp = compute_mcc_metrics(bl_c2, gt, tau_min)
         c2_t_mean, c2_t_med = compute_tisolate(hist_c2, gt, tau_min)
 
-        # FIX 2 — consistency check for C2
         print(f"\n[CONSISTENCY CHECK] C2/binary (file: {pen_c2_file.name})")
         for agent in ["sp", "als", "igh", "fs"]:
             check_gate_blacklist_consistency(pen_c2, bl_c2, agent, tau_min, "C2/binary")
 
-        for at in sorted(b_mcc_dict.keys()):
+        for at in sorted(c2_mcc_dict.keys()):
             ag = at.lower()
-            bv = b_mcc_dict[at]; cv = c2_mcc_dict[at]
+            bv = b_mcc_dict.get(at, {"tp": 0, "mcc": 0.0, "total_attackers": 0})
+            cv = c2_mcc_dict[at]
             records.append({
                 "ablation_study": "C2_binary",
                 "attack_type": at,
-                "gate_fired_baseline": gf_b.get(ag, 0),
+                "gate_fired_baseline": gf_b.get(ag, "N/A"),
                 "gate_fired_ablation": gf_c2.get(ag, 0),
-                "removed_attackers_tp_baseline": bv["tp"],
+                "removed_attackers_tp_baseline": bv["tp"] if b_available else "N/A",
                 "removed_attackers_tp_ablation": cv["tp"],
-                "total_attackers": bv["total_attackers"],
+                "total_attackers": cv["total_attackers"],
                 "removed_honest_fp_baseline": b_fp,
                 "removed_honest_fp_ablation": c2_fp,
-                "mcc_baseline": round(bv["mcc"], 4),
+                "mcc_baseline": round(bv["mcc"], 4) if b_available else "N/A",
                 "mcc_ablation": round(cv["mcc"], 4),
             })
 
@@ -307,25 +325,25 @@ def evaluate_stream(
         c1_mcc_dict, c1_macro, c1_fp = compute_mcc_metrics(bl_c1, gt, tau_min)
         c1_t_mean, c1_t_med = compute_tisolate(hist_c1, gt, tau_min)
 
-        # FIX 2 — consistency check for C1
         print(f"\n[CONSISTENCY CHECK] C1/rule_based (file: {pen_c1_file.name})")
         for agent in ["sp", "als", "igh", "fs"]:
             check_gate_blacklist_consistency(pen_c1, bl_c1, agent, tau_min, "C1/rule_based")
 
-        for at in sorted(b_mcc_dict.keys()):
+        for at in sorted(c1_mcc_dict.keys()):
             ag = at.lower()
-            bv = b_mcc_dict[at]; cv = c1_mcc_dict.get(at, {"tp": 0, "mcc": 0.0})
+            bv = b_mcc_dict.get(at, {"tp": 0, "mcc": 0.0, "total_attackers": 0})
+            cv = c1_mcc_dict[at]
             records.append({
                 "ablation_study": "C1_rule_based",
                 "attack_type": at,
-                "gate_fired_baseline": gf_b.get(ag, 0),
+                "gate_fired_baseline": gf_b.get(ag, "N/A"),
                 "gate_fired_ablation": gf_c1.get(ag, 0),
-                "removed_attackers_tp_baseline": bv["tp"],
+                "removed_attackers_tp_baseline": bv["tp"] if b_available else "N/A",
                 "removed_attackers_tp_ablation": cv["tp"],
-                "total_attackers": bv["total_attackers"],
+                "total_attackers": cv["total_attackers"],
                 "removed_honest_fp_baseline": b_fp,
                 "removed_honest_fp_ablation": c1_fp,
-                "mcc_baseline": round(bv["mcc"], 4),
+                "mcc_baseline": round(bv["mcc"], 4) if b_available else "N/A",
                 "mcc_ablation": round(cv["mcc"], 4),
             })
 
@@ -342,31 +360,56 @@ def evaluate_stream(
     if c2_available:
         print(f"\n--- C2 ABLATION SUMMARY: Baseline (Graded) vs. Config A (Binary) ---")
         print(f"  Source: {pen_c2_file.name}")
-        print(f"  {'Attack':<8} {'Passed Gate (b/c2)':>20} {'Removed Attackers (b/c2)':>26} {'Removed Honest (b/c2)':>22} {'Baseline MCC':>14} {'Binary MCC':>12}")
-        print(f"  {'-'*104}")
-        for at in sorted(b_mcc_dict.keys()):
-            ag = at.lower(); bv = b_mcc_dict[at]; cv = c2_mcc_dict[at]
-            gf_str  = f"{gf_b.get(ag,0)} / {gf_c2.get(ag,0)}"
-            att_str = f"{bv['tp']} / {cv['tp']} (of {bv['total_attackers']})"
-            fp_str  = f"{b_fp} / {c2_fp}"
-            print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>22} {bv['mcc']:>+14.4f} {cv['mcc']:>+12.4f}")
-        print(f"  {'-'*104}")
-        print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c2_fp:>20} {b_macro:>+14.4f} {c2_macro:>+12.4f}")
+        if b_available:
+            print(f"  {'Attack':<8} {'Passed Gate (b/c2)':>20} {'Removed Attackers (b/c2)':>26} {'Removed Honest (b/c2)':>22} {'Baseline MCC':>14} {'Binary MCC':>12}")
+            print(f"  {'-'*104}")
+            for at in sorted(c2_mcc_dict.keys()):
+                ag = at.lower(); bv = b_mcc_dict.get(at, {"tp":0, "mcc":0.0}); cv = c2_mcc_dict[at]
+                gf_str  = f"{gf_b.get(ag,0)} / {gf_c2.get(ag,0)}"
+                att_str = f"{bv['tp']} / {cv['tp']} (of {bv['total_attackers']})"
+                fp_str  = f"{b_fp} / {c2_fp}"
+                print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>22} {bv['mcc']:>+14.4f} {cv['mcc']:>+12.4f}")
+            print(f"  {'-'*104}")
+            print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c2_fp:>20} {b_macro:>+14.4f} {c2_macro:>+12.4f}")
+        else:
+            print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'Removed Honest (FP)':>22} {'Binary MCC':>14}")
+            print(f"  {'-'*88}")
+            for at in sorted(c2_mcc_dict.keys()):
+                ag = at.lower(); cv = c2_mcc_dict[at]
+                att_str = f"{cv['tp']} (of {cv['total_attackers']})"
+                print(f"  {at:<8} {gf_c2.get(ag,0):>15} {att_str:>26} {c2_fp:>22} {cv['mcc']:>+14.4f}")
+            print(f"  {'-'*88}")
+            print(f"  {'Macro':<8} {'—':>15} {'—':>26} {c2_fp:>22} {c2_macro:>+14.4f}")
 
     if c1_available:
         print(f"\n--- C1 ABLATION SUMMARY: Baseline (DRL-Graded) vs. Rule-Based (LW-MAD) ---")
         print(f"  Source: {pen_c1_file.name}")
-        print(f"  {'Attack':<8} {'Passed Gate (b/c1)':>20} {'Removed Attackers (b/c1)':>26} {'Removed Honest (b/c1)':>22} {'Baseline MCC':>14} {'Rule-Based MCC':>16}")
-        print(f"  {'-'*108}")
-        for at in sorted(b_mcc_dict.keys()):
-            ag = at.lower(); bv = b_mcc_dict[at]; cv = c1_mcc_dict.get(at, {"tp": 0, "mcc": 0.0})
-            gf_str  = f"{gf_b.get(ag,0)} / {gf_c1.get(ag,0)}"
-            att_str = f"{bv['tp']} / {cv['tp']} (of {bv['total_attackers']})"
-            fp_str  = f"{b_fp} / {c1_fp}"
-            print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>22} {bv['mcc']:>+14.4f} {cv['mcc']:>+16.4f}")
-        print(f"  {'-'*108}")
-        print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c1_fp:>20} {b_macro:>+14.4f} {c1_macro:>+16.4f}")
-        print(f"  T_isolate : Baseline={b_t_mean:.2f} cycles mean | Rule-Based={c1_t_mean:.2f} cycles mean")
+        if b_available:
+            print(f"  {'Attack':<8} {'Passed Gate (b/c1)':>20} {'Removed Attackers (b/c1)':>26} {'Removed Honest (b/c1)':>22} {'Baseline MCC':>14} {'Rule-Based MCC':>16}")
+            print(f"  {'-'*108}")
+            for at in sorted(c1_mcc_dict.keys()):
+                ag = at.lower(); bv = b_mcc_dict.get(at, {"tp":0, "mcc":0.0}); cv = c1_mcc_dict[at]
+                gf_str  = f"{gf_b.get(ag,0)} / {gf_c1.get(ag,0)}"
+                att_str = f"{bv['tp']} / {cv['tp']} (of {bv['total_attackers']})"
+                fp_str  = f"{b_fp} / {c1_fp}"
+                print(f"  {at:<8} {gf_str:>20} {att_str:>26} {fp_str:>22} {bv['mcc']:>+14.4f} {cv['mcc']:>+16.4f}")
+            print(f"  {'-'*108}")
+            print(f"  {'Macro':<8} {'—':>20} {'—':>26} {b_fp} / {c1_fp:>20} {b_macro:>+14.4f} {c1_macro:>+16.4f}")
+            print(f"  T_isolate : Baseline={b_t_mean:.2f} cycles mean | Rule-Based={c1_t_mean:.2f} cycles mean")
+        else:
+            print(f"  {'Attack':<8} {'Passed Gate':>15} {'Removed Attackers (TP)':>26} {'Removed Honest (FP)':>22} {'Rule-Based MCC':>16}")
+            print(f"  {'-'*90}")
+            for at in sorted(c1_mcc_dict.keys()):
+                ag = at.lower(); cv = c1_mcc_dict[at]
+                att_str = f"{cv['tp']} (of {cv['total_attackers']})"
+                print(f"  {at:<8} {gf_c1.get(ag,0):>15} {att_str:>26} {c1_fp:>22} {cv['mcc']:>+16.4f}")
+            print(f"  {'-'*90}")
+            print(f"  {'Macro':<8} {'—':>15} {'—':>26} {c1_fp:>22} {c1_macro:>+16.4f}")
+            print(f"  T_isolate : Rule-Based={c1_t_mean:.2f} cycles mean")
+
+    print(f"\n[SUCCESS] Detailed summary saved to: {out_csv}")
+    print("=" * w)
+    return summary_df
 
     print(f"\n[SUCCESS] Detailed summary saved to: {out_csv}")
     print("=" * w)
