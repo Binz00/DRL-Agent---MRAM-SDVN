@@ -496,6 +496,14 @@ def _init_outputs(output_dir: Path) -> None:
     _trust_history_csv  = output_dir / f"live_trust_history{suffix}.csv"
     _revoked_csv        = output_dir / "blacklisted_nodes.csv"   # single shared revocation log
 
+    # Truncate any existing output files so each run starts clean.
+    # Without this, re-running a replay appends to stale data and produces
+    # duplicate header rows that break gate_fired bool parsing downstream.
+    for _f in [_penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv]:
+        if _f.exists():
+            _f.unlink()
+            logger.info("[INIT] Cleared stale output file: %s", _f.name)
+
     logger.info(
         "[INIT] ablation=%s run_id=%s | outputs: %s",
         _ablation_mode, _run_id or "(none)", output_dir,
