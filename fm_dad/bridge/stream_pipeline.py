@@ -786,18 +786,20 @@ def _poll_for_sentinels(watch_dir: str, timeout: Optional[int]) -> None:
     start_time  = time.time()
     last_activity = time.time()
 
+    watch_path.mkdir(parents=True, exist_ok=True)
     while True:
-        for f in watch_path.iterdir():
-            m = ns3_re.match(f.name)
-            if m:
-                c = int(m.group(1))
-                if c not in _processed:
-                    _ns3_ready.add(c)
-            m = mid_re.match(f.name)
-            if m:
-                c = int(m.group(1))
-                if c not in _processed:
-                    _mid_ready.add(c)
+        if watch_path.exists():
+            for f in watch_path.iterdir():
+                m = ns3_re.match(f.name)
+                if m:
+                    c = int(m.group(1))
+                    if c not in _processed:
+                        _ns3_ready.add(c)
+                m = mid_re.match(f.name)
+                if m:
+                    c = int(m.group(1))
+                    if c not in _processed:
+                        _mid_ready.add(c)
 
         ready = (_ns3_ready & _mid_ready) - _processed
         if ready:
@@ -876,6 +878,7 @@ def run_streaming(
     _run_id        = run_id
     _init_outputs(output_dir)
 
+    Path(watch_dir).mkdir(parents=True, exist_ok=True)
     logger.info("[STREAM] Loading DRL agents...")
     _agents = load_frozen_agents()
     logger.info("[STREAM] Agents loaded. Watching %s ...", watch_dir)
