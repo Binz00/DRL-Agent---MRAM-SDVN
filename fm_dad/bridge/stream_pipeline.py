@@ -938,6 +938,42 @@ def run_streaming(
     logger.info("[STREAM] Done. Processed %d cycles. Blacklisted: %d nodes.",
                 len(_processed), len(_blacklisted))
     _send_ns3_shutdown()    # ← unblock NS-3's post-sim spin-wait
+    _auto_evaluate_metrics()
+
+
+def _auto_evaluate_metrics() -> None:
+    """Automatically evaluate metrics and save summary CSV at end of stream/replay run."""
+    try:
+        from evaluate_stream_metrics import evaluate_stream
+
+        gt_dir = Path(_watch_dir)
+        gt_files = list(gt_dir.glob("node_attack_ground_truth_*.csv"))
+        if not gt_files:
+            fallback_gt = _FM_DAD_DIR / "data" / "raw_csvs"
+            if fallback_gt.exists():
+                gt_dir = fallback_gt
+
+        if not list(gt_dir.glob("node_attack_ground_truth_*.csv")):
+            logger.warning("[EVAL] Ground truth files not found — skipping auto-evaluation.")
+            return
+
+        mode_map = {"graded": "baseline", "binary": "c2", "rule_based": "c1"}
+        eval_mode = mode_map.get(_ablation_mode, "baseline")
+        out_csv = _output_dir / f"stream_metrics_summary_{_run_id or 'run'}.csv"
+
+        logger.info("[EVAL] Running auto-evaluation for mode=%s, run_id=%s ...", eval_mode, _run_id)
+        evaluate_stream(
+            results_dir = _output_dir,
+            gt_dir      = gt_dir,
+            tau_min     = _tau_min,
+            out_csv     = out_csv,
+            mode_filter = eval_mode,
+            run_id_baseline = _run_id if eval_mode == "baseline" else None,
+            run_id_c1       = _run_id if eval_mode == "c1" else None,
+            run_id_c2       = _run_id if eval_mode == "c2" else None,
+        )
+    except Exception as exc:
+        logger.warning("[EVAL] Auto-evaluation error: %s", exc)
 
 
 # ---------------------------------------------------------------------------
@@ -1003,6 +1039,7 @@ def run_replay(
     logger.info("[REPLAY] Done. Processed %d cycles. Blacklisted: %d nodes.",
                 len(_processed), len(_blacklisted))
     _send_ns3_shutdown()    # ← no-op in replay mode; kept for symmetry
+    _auto_evaluate_metrics()
 
 
 # ---------------------------------------------------------------------------
