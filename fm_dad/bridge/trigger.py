@@ -327,6 +327,24 @@ def process_node(
 
 
 # ---------------------------------------------------------------------------
+# C5 Feature Disabling Constants (Honest Node Means computed across dataset)
+# ---------------------------------------------------------------------------
+HONEST_FEATURE_MEANS = {
+    "CoordScore":    0.0,       # Sit below eta_coord (0.40) so IGH gate condition 3 fails
+    "FFc":           0.999805,  # Benign full-forwarding
+    "dFF":           0.027117,  # Minimal benign forwarding deviation
+    "rho_recv":      0.948733,  # Benign high reception fraction
+    "d_bar":         2.064075,  # Benign mean hop delay
+    "tau":           1.0,       # Fully trusted baseline
+    "PDRVar":        0.0,       # Zero variance in benign PDR
+    "lambda_t":      0.097766,  # Normalized traffic arrival rate
+    "lambda_t_norm": 0.097766,  # Normalized traffic rate alias
+    "SpoofDev":      0.000842,  # Benign spoofing metric (below eta_spoof 0.005)
+    "DelayInfl":     0.423252,  # Benign delay inflation (below eta_delay 1.50)
+}
+
+
+# ---------------------------------------------------------------------------
 # Cycle-level processing
 # ---------------------------------------------------------------------------
 
@@ -337,6 +355,8 @@ def process_cycle(
     active: list = None,
     ablation_mode: str = "graded",
     ablation_binary_agents: Optional[set] = None,
+    disable_agent: Optional[str] = None,
+    disable_feature: str = "none",
 ) -> List[dict]:
     """
     Run process_node for every node present in the given cycle.
@@ -349,11 +369,10 @@ def process_cycle(
         tables                   : agent_name → DataFrame (from assemble_agent_tables).
         agents                   : Loaded DQNAgent instances.
         active                   : Optional list of agent names to run.
-                                   None means all four agents run (default, backward compatible).
-                                   Agents not in this list are marked "dormant" with delta=0.0.
         ablation_mode            : "graded" (default, production) or "binary" (C2/C3).
         ablation_binary_agents   : Set of agent names to apply binary mode to.
-                                   None = ALL agents when mode=="binary" (C2).
+        disable_agent            : Agent to apply C5 feature disabling to ("sp","als","igh","fs").
+        disable_feature          : Feature name to disable via fixed constant substitution (e.g. "CoordScore").
 
     Returns:
         List of result dicts, one per node.
@@ -372,9 +391,10 @@ def process_cycle(
         all_nodes.update(cycle_df["node_id"].unique())
 
     logger.info(
-        "[CYCLE] Processing cycle %d | %d unique nodes across %d agents (active: %s) | ablation=%s",
+        "[CYCLE] Processing cycle %d | %d unique nodes across %d agents (active: %s) | ablation=%s | disable=%s:%s",
         cycle_id, len(all_nodes), len(tables),
         [a.upper() for a in active], ablation_mode,
+        disable_agent.upper() if disable_agent else "NONE", disable_feature,
     )
 
     results = []
@@ -405,11 +425,20 @@ def process_cycle(
             state_feats = AGENT_STATE_FEATURES[name]
             state_vec   = row[state_feats].values.astype(np.float32)
             feat_dict   = {f: row[f] for f in state_feats}
-            # Include gate-only extra cols (e.g. hop_excess) that are NOT
-            # part of the state vector but ARE needed by GATE_CONDITIONS.
+            # Include gate-only extra cols (e.g. hop_excess)
             for c in EXTRA_COLS.get(name, []):
                 if c in cdf.columns:
                     feat_dict[c] = row[c]
+
+            # --- C5 Ablation: Feature Disabling via Fixed-Constant Substitution ---
+            if disable_agent and disable_feature != "none" and name.lower() == disable_agent.lower():
+                const_val = HONEST_FEATURE_MEANS.get(disable_feature, 0.0)
+                # 1. Substitute in feat_dict (feeds gate checks, e.g. CoordScore > 0.40)
+                feat_dict[disable_feature] = const_val
+                # 2. Substitute in state_vec (feeds DQN agent.act)
+                if disable_feature in state_feats:
+                    idx = state_feats.index(disable_feature)
+                    state_vec[idx] = np.float32(const_val)
 
             states_by_agent[name]     = state_vec
             feat_dicts_by_agent[name] = feat_dict

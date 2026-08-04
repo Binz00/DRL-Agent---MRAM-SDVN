@@ -146,7 +146,9 @@ _tau_min:      float = 0.4
 _max_cycles:   Optional[int] = None
 _agents:       Optional[Dict] = None
 _is_replay:    bool = False
-_ablation_mode: str = "graded"   # "graded" (production) or "binary" (C2)
+_ablation_mode: str = "graded"   # "graded" (production), "binary" (C2), or "rule_based" (C1)
+_disable_agent: Optional[str] = None  # C5: targeted agent for feature disabling ("sp","als","igh","fs")
+_disable_feature: str = "none"         # C5: feature to disable via fixed constant substitution
 _run_id:       str = ""           # set at startup; used in output filenames
 
 # Ground truth state (loaded at startup, IGH refreshed per-cycle)
@@ -715,6 +717,8 @@ def process_cycle_streaming(cycle_no: int) -> None:
             cycle_no, tables, _agents,
             active=active_agents,
             ablation_mode=_ablation_mode,
+            disable_agent=_disable_agent,
+            disable_feature=_disable_feature,
         )
 
     # Step 11: Update trust; returns nodes whose on-chain trust fell below threshold
@@ -871,33 +875,33 @@ def run_streaming(
     watch_dir: str,
     output_dir: Path,
     tau: float,
-    max_cycles: Optional[int],
-    timeout: Optional[int],
+    max_cycles: Optional[int] = None,
+    timeout: Optional[int] = None,
     ablation: str = "graded",
     run_id: str = "",
+    disable_agent: Optional[str] = None,
+    disable_feature: str = "none",
 ) -> None:
     """Start the watchdog/polling sentinel watcher in live mode."""
     global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents, _is_replay
-    global _ablation_mode, _run_id
+    global _ablation_mode, _run_id, _disable_agent, _disable_feature
 
     reset_state()
-    _is_replay     = False
-    _watch_dir     = watch_dir
-    _output_dir    = output_dir
-    _tau_min       = tau
-    _max_cycles    = max_cycles
-    _ablation_mode = ablation
-    _run_id        = run_id
+    _is_replay       = False
+    _watch_dir       = watch_dir
+    _output_dir      = output_dir
+    _tau_min         = tau
+    _max_cycles      = max_cycles
+    _ablation_mode   = ablation
+    _run_id          = run_id
+    _disable_agent   = disable_agent
+    _disable_feature = disable_feature
     _init_outputs(output_dir)
 
     Path(watch_dir).mkdir(parents=True, exist_ok=True)
     logger.info("[STREAM] Loading DRL agents...")
     _agents = load_frozen_agents()
     logger.info("[STREAM] Agents loaded. Watching %s ...", watch_dir)
-
-    # _load_static_gt() removed from here (Fix 1) — now called lazily inside
-    # process_cycle_streaming() on the first successful cycle, so NS-3 has had
-    # time to write its ground-truth files before the pipeline tries to read them.
 
     handler = _make_handler()
     if handler is not None:
@@ -950,6 +954,8 @@ def run_replay(
     tau: float,
     ablation: str = "graded",
     run_id: str = "",
+    disable_agent: Optional[str] = None,
+    disable_feature: str = "none",
 ) -> None:
     """
     Replay mode: process existing CSVs in cycle order, simulating sentinel arrival.
@@ -959,20 +965,23 @@ def run_replay(
     Both graded and binary runs use the exact same cycle ordering (deterministic).
     """
     global _watch_dir, _output_dir, _tau_min, _max_cycles, _agents, _is_replay
-    global _ablation_mode, _run_id
+    global _ablation_mode, _run_id, _disable_agent, _disable_feature
 
     reset_state()
-    _is_replay     = True
-    _watch_dir     = replay_dir
-    _output_dir    = output_dir
-    _tau_min       = tau
-    _max_cycles    = None
-    _ablation_mode = ablation
-    _run_id        = run_id
+    _is_replay       = True
+    _watch_dir       = replay_dir
+    _output_dir      = output_dir
+    _tau_min         = tau
+    _max_cycles      = None
+    _ablation_mode   = ablation
+    _run_id          = run_id
+    _disable_agent   = disable_agent
+    _disable_feature = disable_feature
     _init_outputs(output_dir)
 
-    logger.info("[REPLAY] ablation=%s  tau_min=%.2f  run_id=%s",
-                ablation, tau, run_id or "(none)")
+    logger.info("[REPLAY] ablation=%s  disable=%s:%s  tau_min=%.2f  run_id=%s",
+                ablation, disable_agent.upper() if disable_agent else "NONE",
+                disable_feature, tau, run_id or "(none)")
 
     logger.info("[REPLAY] Loading DRL agents...")
     _agents = load_frozen_agents()
@@ -1040,6 +1049,14 @@ def _build_parser() -> argparse.ArgumentParser:
              "'rule_based' (C1: LW-MAD Algorithm 1 rules, DRL bypassed, delta=1.0 on alert).",
     )
     p.add_argument(
+        "--disable-feature", default="none", metavar="NAME",
+        help="C5: Feature to disable via fixed-constant substitution (e.g. 'CoordScore', 'dFF').",
+    )
+    p.add_argument(
+        "--disable-agent", choices=["sp", "als", "igh", "fs"], default=None, metavar="AGENT",
+        help="C5: Targeted agent for feature disabling (required when --disable-feature is not 'none').",
+    )
+    p.add_argument(
         "--run-id", default="", metavar="ID",
         help="Optional run identifier appended to output filenames (e.g. '20260803_170026'). "
              "Defaults to a timestamp generated at startup if left empty.",
@@ -1058,21 +1075,25 @@ def _build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = _build_parser().parse_args()
 
+    if args.disable_feature != "none" and not args.disable_agent:
+        raise ValueError("--disable-agent must be specified when --disable-feature is used (e.g. --disable-agent igh --disable-feature CoordScore).")
+
     # Auto-generate run_id from timestamp if not supplied — ensures distinct output
     # filenames every run without user needing to remember to set --run-id.
     run_id = args.run_id or time.strftime("%Y%m%d_%H%M%S")
 
     if args.replay:
         run_replay(
-            replay_dir = args.replay,
-            output_dir = Path(args.output_dir),
-            tau        = args.tau,
-            ablation   = args.ablation,
-            run_id     = run_id,
+            replay_dir      = args.replay,
+            output_dir      = Path(args.output_dir),
+            tau             = args.tau,
+            ablation        = args.ablation,
+            run_id          = run_id,
+            disable_agent   = args.disable_agent,
+            disable_feature = args.disable_feature,
         )
     else:
         run_streaming(
-            watch_dir  = args.watch_dir,
             output_dir = Path(args.output_dir),
             tau        = args.tau,
             max_cycles = args.max_cycles,

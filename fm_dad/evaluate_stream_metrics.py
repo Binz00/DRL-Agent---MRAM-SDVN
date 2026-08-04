@@ -385,17 +385,14 @@ def main():
                    help="Directory containing node_attack_ground_truth_*.csv files")
     p.add_argument("--tau-min",           type=float, default=0.3,
                    help="Blacklist trust threshold")
-    p.add_argument("--mode",              choices=["c1", "c2", "all"], default="all",
-                   help="Ablation study to report: 'c1', 'c2', or 'all'")
+    p.add_argument("--mode",              choices=["c1", "c2", "c5", "all"], default="all",
+                   help="Ablation study to report: 'c1', 'c2', 'c5', or 'all'")
     p.add_argument("--run-id-baseline",   default=None,
-                   help="Exact run_id for baseline files (e.g. 'baseline'). "
-                        "Required when multiple baseline files exist.")
+                   help="Exact run_id for baseline files (e.g. 'baseline').")
     p.add_argument("--run-id-c1",         default=None,
-                   help="Exact run_id for C1/rule_based files (e.g. 'c1'). "
-                        "Required when multiple rule_based files exist.")
+                   help="Exact run_id for C1/rule_based files (e.g. 'c1').")
     p.add_argument("--run-id-c2",         default=None,
-                   help="Exact run_id for C2/binary files (e.g. 'c2'). "
-                        "Required when multiple binary files exist.")
+                   help="Exact run_id for C2/binary files (e.g. 'c2').")
     p.add_argument("--out-csv",           default=str(_FM_DAD_DIR / "data" / "stream_ablation" / "stream_metrics_summary.csv"),
                    help="Output path for metric summary CSV")
     args = p.parse_args()
@@ -407,7 +404,7 @@ def main():
         out_csv=Path(args.out_csv),
         mode_filter=args.mode,
         run_id_baseline=args.run_id_baseline,
-        run_id_c1=args.run_id_c1,
+        run_id_c1=args.run_id_c1 if args.mode != "c5" else args.run_id_c1,
         run_id_c2=args.run_id_c2,
     )
 
