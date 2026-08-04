@@ -2,17 +2,12 @@
 evaluate_stream_metrics.py — Compute stream pipeline ablation metrics & export to CSV.
 
 Reads streaming outputs from data/stream_ablation/ (or user specified dir):
-  - pipeline_penalties_baseline_baseline.csv / pipeline_penalties_binary_c2.csv
-  - live_blacklist_baseline_baseline.csv / live_blacklist_binary_c2.csv
-  - live_trust_history_baseline_baseline.csv / live_trust_history_binary_c2.csv
+  - pipeline_penalties_<mode>_<run_id>.csv
+  - live_blacklist_<mode>_<run_id>.csv
+  - live_trust_history_<mode>_<run_id>.csv
 
-Computes:
-  1. Gate-fire parity per agent
-  2. Per-attack-type & Macro MCC (Equation 4.1)
-  3. Confusion matrix metrics (TP, FP, FN, TN)
-  4. Isolation latency T_isolate (mean, median)
-  
-Saves all computed metrics cleanly into a structured CSV file.
+Supports C1 (rule_based vs graded) and C2 (binary vs graded) ablation evaluations.
+FS rule-based detection is marked N/A (Not Evaluable) per Section 1 (missing h_bc/h_obs metrics).
 
 Usage:
     python3 evaluate_stream_metrics.py
@@ -27,7 +22,7 @@ import math
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -98,6 +93,8 @@ def compute_mcc_metrics(bl_df: pd.DataFrame, gt: pd.DataFrame, tau_min: float) -
 
 def compute_tisolate(hist_df: pd.DataFrame, gt: pd.DataFrame, tau_min: float) -> Tuple[float, float]:
     """Compute mean and median T_isolate latency."""
+    if hist_df is None or hist_df.empty:
+        return 0.0, 0.0
     attacker_ids = set(gt[gt["is_attacker"] == 1]["node_id"].tolist())
     att_h = hist_df[hist_df["node_id"].isin(attacker_ids)].copy()
 
@@ -116,138 +113,144 @@ def compute_tisolate(hist_df: pd.DataFrame, gt: pd.DataFrame, tau_min: float) ->
     return float(arr.mean()), float(np.median(arr))
 
 
+def _find_file(results_dir: Path, prefix: str, mode: str) -> Optional[Path]:
+    """Locate a result file for a given prefix and mode."""
+    candidates = sorted(results_dir.glob(f"{prefix}_{mode}_*.csv"))
+    if not candidates:
+        # Try exact fallback
+        fallback = results_dir / f"{prefix}_{mode}.csv"
+        return fallback if fallback.exists() else None
+    return candidates[0]
+
+
 def evaluate_stream(results_dir: Path, gt_dir: Path, tau_min: float, out_csv: Path) -> pd.DataFrame:
-    """Run stream evaluation, print report, and save summary metrics to CSV."""
-    pen_b_file = results_dir / "pipeline_penalties_baseline_baseline.csv"
-    pen_c_file = results_dir / "pipeline_penalties_binary_c2.csv"
+    """Run stream evaluation for C1/C2, print report, and save summary metrics to CSV."""
+    gt = _load_ground_truth(gt_dir)
 
-    bl_b_file  = results_dir / "live_blacklist_baseline_baseline.csv"
-    bl_c_file  = results_dir / "live_blacklist_binary_c2.csv"
+    # Baseline files
+    pen_b_file = _find_file(results_dir, "pipeline_penalties", "baseline")
+    bl_b_file  = _find_file(results_dir, "live_blacklist", "baseline")
+    hist_b_file = _find_file(results_dir, "live_trust_history", "baseline")
 
-    hist_b_file = results_dir / "live_trust_history_baseline_baseline.csv"
-    hist_c_file = results_dir / "live_trust_history_binary_c2.csv"
+    # C2 (binary) files
+    pen_c2_file = _find_file(results_dir, "pipeline_penalties", "binary")
+    bl_c2_file  = _find_file(results_dir, "live_blacklist", "binary")
+    hist_c2_file = _find_file(results_dir, "live_trust_history", "binary")
 
-    for f in [pen_b_file, pen_c_file, bl_b_file, bl_c_file]:
-        if not f.exists():
-            raise FileNotFoundError(f"Required result file not found: {f}")
+    # C1 (rule_based) files
+    pen_c1_file = _find_file(results_dir, "pipeline_penalties", "rule_based")
+    bl_c1_file  = _find_file(results_dir, "live_blacklist", "rule_based")
+    hist_c1_file = _find_file(results_dir, "live_trust_history", "rule_based")
 
-    # Load data
-    gt    = _load_ground_truth(gt_dir)
-    pen_b = pd.read_csv(pen_b_file)
-    pen_c = pd.read_csv(pen_c_file)
+    if not pen_b_file or not bl_b_file:
+        raise FileNotFoundError(f"Baseline files missing in {results_dir}")
+
     bl_b  = pd.read_csv(bl_b_file)
-    bl_c  = pd.read_csv(bl_c_file)
-    hist_b = pd.read_csv(hist_b_file) if hist_b_file.exists() else None
-    hist_c = pd.read_csv(hist_c_file) if hist_c_file.exists() else None
+    pen_b = pd.read_csv(pen_b_file)
+    hist_b = pd.read_csv(hist_b_file) if hist_b_file and hist_b_file.exists() else None
 
-    # 1. Gate-Fire Parity
     gf_b = pen_b[pen_b["gate_fired"] == True].groupby("agent").size().to_dict()
-    gf_c = pen_c[pen_c["gate_fired"] == True].groupby("agent").size().to_dict()
-
-    parity_ok = all(gf_b.get(a, -1) == gf_c.get(a, -2) for a in ["sp", "als", "fs", "igh"])
-
-    # 2. MCC Calculation
     b_mcc_dict, b_macro, b_fp = compute_mcc_metrics(bl_b, gt, tau_min)
-    c_mcc_dict, c_macro, c_fp = compute_mcc_metrics(bl_c, gt, tau_min)
+    b_t_mean, b_t_med = compute_tisolate(hist_b, gt, tau_min)
 
-    # 3. T_isolate Latency
-    b_t_mean, b_t_med = compute_tisolate(hist_b, gt, tau_min) if hist_b is not None else (0.0, 0.0)
-    c_t_mean, c_t_med = compute_tisolate(hist_c, gt, tau_min) if hist_c is not None else (0.0, 0.0)
-
-    # Build Summary Rows for CSV Export
     records = []
-    
-    # Add Gate Parity rows
-    for agent in ["sp", "als", "fs", "igh"]:
-        records.append({
-            "metric_category": "gate_fire_count",
-            "item": agent.upper(),
-            "baseline_value": gf_b.get(agent, 0),
-            "config_a_binary_value": gf_c.get(agent, 0),
-            "match": gf_b.get(agent, 0) == gf_c.get(agent, 0),
-            "notes": "Gate fire parity check"
-        })
 
-    # Add MCC rows per attack
-    for at in sorted(b_mcc_dict.keys()):
-        bv = b_mcc_dict[at]
-        cv = c_mcc_dict[at]
+    # Process C2 if available
+    c2_available = pen_c2_file and bl_c2_file and pen_c2_file.exists() and bl_c2_file.exists()
+    if c2_available:
+        pen_c2  = pd.read_csv(pen_c2_file)
+        bl_c2   = pd.read_csv(bl_c2_file)
+        hist_c2 = pd.read_csv(hist_c2_file) if hist_c2_file and hist_c2_file.exists() else None
+        gf_c2   = pen_c2[pen_c2["gate_fired"] == True].groupby("agent").size().to_dict()
+        c2_mcc_dict, c2_macro, c2_fp = compute_mcc_metrics(bl_c2, gt, tau_min)
+        c2_t_mean, c2_t_med = compute_tisolate(hist_c2, gt, tau_min)
+
+        for agent in ["sp", "als", "fs", "igh"]:
+            records.append({
+                "ablation_study": "C2_binary",
+                "metric_category": "gate_fire_count",
+                "item": agent.upper(),
+                "baseline_value": gf_b.get(agent, 0),
+                "ablation_value": gf_c2.get(agent, 0),
+                "match": gf_b.get(agent, 0) == gf_c2.get(agent, 0),
+                "notes": "Gate fire parity check (C2 binary)"
+            })
+        for at in sorted(b_mcc_dict.keys()):
+            bv = b_mcc_dict[at]; cv = c2_mcc_dict[at]
+            records.append({
+                "ablation_study": "C2_binary",
+                "metric_category": "mcc_score",
+                "item": f"{at}_mcc",
+                "baseline_value": round(bv["mcc"], 4),
+                "ablation_value": round(cv["mcc"], 4),
+                "match": False,
+                "notes": f"TP_b={bv['tp']} FP_b={bv['fp']} FN_b={bv['fn']} | TP_c2={cv['tp']} FP_c2={cv['fp']} FN_c2={cv['fn']}"
+            })
+
+    # Process C1 if available
+    c1_available = pen_c1_file and bl_c1_file and pen_c1_file.exists() and bl_c1_file.exists()
+    if c1_available:
+        pen_c1  = pd.read_csv(pen_c1_file)
+        bl_c1   = pd.read_csv(bl_c1_file)
+        hist_c1 = pd.read_csv(hist_c1_file) if hist_c1_file and hist_c1_file.exists() else None
+        gf_c1   = pen_c1[pen_c1["gate_fired"] == True].groupby("agent").size().to_dict()
+        c1_mcc_dict, c1_macro, c1_fp = compute_mcc_metrics(bl_c1, gt, tau_min)
+        c1_t_mean, c1_t_med = compute_tisolate(hist_c1, gt, tau_min)
+
+        for at in sorted(b_mcc_dict.keys()):
+            bv = b_mcc_dict[at]; cv = c1_mcc_dict.get(at, {"mcc": 0.0, "tp": 0, "fp": c1_fp, "fn": 0})
+            is_evaluable = (at != "FS")
+            records.append({
+                "ablation_study": "C1_rule_based",
+                "metric_category": "mcc_score",
+                "item": f"{at}_mcc",
+                "baseline_value": round(bv["mcc"], 4),
+                "ablation_value": round(cv["mcc"], 4) if is_evaluable else "N/A",
+                "match": False,
+                "notes": f"LW-MAD rule detection. FS is N/A (Section 1: missing h_bc/h_obs hop data)." if not is_evaluable else f"TP_b={bv['tp']} FP_b={bv['fp']} | TP_c1={cv['tp']} FP_c1={cv['fp']}"
+            })
         records.append({
+            "ablation_study": "C1_rule_based",
             "metric_category": "mcc_score",
-            "item": f"{at}_mcc",
-            "baseline_value": round(bv["mcc"], 4),
-            "config_a_binary_value": round(cv["mcc"], 4),
+            "item": "macro_mcc",
+            "baseline_value": round(b_macro, 4),
+            "ablation_value": round(c1_macro, 4),
             "match": False,
-            "notes": f"TP_b={bv['tp']} FP_b={bv['fp']} FN_b={bv['fn']} | TP_c={cv['tp']} FP_c={cv['fp']} FN_c={cv['fn']}"
+            "notes": f"LW-MAD Rule-based Macro MCC. Baseline FP={b_fp} | Rule-based FP={c1_fp}"
         })
-
-    # Macro MCC
-    records.append({
-        "metric_category": "mcc_score",
-        "item": "macro_mcc",
-        "baseline_value": round(b_macro, 4),
-        "config_a_binary_value": round(c_macro, 4),
-        "match": False,
-        "notes": f"Baseline FP={b_fp} | Config A FP={c_fp}"
-    })
-
-    # Blacklisted Node Count
-    bl_b_count = int(bl_b["current_trust"].lt(tau_min).sum())
-    bl_c_count = int(bl_c["current_trust"].lt(tau_min).sum())
-    records.append({
-        "metric_category": "blacklist_summary",
-        "item": "blacklisted_node_count",
-        "baseline_value": bl_b_count,
-        "config_a_binary_value": bl_c_count,
-        "match": False,
-        "notes": f"Total honest nodes blacklisted (FP): Baseline={b_fp}, Config A={c_fp}"
-    })
-
-    # T_isolate Latency
-    records.append({
-        "metric_category": "responsiveness",
-        "item": "tisolate_mean_cycles",
-        "baseline_value": round(b_t_mean, 2),
-        "config_a_binary_value": round(c_t_mean, 2),
-        "match": False,
-        "notes": "Mean cycles from initial penalty to blacklist threshold"
-    })
 
     summary_df = pd.DataFrame(records)
-    
-    # Save CSV
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     summary_df.to_csv(out_csv, index=False)
-    
-    # Print Console Summary
+
     w = 78
     print("=" * w)
-    print(f"FM-DAD STREAM PIPELINE ABLATION REPORT — Baseline vs. Config A (Binary)")
+    print(f"FM-DAD STREAM PIPELINE ABLATION REPORT")
     print(f"  tau_min = {tau_min} | Output CSV: {out_csv}")
     print("=" * w)
-    print(f"\n1. GATE-FIRE PARITY CHECK: {'✅ PASS' if parity_ok else '❌ FAIL'}")
-    for a in ["sp", "als", "fs", "igh"]:
-        b_val, c_val = gf_b.get(a, 0), gf_c.get(a, 0)
-        print(f"  {a.upper():<6} Baseline={b_val:>5} | Config A={c_val:>5} | {'✅ Match' if b_val==c_val else '❌ Mismatch'}")
 
-    print(f"\n2. MCC & CONFUSION MATRIX COMPARISON:")
-    print(f"  {'Attack':<8} {'Baseline MCC':>14} {'Config A MCC':>14} {'Baseline TP/FP/FN':>22} {'Config A TP/FP/FN':>20}")
-    print(f"  {'-'*76}")
-    for at in sorted(b_mcc_dict.keys()):
-        bv = b_mcc_dict[at]; cv = c_mcc_dict[at]
-        b_tpfn = f"TP={bv['tp']} FP={bv['fp']} FN={bv['fn']}"
-        c_tpfn = f"TP={cv['tp']} FP={cv['fp']} FN={cv['fn']}"
-        print(f"  {at:<8} {bv['mcc']:>+14.4f} {cv['mcc']:>+14.4f}   {b_tpfn:<20} {c_tpfn}")
-    print(f"  {'-'*76}")
-    print(f"  {'Macro':<8} {b_macro:>+14.4f} {c_macro:>+14.4f}   FP={b_fp} (Baseline)       FP={c_fp} (Config A)")
+    if c2_available:
+        print(f"\n--- C2 ABLATION SUMMARY: Baseline (Graded) vs. Config A (Binary) ---")
+        print(f"  Gate Parity: {'✅ PASS' if all(gf_b.get(a, -1) == gf_c2.get(a, -2) for a in ['sp','als','fs','igh']) else '❌ FAIL'}")
+        print(f"  Macro MCC  : Baseline={b_macro:+.4f} | Binary={c2_macro:+.4f} | FP: Baseline={b_fp}, Binary={c2_fp}")
 
-    print(f"\n3. ISOLATION RESPONSIVENESS (T_isolate):")
-    print(f"  Baseline (graded): {b_t_mean:.2f} cycles mean ({b_t_med:.1f} median)")
-    print(f"  Config A (binary): {c_t_mean:.2f} cycles mean ({c_t_med:.1f} median)")
+    if c1_available:
+        print(f"\n--- C1 ABLATION SUMMARY: Baseline (DRL-Graded) vs. Rule-Based (LW-MAD) ---")
+        print(f"  {'Attack':<8} {'Baseline (DRL) MCC':>20} {'Rule-Based (LW-MAD) MCC':>25} {'Evaluability':>15}")
+        print(f"  {'-'*74}")
+        for at in sorted(b_mcc_dict.keys()):
+            bv = b_mcc_dict[at]
+            if at == "FS":
+                print(f"  {at:<8} {bv['mcc']:>+20.4f} {'N/A':>25} {'NOT EVALUABLE (missing h_bc/h_obs)':>35}")
+            else:
+                cv = c1_mcc_dict.get(at, {"mcc": 0.0})
+                print(f"  {at:<8} {bv['mcc']:>+20.4f} {cv['mcc']:>+25.4f} {'Evaluable ✅':>25}")
+        print(f"  {'-'*74}")
+        print(f"  {'Macro':<8} {b_macro:>+20.4f} {c1_macro:>+25.4f}   FP: Baseline={b_fp}, Rule-Based={c1_fp}")
+        print(f"  T_isolate : Baseline={b_t_mean:.2f} cycles mean | Rule-Based={c1_t_mean:.2f} cycles mean")
 
     print(f"\n[SUCCESS] Summary saved to: {out_csv}")
     print("=" * w)
-
     return summary_df
 
 
