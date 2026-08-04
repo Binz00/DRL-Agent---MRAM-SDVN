@@ -963,6 +963,9 @@ def _auto_evaluate_metrics() -> None:
 
         mode_map = {"graded": "baseline", "binary": "c2", "rule_based": "c1"}
         eval_mode = mode_map.get(_ablation_mode, "baseline")
+        if _disable_feature != "none":
+            eval_mode = "c5"
+            
         out_csv = _output_dir / f"stream_metrics_summary_{_run_id or 'run'}.csv"
 
         logger.info("[EVAL] Running auto-evaluation for mode=%s, run_id=%s ...", eval_mode, _run_id)
@@ -973,7 +976,7 @@ def _auto_evaluate_metrics() -> None:
             out_csv     = out_csv,
             mode_filter = eval_mode,
             run_id_baseline = _run_id if eval_mode == "baseline" else None,
-            run_id_c1       = _run_id if eval_mode == "c1" else None,
+            run_id_c1       = _run_id if eval_mode in ["c1", "c5"] else None,
             run_id_c2       = _run_id if eval_mode == "c2" else None,
         )
     except Exception as exc:
