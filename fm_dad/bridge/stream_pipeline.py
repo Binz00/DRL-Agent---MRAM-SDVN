@@ -78,6 +78,7 @@ from bridge.features_percycle import add_percycle_features
 from bridge.features_windowed import add_windowed_features
 from bridge.assemble import assemble_agent_tables
 from bridge.trigger import process_cycle as trigger_process_cycle, load_agents
+from bridge.lw_mad import evaluate_cycle_lw_mad
 from bridge.config_bridge import RAW_CSV_FOLDER, CYCLE_DETECTION_REGEX
 from config import AGENT_CONFIGS
 from episode_eval import load_frozen_agents
@@ -495,6 +496,14 @@ def _init_outputs(output_dir: Path) -> None:
     _trust_history_csv  = output_dir / f"live_trust_history{suffix}.csv"
     _revoked_csv        = output_dir / "blacklisted_nodes.csv"   # single shared revocation log
 
+    # Truncate any existing output files so each run starts clean.
+    # Without this, re-running a replay appends to stale data and produces
+    # duplicate header rows that break gate_fired bool parsing downstream.
+    for _f in [_penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv]:
+        if _f.exists():
+            _f.unlink()
+            logger.info("[INIT] Cleared stale output file: %s", _f.name)
+
     logger.info(
         "[INIT] ablation=%s run_id=%s | outputs: %s",
         _ablation_mode, _run_id or "(none)", output_dir,
@@ -698,12 +707,15 @@ def process_cycle_streaming(cycle_no: int) -> None:
             cycle_no, len(_cycle_buffer), W_MIN,
         )
 
-    # Step 10: Run agent inference
-    results = trigger_process_cycle(
-        cycle_no, tables, _agents,
-        active=active_agents,
-        ablation_mode=_ablation_mode,
-    )
+    # Step 10: Run agent inference or LW-MAD rule check
+    if _ablation_mode == "rule_based":
+        results = evaluate_cycle_lw_mad(cycle_no, tables, active=active_agents)
+    else:
+        results = trigger_process_cycle(
+            cycle_no, tables, _agents,
+            active=active_agents,
+            ablation_mode=_ablation_mode,
+        )
 
     # Step 11: Update trust; returns nodes whose on-chain trust fell below threshold
     to_revoke = _update_trust(results, cycle_no, cycle_gt=cycle_gt)
@@ -786,18 +798,20 @@ def _poll_for_sentinels(watch_dir: str, timeout: Optional[int]) -> None:
     start_time  = time.time()
     last_activity = time.time()
 
+    watch_path.mkdir(parents=True, exist_ok=True)
     while True:
-        for f in watch_path.iterdir():
-            m = ns3_re.match(f.name)
-            if m:
-                c = int(m.group(1))
-                if c not in _processed:
-                    _ns3_ready.add(c)
-            m = mid_re.match(f.name)
-            if m:
-                c = int(m.group(1))
-                if c not in _processed:
-                    _mid_ready.add(c)
+        if watch_path.exists():
+            for f in watch_path.iterdir():
+                m = ns3_re.match(f.name)
+                if m:
+                    c = int(m.group(1))
+                    if c not in _processed:
+                        _ns3_ready.add(c)
+                m = mid_re.match(f.name)
+                if m:
+                    c = int(m.group(1))
+                    if c not in _processed:
+                        _mid_ready.add(c)
 
         ready = (_ns3_ready & _mid_ready) - _processed
         if ready:
@@ -876,6 +890,7 @@ def run_streaming(
     _run_id        = run_id
     _init_outputs(output_dir)
 
+    Path(watch_dir).mkdir(parents=True, exist_ok=True)
     logger.info("[STREAM] Loading DRL agents...")
     _agents = load_frozen_agents()
     logger.info("[STREAM] Agents loaded. Watching %s ...", watch_dir)
@@ -1019,9 +1034,10 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Blacklisting trust threshold (tau_min).",
     )
     p.add_argument(
-        "--ablation", choices=["graded", "binary"], default="graded", metavar="MODE",
-        help="C2 ablation mode: 'graded' (production default, DQN inference active) or "
-             "'binary' (DQN skipped, delta=1.0 on any gate fire).",
+        "--ablation", choices=["graded", "binary", "rule_based"], default="graded", metavar="MODE",
+        help="Ablation mode: 'graded' (production default, DQN inference active), "
+             "'binary' (C2: DQN skipped, delta=1.0 on gate fire), or "
+             "'rule_based' (C1: LW-MAD Algorithm 1 rules, DRL bypassed, delta=1.0 on alert).",
     )
     p.add_argument(
         "--run-id", default="", metavar="ID",
