@@ -979,6 +979,12 @@ def _build_final_ground_truth() -> Dict[int, dict]:
     final_gt = dict(_gt_static)
     for nid in _all_igh_nodes:
         final_gt[nid] = {"is_attacker": 1, "attack_type": "IGH"}
+    
+    total_nodes = len(final_gt)
+    attackers = sum(1 for v in final_gt.values() if v.get("is_attacker") == 1)
+    honest = total_nodes - attackers
+    logger.debug("[MONITOR][GT] Final ground truth built: total=%d, attackers=%d, honest=%d, igh_nodes_overlay=%d",
+                 total_nodes, attackers, honest, len(_all_igh_nodes))
     return final_gt
 
 
@@ -1014,6 +1020,8 @@ def _classify_at_tau(final_gt: Dict[int, dict], tau: float) -> Dict[str, tuple]:
                 tn += 0 if is_detected else 1
             # else: other-type attacker — EXCLUDED
         results[agent_name] = (tp, fp, fn, tn)
+        logger.debug("[MONITOR][EVAL] tau=%.2f agent=%-4s -> TP=%d, FP=%d, FN=%d, TN=%d (target_nodes=%d)",
+                     tau, agent_name.upper(), tp, fp, fn, tn, len(target_mask))
     return results
 
 
@@ -1027,17 +1035,21 @@ def _auto_evaluate_metrics() -> None:
 
     NEVER RAISES — any failure is logged and the pipeline exits cleanly.
     """
+    logger.info("[MONITOR][EVAL] Starting real-time end-of-run metrics evaluation...")
     try:
         from episode_eval import mcc_from_counts
 
         if not _trust:
-            logger.warning("[METRICS] No trust data recorded — skipping auto-evaluation.")
+            logger.warning("[MONITOR][EVAL][WARN] No trust data recorded in _trust map — skipping auto-evaluation.")
             return
 
         final_gt = _build_final_ground_truth()
         if not final_gt:
-            logger.warning("[METRICS] No ground truth available — skipping auto-evaluation.")
+            logger.warning("[MONITOR][EVAL][WARN] Ground truth map is empty — skipping auto-evaluation.")
             return
+
+        logger.info("[MONITOR][EVAL] Evaluated trust nodes count: %d, GT nodes count: %d",
+                    len(_trust), len(final_gt))
 
         rows: List[dict] = []
         best_tau   = None
@@ -1056,6 +1068,8 @@ def _auto_evaluate_metrics() -> None:
                     "run_id": _run_id,
                     "cycles_processed": len(_processed),
                 })
+                logger.debug("[MONITOR][EVAL] tau=%.2f agent=%-4s MCC=%.4f", tau, agent_name.upper(), mcc)
+            
             macro = sum(mccs) / len(mccs) if mccs else 0.0
             rows.append({
                 "tau_min": tau, "attack": "MACRO",
@@ -1064,6 +1078,8 @@ def _auto_evaluate_metrics() -> None:
                 "run_id": _run_id,
                 "cycles_processed": len(_processed),
             })
+            logger.info("[MONITOR][EVAL] Candidate tau=%.2f -> Macro MCC=%.4f", tau, macro)
+            
             # Tie-break: prefer higher tau when macro MCCs are equal
             if macro > best_macro or (abs(macro - best_macro) < 1e-9 and tau > (best_tau or 0)):
                 best_macro = macro
@@ -1077,12 +1093,12 @@ def _auto_evaluate_metrics() -> None:
         pd.DataFrame(rows).to_csv(metrics_path, index=False)
 
         logger.info("=" * 60)
-        logger.info("[METRICS] Auto-evaluation complete → %s", metrics_path.name)
-        logger.info("[METRICS] Best tau_min=%.1f | macro MCC=%.4f", best_tau, best_macro)
+        logger.info("[MONITOR][EVAL] Auto-evaluation complete -> %s", metrics_path.name)
+        logger.info("[MONITOR][EVAL] Selected optimal tau_min=%.1f | macro MCC=%.4f", best_tau, best_macro)
         logger.info("=" * 60)
 
     except Exception as exc:
-        logger.error("[METRICS] Auto-evaluation failed (pipeline unaffected): %s", exc)
+        logger.error("[MONITOR][EVAL][ERROR] Auto-evaluation failed with exception: %s", exc, exc_info=True)
 
 
 # ---------------------------------------------------------------------------
