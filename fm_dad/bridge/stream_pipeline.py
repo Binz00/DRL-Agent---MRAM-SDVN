@@ -1141,12 +1141,15 @@ def main() -> None:
         )
     else:
         run_streaming(
-            output_dir = Path(args.output_dir),
-            tau        = args.tau,
-            max_cycles = args.max_cycles,
-            timeout    = args.timeout,
-            ablation   = args.ablation,
-            run_id     = run_id,
+            watch_dir       = args.watch_dir,
+            output_dir      = Path(args.output_dir),
+            tau             = args.tau,
+            max_cycles      = args.max_cycles,
+            timeout         = args.timeout,
+            ablation        = args.ablation,
+            run_id          = run_id,
+            disable_agent   = args.disable_agent,
+            disable_feature = args.disable_feature,
         )
 
 
