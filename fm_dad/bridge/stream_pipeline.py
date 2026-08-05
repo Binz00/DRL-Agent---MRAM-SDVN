@@ -904,45 +904,48 @@ def run_streaming(
     # time to write its ground-truth files before the pipeline tries to read them.
 
     handler = _make_handler()
-    if handler is not None:
-        try:
-            from watchdog.observers import Observer
-            observer = Observer()
-            observer.schedule(handler, str(watch_dir), recursive=False)
-            observer.start()
-            logger.info("[STREAM] watchdog observer started.")
-
-            start_time    = time.time()
-            last_activity = time.time()
+    try:
+        if handler is not None:
             try:
-                while True:
-                    time.sleep(1.0)
+                from watchdog.observers import Observer
+                observer = Observer()
+                observer.schedule(handler, str(watch_dir), recursive=False)
+                observer.start()
+                logger.info("[STREAM] watchdog observer started.")
 
-                    if _max_cycles is not None and len(_processed) >= _max_cycles:
-                        logger.info("[STREAM] Reached max-cycles=%d — stopping.", _max_cycles)
-                        break
+                start_time    = time.time()
+                last_activity = time.time()
+                try:
+                    while True:
+                        time.sleep(1.0)
 
-                    if timeout is not None:
-                        now_processed = len(_processed)
-                        if now_processed > 0:
-                            last_activity = time.time()
-                        if (time.time() - last_activity) > timeout:
-                            logger.info("[STREAM] Timeout (%ds no new cycle) — stopping.", timeout)
+                        if _max_cycles is not None and len(_processed) >= _max_cycles:
+                            logger.info("[STREAM] Reached max-cycles=%d — stopping.", _max_cycles)
                             break
 
-            finally:
-                observer.stop()
-                observer.join()
-        except Exception as exc:
-            logger.warning("[STREAM] watchdog observer error: %s — falling back to polling", exc)
-            _poll_for_sentinels(watch_dir, timeout)
-    else:
-        _poll_for_sentinels(watch_dir, timeout)
+                        if timeout is not None:
+                            now_processed = len(_processed)
+                            if now_processed > 0:
+                                last_activity = time.time()
+                            if (time.time() - last_activity) > timeout:
+                                logger.info("[STREAM] Timeout (%ds no new cycle) — stopping.", timeout)
+                                break
 
-    logger.info("[STREAM] Done. Processed %d cycles. Blacklisted: %d nodes.",
-                len(_processed), len(_blacklisted))
-    _send_ns3_shutdown()    # ← unblock NS-3's post-sim spin-wait
-    _auto_evaluate_metrics()
+                finally:
+                    observer.stop()
+                    observer.join()
+            except Exception as exc:
+                logger.warning("[STREAM] watchdog observer error: %s — falling back to polling", exc)
+                _poll_for_sentinels(watch_dir, timeout)
+        else:
+            _poll_for_sentinels(watch_dir, timeout)
+    except KeyboardInterrupt:
+        logger.info("[STREAM] KeyboardInterrupt received — running final evaluation before exit.")
+    finally:
+        logger.info("[STREAM] Done. Processed %d cycles. Blacklisted: %d nodes.",
+                    len(_processed), len(_blacklisted))
+        _send_ns3_shutdown()    # ← unblock NS-3's post-sim spin-wait
+        _auto_evaluate_metrics()
 
 
 def _auto_evaluate_metrics() -> None:
