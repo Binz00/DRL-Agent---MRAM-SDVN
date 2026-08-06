@@ -14,7 +14,12 @@ Outputs (written to --output-dir):
     live_blacklist_<run_id>.csv             — overwritten after every cycle
     live_trust_scores_<run_id>.csv          — overwritten after every cycle
     live_trust_history_<run_id>.csv         — appended after every cycle
-    stream_metrics_summary_<run_id>.csv     — written at run end (auto-eval)
+    stream_metrics_summary_<run_id>.csv     — written at run end (auto-eval);
+                                              6 rows per tau candidate:
+                                              SP, ALS, FS, IGH (per-agent MCC),
+                                              MACRO (avg of the four per-agent MCCs),
+                                              SYSTEM (combined-detector MCC, FP/TN
+                                              shared once across all four agents)
 
 Usage:
     # Live mode — watch /tmp/ for sentinel files from NS-3 + middleware
@@ -1033,6 +1038,19 @@ def _auto_evaluate_metrics() -> None:
     at each tau_min candidate, selects the best by macro MCC (tie-break: higher
     tau preferred, matching validate_pipeline.py's rule), and writes results to CSV.
 
+    Output CSV has 6 rows per tau candidate (18 rows total for 3 candidates):
+      SP / ALS / FS / IGH : per-agent MCC (independent classification per attack type)
+      MACRO               : arithmetic mean of the four per-agent MCCs
+      SYSTEM              : single combined-detector MCC, where TP and FN are
+                            summed across all four agents (disjoint attacker sets,
+                            so no double-counting), but FP and TN are shared ONCE
+                            (the same honest-node pool appears identically in every
+                            agent's counts — taking it from any one agent is correct
+                            and avoids 4x inflation of the FP penalty).
+
+    The tie-break for selecting best_tau uses macro MCC only (unchanged).
+    SYSTEM MCC is an additional reported metric and does not drive any decision.
+
     NEVER RAISES — any failure is logged and the pipeline exits cleanly.
     """
     logger.info("[MONITOR][EVAL] Starting real-time end-of-run metrics evaluation...")
@@ -1079,8 +1097,33 @@ def _auto_evaluate_metrics() -> None:
                 "cycles_processed": len(_processed),
             })
             logger.info("[MONITOR][EVAL] Candidate tau=%.2f -> Macro MCC=%.4f", tau, macro)
-            
-            # Tie-break: prefer higher tau when macro MCCs are equal
+
+            # --- System-level MCC (all 4 agents treated as one combined detector) ---
+            # TP and FN are summed across agents: each agent detects a disjoint
+            # attacker set, so summing is correct — no double-counting.
+            # FP and TN are NOT summed: they represent the same shared honest-node
+            # pool and appear identically in every agent's counts. Taking from the
+            # first entry is correct; summing would 4x-inflate the FP penalty.
+            system_tp = sum(v[0] for v in per_agent.values())
+            system_fn = sum(v[2] for v in per_agent.values())
+            _, system_fp, _, system_tn = next(iter(per_agent.values()))
+            system_mcc = mcc_from_counts(system_tp, system_fp, system_fn, system_tn)
+            rows.append({
+                "tau_min": tau, "attack": "SYSTEM",
+                "tp": system_tp, "fp": system_fp,
+                "fn": system_fn, "tn": system_tn,
+                "mcc": round(system_mcc, 4),
+                "run_id": _run_id,
+                "cycles_processed": len(_processed),
+            })
+            logger.info("[MONITOR][EVAL] Candidate tau=%.2f -> System MCC=%.4f "
+                        "(system_tp=%d, system_fp=%d, system_fn=%d, system_tn=%d)",
+                        tau, system_mcc, system_tp, system_fp, system_fn, system_tn)
+            # --- end system MCC ---
+
+            # Tie-break: prefer higher tau when macro MCCs are equal.
+            # NOTE: intentionally uses macro, NOT system_mcc — system MCC is a
+            # reported metric only and does not drive tau selection.
             if macro > best_macro or (abs(macro - best_macro) < 1e-9 and tau > (best_tau or 0)):
                 best_macro = macro
                 best_tau   = tau
@@ -1092,9 +1135,15 @@ def _auto_evaluate_metrics() -> None:
         metrics_path = _output_dir / f"stream_metrics_summary{suffix}.csv"
         pd.DataFrame(rows).to_csv(metrics_path, index=False)
 
+        # Pull system MCC at the selected best_tau for the summary log line
+        system_mcc_at_best = next(
+            (r["mcc"] for r in rows if r["tau_min"] == best_tau and r["attack"] == "SYSTEM"),
+            None,
+        )
         logger.info("=" * 60)
         logger.info("[MONITOR][EVAL] Auto-evaluation complete -> %s", metrics_path.name)
-        logger.info("[MONITOR][EVAL] Selected optimal tau_min=%.1f | macro MCC=%.4f", best_tau, best_macro)
+        logger.info("[MONITOR][EVAL] Selected optimal tau_min=%.1f | macro MCC=%.4f | system MCC=%s",
+                    best_tau, best_macro, system_mcc_at_best)
         logger.info("=" * 60)
 
     except Exception as exc:
