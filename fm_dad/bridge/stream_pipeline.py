@@ -162,6 +162,10 @@ _penalties_written:     bool = False   # tracks whether header needs to be writt
 _trust_history_written: bool = False   # tracks whether header needs to be written
 _revoked_written:       bool = False   # tracks whether header needs to be written
 
+# Cycle-wise metrics history — one entry per cycle processed, at pipeline tau.
+# Each entry: {cycle_id, agent, tp, fp, fn, tn, mcc, igh_active_this_cycle}
+_cycle_metrics_history: List[dict] = []
+
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
@@ -175,6 +179,7 @@ def reset_state() -> None:
     _gt_static.clear()
     _all_igh_nodes.clear()
     _ns3_revoked.clear()
+    _cycle_metrics_history.clear()
     _penalties_written     = False
     _trust_history_written = False
     _revoked_written       = False
@@ -702,6 +707,10 @@ def process_cycle_streaming(cycle_no: int) -> None:
     # Step 15: Summary log
     _log_cycle_summary(cycle_no, results, active_agents)
 
+    # Step 15b: Snapshot per-agent MCC at the pipeline tau for this cycle.
+    # Must run AFTER _update_trust() so _trust reflects this cycle's deltas.
+    _snapshot_cycle_metrics(cycle_no, igh_active=len(active_igh) > 0)
+
     # Step 16: Delete both sentinel files after successful processing (live mode only).
     if not _is_replay:
         for suffix in ["ns3", "mid"]:
@@ -973,6 +982,70 @@ def run_replay(
 TAU_CANDIDATES = [0.3, 0.4, 0.5]
 
 
+def _snapshot_cycle_metrics(cycle_no: int, igh_active: bool) -> None:
+    """
+    Records per-agent TP/FP/FN/TN/MCC at the pipeline's configured tau (_tau_min)
+    after each cycle completes. Appended to _cycle_metrics_history.
+
+    IGH note: early cycles before W_MIN may have no IGH target nodes in
+    _all_igh_nodes yet (agent dormant). If so, the IGH row will show
+    tp=0, fn=0 (no targets known yet) with a note in igh_active_this_cycle=False.
+    This is correct and informative — it shows IGH MCC only becomes
+    meaningful once at least one IGH node has been seen.
+
+    NEVER RAISES — any failure is logged and silently skipped.
+    """
+    try:
+        from episode_eval import mcc_from_counts
+        if not _trust or not _gt_static:
+            return  # Nothing to evaluate yet
+
+        final_gt  = _build_final_ground_truth()
+        per_agent = _classify_at_tau(final_gt, _tau_min)
+
+        for agent_name, (tp, fp, fn, tn) in per_agent.items():
+            mcc = mcc_from_counts(tp, fp, fn, tn)
+            _cycle_metrics_history.append({
+                "cycle_id":            cycle_no,
+                "agent":              agent_name.upper(),
+                "tau":                _tau_min,
+                "tp":                 tp,
+                "fp":                 fp,
+                "fn":                 fn,
+                "tn":                 tn,
+                "mcc":               round(mcc, 4),
+                "igh_active_this_cycle": igh_active,
+                "run_id":             _run_id,
+            })
+            logger.debug(
+                "[CYCLE-METRICS] cycle=%d agent=%-4s tau=%.2f "
+                "tp=%d fp=%d fn=%d tn=%d mcc=%.4f igh_active=%s",
+                cycle_no, agent_name.upper(), _tau_min,
+                tp, fp, fn, tn, mcc, igh_active,
+            )
+    except Exception as exc:
+        logger.warning("[CYCLE-METRICS] snapshot failed for cycle %d: %s", cycle_no, exc)
+
+
+def _write_cycle_metrics_csv() -> None:
+    """
+    Writes _cycle_metrics_history to stream_cycle_metrics_<run_id>.csv.
+    Called at end-of-run (inside _auto_evaluate_metrics, always-fires finally block).
+    NEVER RAISES.
+    """
+    try:
+        if not _cycle_metrics_history:
+            logger.warning("[CYCLE-METRICS] No cycle metrics to write — skipping.")
+            return
+        suffix = f"_{_run_id}" if _run_id else ""
+        path   = _output_dir / f"stream_cycle_metrics{suffix}.csv"
+        pd.DataFrame(_cycle_metrics_history).to_csv(path, index=False)
+        logger.info("[CYCLE-METRICS] Cycle-wise metrics CSV written -> %s (%d rows)",
+                    path.name, len(_cycle_metrics_history))
+    except Exception as exc:
+        logger.error("[CYCLE-METRICS][ERROR] Failed to write cycle metrics CSV: %s", exc, exc_info=True)
+
+
 def _build_final_ground_truth() -> Dict[int, dict]:
     """
     Union ground truth for end-of-run classification.
@@ -1140,11 +1213,23 @@ def _auto_evaluate_metrics() -> None:
             (r["mcc"] for r in rows if r["tau_min"] == best_tau and r["attack"] == "SYSTEM"),
             None,
         )
+
+        # Print per-agent detail at best_tau to the log (not just MACRO/SYSTEM)
         logger.info("=" * 60)
         logger.info("[MONITOR][EVAL] Auto-evaluation complete -> %s", metrics_path.name)
         logger.info("[MONITOR][EVAL] Selected optimal tau_min=%.1f | macro MCC=%.4f | system MCC=%s",
                     best_tau, best_macro, system_mcc_at_best)
+        logger.info("[MONITOR][EVAL] --- Per-agent breakdown at tau_min=%.1f ---", best_tau)
+        for r in rows:
+            if r["tau_min"] == best_tau and r["attack"] not in ("MACRO", "SYSTEM"):
+                logger.info(
+                    "[MONITOR][EVAL]   %-4s  TP=%-4s  FP=%-4s  FN=%-4s  TN=%-4s  MCC=%s",
+                    r["attack"], r["tp"], r["fp"], r["fn"], r["tn"], r["mcc"],
+                )
         logger.info("=" * 60)
+
+        # Write cycle-wise metrics CSV
+        _write_cycle_metrics_csv()
 
     except Exception as exc:
         logger.error("[MONITOR][EVAL][ERROR] Auto-evaluation failed with exception: %s", exc, exc_info=True)
