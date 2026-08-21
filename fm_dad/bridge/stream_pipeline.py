@@ -157,19 +157,18 @@ _blacklist_csv:       Optional[Path] = None
 _trust_csv:           Optional[Path] = None
 _trust_history_csv:   Optional[Path] = None
 _revoked_csv:         Optional[Path] = None
+_cycle_metrics_csv:   Optional[Path] = None   # stream_cycle_metrics_<run_id>.csv
 _ns3_revoked:         Set[int] = set()          # nodes already sent to NS-3; never re-sent
-_penalties_written:     bool = False   # tracks whether header needs to be written
-_trust_history_written: bool = False   # tracks whether header needs to be written
-_revoked_written:       bool = False   # tracks whether header needs to be written
-
-# Cycle-wise metrics history — one entry per cycle processed, at pipeline tau.
-# Each entry: {cycle_id, agent, tp, fp, fn, tn, mcc, igh_active_this_cycle}
-_cycle_metrics_history: List[dict] = []
+_penalties_written:       bool = False   # tracks whether header needs to be written
+_trust_history_written:   bool = False   # tracks whether header needs to be written
+_revoked_written:         bool = False   # tracks whether header needs to be written
+_cycle_metrics_written:   bool = False   # tracks whether header needs to be written
 
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
-    global _penalties_written, _trust_history_written, _revoked_written, _is_replay, _run_id
+    global _penalties_written, _trust_history_written, _revoked_written, \
+           _cycle_metrics_written, _is_replay, _run_id
     _cycle_buffer.clear()
     _trust.clear()
     _blacklisted.clear()
@@ -179,10 +178,10 @@ def reset_state() -> None:
     _gt_static.clear()
     _all_igh_nodes.clear()
     _ns3_revoked.clear()
-    _cycle_metrics_history.clear()
-    _penalties_written     = False
-    _trust_history_written = False
-    _revoked_written       = False
+    _penalties_written       = False
+    _trust_history_written   = False
+    _revoked_written         = False
+    _cycle_metrics_written   = False
     _is_replay = False
     _run_id = ""
 
@@ -475,7 +474,8 @@ def _revoke_low_trust(cycle_no: int, node_ids: List[int]) -> None:
 
 def _init_outputs(output_dir: Path) -> None:
     """Create output directory and initialise file paths."""
-    global _penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv, _revoked_csv
+    global _penalties_csv, _blacklist_csv, _trust_csv, _trust_history_csv, \
+           _revoked_csv, _cycle_metrics_csv
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Filenames based on run_id only — no ablation prefix on this branch.
@@ -486,11 +486,13 @@ def _init_outputs(output_dir: Path) -> None:
     _trust_csv          = output_dir / f"live_trust_scores{suffix}.csv"
     _trust_history_csv  = output_dir / f"live_trust_history{suffix}.csv"
     _revoked_csv        = output_dir / "blacklisted_nodes.csv"
+    _cycle_metrics_csv  = output_dir / f"stream_cycle_metrics{suffix}.csv"
 
     logger.info("[INIT] run_id=%s | outputs: %s", _run_id or "(none)", output_dir)
-    logger.info("[INIT]   penalties      → %s", _penalties_csv.name)
-    logger.info("[INIT]   trust_history  → %s", _trust_history_csv.name)
-    logger.info("[INIT]   live_blacklist → %s", _blacklist_csv.name)
+    logger.info("[INIT]   penalties      -> %s", _penalties_csv.name)
+    logger.info("[INIT]   trust_history  -> %s", _trust_history_csv.name)
+    logger.info("[INIT]   live_blacklist -> %s", _blacklist_csv.name)
+    logger.info("[INIT]   cycle_metrics  -> %s", _cycle_metrics_csv.name)
 
 
 def _append_penalties(results: List[dict], cycle_no: int) -> None:
@@ -982,68 +984,163 @@ def run_replay(
 TAU_CANDIDATES = [0.3, 0.4, 0.5]
 
 
+# CSV column order for cycle metrics file
+_CYCLE_METRICS_FIELDS = [
+    "cycle_id", "agent", "tau", "tp", "fp", "fn", "tn",
+    "mcc", "igh_active_this_cycle", "run_id",
+]
+
+
 def _snapshot_cycle_metrics(cycle_no: int, igh_active: bool) -> None:
     """
-    Records per-agent TP/FP/FN/TN/MCC at the pipeline's configured tau (_tau_min)
-    after each cycle completes. Appended to _cycle_metrics_history.
+    Appends per-agent TP/FP/FN/TN/MCC at the pipeline's configured tau (_tau_min)
+    directly to stream_cycle_metrics_<run_id>.csv after each cycle completes.
+    The CSV is live-readable from another terminal while the pipeline is running.
 
     IGH note: early cycles before W_MIN may have no IGH target nodes in
-    _all_igh_nodes yet (agent dormant). If so, the IGH row will show
-    tp=0, fn=0 (no targets known yet) with a note in igh_active_this_cycle=False.
-    This is correct and informative — it shows IGH MCC only becomes
-    meaningful once at least one IGH node has been seen.
+    _all_igh_nodes yet (agent dormant). The IGH row will show tp=0, fn=0
+    with igh_active_this_cycle=False — correct and informative.
 
     NEVER RAISES — any failure is logged and silently skipped.
     """
+    global _cycle_metrics_written
     try:
         from episode_eval import mcc_from_counts
-        if not _trust or not _gt_static:
-            return  # Nothing to evaluate yet
+        if not _trust or not _gt_static or _cycle_metrics_csv is None:
+            return
 
         final_gt  = _build_final_ground_truth()
         per_agent = _classify_at_tau(final_gt, _tau_min)
 
-        for agent_name, (tp, fp, fn, tn) in per_agent.items():
-            mcc = mcc_from_counts(tp, fp, fn, tn)
-            _cycle_metrics_history.append({
-                "cycle_id":            cycle_no,
-                "agent":              agent_name.upper(),
-                "tau":                _tau_min,
-                "tp":                 tp,
-                "fp":                 fp,
-                "fn":                 fn,
-                "tn":                 tn,
-                "mcc":               round(mcc, 4),
-                "igh_active_this_cycle": igh_active,
-                "run_id":             _run_id,
-            })
-            logger.debug(
-                "[CYCLE-METRICS] cycle=%d agent=%-4s tau=%.2f "
-                "tp=%d fp=%d fn=%d tn=%d mcc=%.4f igh_active=%s",
-                cycle_no, agent_name.upper(), _tau_min,
-                tp, fp, fn, tn, mcc, igh_active,
-            )
+        write_header = not _cycle_metrics_written or not _cycle_metrics_csv.exists()
+        with open(_cycle_metrics_csv, "a", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=_CYCLE_METRICS_FIELDS)
+            if write_header:
+                writer.writeheader()
+            for agent_name, (tp, fp, fn, tn) in per_agent.items():
+                mcc = mcc_from_counts(tp, fp, fn, tn)
+                writer.writerow({
+                    "cycle_id":              cycle_no,
+                    "agent":                 agent_name.upper(),
+                    "tau":                   _tau_min,
+                    "tp":                    tp,
+                    "fp":                    fp,
+                    "fn":                    fn,
+                    "tn":                    tn,
+                    "mcc":                   round(mcc, 4),
+                    "igh_active_this_cycle": igh_active,
+                    "run_id":                _run_id,
+                })
+                logger.debug(
+                    "[CYCLE-METRICS] cycle=%d agent=%-4s tau=%.2f "
+                    "tp=%d fp=%d fn=%d tn=%d mcc=%.4f igh_active=%s",
+                    cycle_no, agent_name.upper(), _tau_min,
+                    tp, fp, fn, tn, mcc, igh_active,
+                )
+        _cycle_metrics_written = True
+        logger.debug("[CYCLE-METRICS] cycle=%d appended to %s", cycle_no, _cycle_metrics_csv.name)
     except Exception as exc:
         logger.warning("[CYCLE-METRICS] snapshot failed for cycle %d: %s", cycle_no, exc)
 
 
-def _write_cycle_metrics_csv() -> None:
+def _plot_cycle_metrics() -> None:
     """
-    Writes _cycle_metrics_history to stream_cycle_metrics_<run_id>.csv.
-    Called at end-of-run (inside _auto_evaluate_metrics, always-fires finally block).
+    Reads stream_cycle_metrics_<run_id>.csv and generates two plots saved to
+    <output_dir>/graphs/:
+      1. mcc_over_cycles_<run_id>.png   — MCC per agent across cycles
+      2. counts_over_cycles_<run_id>.png — TP/FP/FN/TN per agent across cycles
     NEVER RAISES.
     """
     try:
-        if not _cycle_metrics_history:
-            logger.warning("[CYCLE-METRICS] No cycle metrics to write — skipping.")
+        import matplotlib
+        matplotlib.use("Agg")  # non-interactive — safe on headless servers
+        import matplotlib.pyplot as plt
+        import matplotlib.ticker as ticker
+
+        if _cycle_metrics_csv is None or not _cycle_metrics_csv.exists():
+            logger.warning("[CYCLE-METRICS][PLOT] CSV not found — skipping plots.")
             return
+
+        df = pd.read_csv(_cycle_metrics_csv)
+        if df.empty:
+            logger.warning("[CYCLE-METRICS][PLOT] CSV is empty — skipping plots.")
+            return
+
+        graphs_dir = _output_dir / "graphs"
+        graphs_dir.mkdir(parents=True, exist_ok=True)
         suffix = f"_{_run_id}" if _run_id else ""
-        path   = _output_dir / f"stream_cycle_metrics{suffix}.csv"
-        pd.DataFrame(_cycle_metrics_history).to_csv(path, index=False)
-        logger.info("[CYCLE-METRICS] Cycle-wise metrics CSV written -> %s (%d rows)",
-                    path.name, len(_cycle_metrics_history))
+
+        agents    = ["SP", "ALS", "FS", "IGH"]
+        colors    = {"SP": "#3498db", "ALS": "#f39c12", "FS": "#9b59b6", "IGH": "#e74c3c"}
+        markers   = {"SP": "s",       "ALS": "^",       "FS": "D",       "IGH": "o"}
+        all_cycles = sorted(df["cycle_id"].unique())
+
+        # ── Plot 1: MCC per agent across cycles ──────────────────────────────
+        fig, ax = plt.subplots(figsize=(14, 5))
+        for agent in agents:
+            sub = df[df["agent"] == agent].sort_values("cycle_id")
+            ax.plot(
+                sub["cycle_id"], sub["mcc"],
+                color=colors[agent], marker=markers[agent],
+                linestyle="-", markersize=4, linewidth=1.6,
+                label=agent,
+            )
+        ax.set_title(f"MCC per Agent Across Cycles (tau={_tau_min})",
+                     fontsize=13, fontweight="bold", pad=12)
+        ax.set_xlabel("Cycle ID", fontsize=10)
+        ax.set_ylabel("MCC", fontsize=10)
+        ax.set_xlim(min(all_cycles) - 0.5, max(all_cycles) + 0.5)
+        ax.set_ylim(-1.05, 1.05)
+        ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=28))
+        ax.axhline(0, color="grey", linewidth=0.8, linestyle="--")
+        ax.legend(fontsize=9, loc="upper left", framealpha=0.9)
+        ax.grid(True, linestyle="--", alpha=0.4)
+        ax.tick_params(axis="both", labelsize=9)
+        plt.tight_layout()
+        mcc_plot = graphs_dir / f"mcc_over_cycles{suffix}.png"
+        plt.savefig(mcc_plot, dpi=150, bbox_inches="tight")
+        plt.close()
+        logger.info("[CYCLE-METRICS][PLOT] MCC plot saved -> %s", mcc_plot.name)
+
+        # ── Plot 2: TP/FP/FN/TN per agent across cycles (2x2 subplots) ──────
+        fig, axes = plt.subplots(2, 2, figsize=(16, 9), sharex=True)
+        axes_flat = axes.flatten()
+        count_cols = [("tp", "#2ecc71"), ("fp", "#e74c3c"),
+                      ("fn", "#f39c12"), ("tn", "#3498db")]
+
+        for ax_idx, (col, base_color) in enumerate(count_cols):
+            ax = axes_flat[ax_idx]
+            for agent in agents:
+                sub = df[df["agent"] == agent].sort_values("cycle_id")
+                ax.plot(
+                    sub["cycle_id"], sub[col],
+                    color=colors[agent], marker=markers[agent],
+                    linestyle="-", markersize=3, linewidth=1.4,
+                    label=agent,
+                )
+            ax.set_title(col.upper(), fontsize=11, fontweight="bold", pad=8)
+            ax.set_ylabel("Count", fontsize=9)
+            ax.legend(fontsize=8, loc="upper left", framealpha=0.9)
+            ax.grid(True, linestyle="--", alpha=0.4)
+            ax.tick_params(axis="both", labelsize=8)
+            ax.set_ylim(bottom=0)
+
+        for ax in axes[1]:
+            ax.set_xlabel("Cycle ID", fontsize=9)
+            ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True, nbins=14))
+
+        fig.suptitle(
+            f"TP / FP / FN / TN per Agent Across Cycles (tau={_tau_min})",
+            fontsize=13, fontweight="bold", y=1.01,
+        )
+        plt.tight_layout()
+        counts_plot = graphs_dir / f"counts_over_cycles{suffix}.png"
+        plt.savefig(counts_plot, dpi=150, bbox_inches="tight")
+        plt.close()
+        logger.info("[CYCLE-METRICS][PLOT] Counts plot saved -> %s", counts_plot.name)
+
     except Exception as exc:
-        logger.error("[CYCLE-METRICS][ERROR] Failed to write cycle metrics CSV: %s", exc, exc_info=True)
+        logger.error("[CYCLE-METRICS][PLOT][ERROR] Plot generation failed: %s", exc, exc_info=True)
 
 
 def _build_final_ground_truth() -> Dict[int, dict]:
@@ -1211,8 +1308,8 @@ def _auto_evaluate_metrics() -> None:
                 )
         logger.info("=" * 60)
 
-        # Write cycle-wise metrics CSV
-        _write_cycle_metrics_csv()
+        # Generate cycle-wise plots from the live-appended CSV
+        _plot_cycle_metrics()
 
     except Exception as exc:
         logger.error("[MONITOR][EVAL][ERROR] Auto-evaluation failed with exception: %s", exc, exc_info=True)
