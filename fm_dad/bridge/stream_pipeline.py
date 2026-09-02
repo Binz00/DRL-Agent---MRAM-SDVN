@@ -58,6 +58,7 @@ import re
 import sys
 import time
 from collections import deque
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
@@ -164,11 +165,15 @@ _trust_history_written:   bool = False   # tracks whether header needs to be wri
 _revoked_written:         bool = False   # tracks whether header needs to be written
 _cycle_metrics_written:   bool = False   # tracks whether header needs to be written
 
+# Live dashboard CSVs written to /tmp/drl_agent/ (watch_dir) — overwritten each cycle
+# so external tools (spreadsheet, monitoring script) always see latest state.
+_live_removed_written: bool = False    # tracks header for removed_nodes.csv (append-only)
+
 
 def reset_state() -> None:
     """Reset all mutable global state for a fresh run (used by replay mode)."""
     global _penalties_written, _trust_history_written, _revoked_written, \
-           _cycle_metrics_written, _is_replay, _run_id
+           _cycle_metrics_written, _live_removed_written, _is_replay, _run_id
     _cycle_buffer.clear()
     _trust.clear()
     _blacklisted.clear()
@@ -182,6 +187,7 @@ def reset_state() -> None:
     _trust_history_written   = False
     _revoked_written         = False
     _cycle_metrics_written   = False
+    _live_removed_written    = False
     _is_replay = False
     _run_id = ""
 
@@ -713,6 +719,11 @@ def process_cycle_streaming(cycle_no: int) -> None:
     # Must run AFTER _update_trust() so _trust reflects this cycle's deltas.
     _snapshot_cycle_metrics(cycle_no, igh_active=len(active_igh) > 0)
 
+    # Step 15c: Live dashboard CSVs in /tmp/drl_agent/ — always latest state.
+    _write_live_mcc_table(cycle_no)
+    _write_live_trust_scores()
+    _append_live_removed_nodes(cycle_no, to_revoke)
+
     # Step 16: Delete both sentinel files after successful processing (live mode only).
     if not _is_replay:
         for suffix in ["ns3", "mid"]:
@@ -982,6 +993,124 @@ def run_replay(
 
 # Tau candidates for grid search — mirrors validate_pipeline.py's sweep.
 TAU_CANDIDATES = [0.3, 0.4, 0.5]
+
+
+# ---------------------------------------------------------------------------
+# Live dashboard CSV writers  (written to /tmp/drl_agent/ = _watch_dir)
+# ---------------------------------------------------------------------------
+
+# Human-readable attack type names matching mcc_table_latest.csv reference
+_ATTACK_LABEL = {
+    "sp":  "Split Path",
+    "als": "Asym Link Spoofing",
+    "fs":  "Flow Stretching",
+    "igh": "Interleaved Jamming",
+}
+
+
+def _write_live_mcc_table(cycle_no: int) -> None:
+    """
+    Overwrites /tmp/drl_agent/mcc_table_latest.csv with current per-agent
+    TP/FP/FN/TN/MCC values at the operational tau. The file is always a
+    snapshot of the latest cycle — no history.
+
+    Columns: Attack Type, TP, FP, TN, FN, MCC
+    Rows: SP / ALS / FS / IGH + an All Attacks (Overall) row.
+    NEVER RAISES.
+    """
+    try:
+        from episode_eval import mcc_from_counts
+        if not _trust or not _gt_static:
+            return
+
+        final_gt  = _build_final_ground_truth()
+        per_agent = _classify_at_tau(final_gt, _tau_min)
+
+        rows = []
+        all_tp = all_fp = all_fn = all_tn = 0
+        for agent_name, (tp, fp, fn, tn) in per_agent.items():
+            mcc = mcc_from_counts(tp, fp, fn, tn)
+            rows.append({
+                "Attack Type": _ATTACK_LABEL.get(agent_name, agent_name.upper()),
+                "TP": tp, "FP": fp, "TN": tn, "FN": fn,
+                "MCC": round(mcc, 4),
+            })
+            all_tp += tp
+            all_fp  = fp   # shared honest pool — take once (not summed)
+            all_fn += fn
+            all_tn  = tn   # shared honest pool — take once
+
+        overall_mcc = mcc_from_counts(all_tp, all_fp, all_fn, all_tn)
+        rows.append({
+            "Attack Type": "All Attacks (Overall)",
+            "TP": all_tp, "FP": all_fp, "TN": all_tn, "FN": all_fn,
+            "MCC": round(overall_mcc, 4),
+        })
+
+        out_path = Path(_watch_dir) / "mcc_table_latest.csv"
+        with open(out_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["Attack Type", "TP", "FP", "TN", "FN", "MCC"])
+            writer.writeheader()
+            writer.writerows(rows)
+        logger.debug("[LIVE-CSV] mcc_table_latest.csv updated (cycle=%d)", cycle_no)
+    except Exception as exc:
+        logger.warning("[LIVE-CSV] mcc_table_latest.csv write failed (cycle=%d): %s", cycle_no, exc)
+
+
+def _write_live_trust_scores() -> None:
+    """
+    Overwrites /tmp/drl_agent/trust_scores_latest.csv with the current trust
+    score for every known node. Format matches the user's reference image:
+      node_id, health
+    Sorted by node_id. The file is always a full snapshot — no history.
+    NEVER RAISES.
+    """
+    try:
+        if not _trust:
+            return
+        out_path = Path(_watch_dir) / "trust_scores_latest.csv"
+        with open(out_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["node_id", "health"])
+            writer.writeheader()
+            for nid in sorted(_trust):
+                writer.writerow({"node_id": nid, "health": round(_trust[nid], 4)})
+        logger.debug("[LIVE-CSV] trust_scores_latest.csv updated (%d nodes)", len(_trust))
+    except Exception as exc:
+        logger.warning("[LIVE-CSV] trust_scores_latest.csv write failed: %s", exc)
+
+
+def _append_live_removed_nodes(cycle_no: int, newly_revoked: List[int]) -> None:
+    """
+    Appends rows to /tmp/drl_agent/removed_nodes.csv for each node revoked
+    THIS cycle. If no new revocations, nothing is written.
+    Columns: cycle_id, removed_at_timestamp, node_id
+    Header is written only once (first write).
+    NEVER RAISES.
+    """
+    global _live_removed_written
+    try:
+        if not newly_revoked:
+            return
+        ts  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        out_path = Path(_watch_dir) / "removed_nodes.csv"
+        write_header = not _live_removed_written or not out_path.exists()
+        with open(out_path, "a", newline="") as f:
+            writer = csv.DictWriter(
+                f, fieldnames=["cycle_id", "removed_at_timestamp", "node_id"]
+            )
+            if write_header:
+                writer.writeheader()
+            for nid in sorted(set(newly_revoked)):
+                writer.writerow({
+                    "cycle_id":             cycle_no,
+                    "removed_at_timestamp": ts,
+                    "node_id":              nid,
+                })
+        _live_removed_written = True
+        logger.debug("[LIVE-CSV] removed_nodes.csv: %d node(s) appended (cycle=%d)",
+                     len(newly_revoked), cycle_no)
+    except Exception as exc:
+        logger.warning("[LIVE-CSV] removed_nodes.csv write failed (cycle=%d): %s", cycle_no, exc)
 
 
 # CSV column order for cycle metrics file
