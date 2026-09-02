@@ -1031,9 +1031,10 @@ def _write_live_mcc_table(cycle_no: int) -> None:
         for agent_name, (tp, fp, fn, tn) in per_agent.items():
             mcc = mcc_from_counts(tp, fp, fn, tn)
             rows.append({
-                "Attack Type": _ATTACK_LABEL.get(agent_name, agent_name.upper()),
+                "Attack Type":    _ATTACK_LABEL.get(agent_name, agent_name.upper()),
                 "TP": tp, "FP": fp, "TN": tn, "FN": fn,
-                "MCC": round(mcc, 4),
+                "MCC":            round(mcc, 4),
+                "Avg TP Latency": 0.00,
             })
             all_tp += tp
             all_fp  = fp   # shared honest pool — take once (not summed)
@@ -1042,14 +1043,18 @@ def _write_live_mcc_table(cycle_no: int) -> None:
 
         overall_mcc = mcc_from_counts(all_tp, all_fp, all_fn, all_tn)
         rows.append({
-            "Attack Type": "All Attacks (Overall)",
+            "Attack Type":    "All Attacks (Overall)",
             "TP": all_tp, "FP": all_fp, "TN": all_tn, "FN": all_fn,
-            "MCC": round(overall_mcc, 4),
+            "MCC":            round(overall_mcc, 4),
+            "Avg TP Latency": 0.00,
         })
 
         out_path = Path(_watch_dir) / "mcc_table_latest.csv"
         with open(out_path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["Attack Type", "TP", "FP", "TN", "FN", "MCC"])
+            writer = csv.DictWriter(
+                f,
+                fieldnames=["Attack Type", "TP", "FP", "TN", "FN", "MCC", "Avg TP Latency"],
+            )
             writer.writeheader()
             writer.writerows(rows)
         logger.debug("[LIVE-CSV] mcc_table_latest.csv updated (cycle=%d)", cycle_no)
@@ -1068,7 +1073,7 @@ def _write_live_trust_scores() -> None:
     try:
         if not _trust:
             return
-        out_path = Path(_watch_dir) / "trust_scores_latest.csv"
+        out_path = Path(_watch_dir) / "health.csv"
         with open(out_path, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["node_id", "health"])
             writer.writeheader()
